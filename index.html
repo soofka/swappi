@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <title>swn.ski</title>
+    </head>
+    <body>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .hero {
+                position: relative;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .hero::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url(me.jpg);
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
+                filter: brightness(60%);
+            }
+            .hero-content {
+                position: relative; 
+                font-family: "Monserrat", sans-serif;
+                color: white;
+                text-align: center;
+                margin: 0.625rem;
+            }
+            .hero-title {
+                font-size: 3rem;
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+            .hero-subtitle {
+                position: relative;
+                font-size: 2rem;
+                font-weight: 200;
+                margin-top: 1rem;
+                display: flex;
+                justify-content: space-between;
+                overflow: hidden;
+            }
+            .hero-subtitle .animated-text-container {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                position: relative;
+            }
+            .hero-subtitle .animated-text-container li {
+                opacity: 0;
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+            .hero-subtitle .animated-text-container li:nth-of-type(1) {
+                animation: slideIn 12s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
+            }
+            .hero-subtitle .animated-text-container li:nth-of-type(2) {
+                animation: slideIn 12s 4s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
+            }
+            .hero-subtitle .animated-text-container li:nth-of-type(3) {
+                animation: slideIn 12s 8s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
+            }
+            @keyframes slideIn {
+                0% {
+                    transform: translate3d(50%, 0, 0);
+                    opacity: 0;
+                }
+                6.66% {
+                    transform: translate3d(0, 0, 0);
+                    opacity: 1;
+                }
+                26.66% {
+                    transform: translate3d(0, 0, 0);
+                    opacity: 1;
+                }
+                33.30% {
+                    transform: translate3d(-50%, 0, 0);
+                    opacity: 0;
+                }
+                33.33% {
+                    transform: translate3d(50%, 0, 0);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translate3d(50%, 0, 0);
+                    opacity: 0;
+                }
+            }
+        </style>
+        <header></header>
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        jakub sowinski
+                    </h1>
+                    <h2 class="hero-subtitle">
+                        <span>software</span>
+                        <ul class="animated-text-container">
+                            <li>developer</li>
+                            <li>architect</li>
+                            <li>teacher</li>
+                        </ul>
+                    </h2>
+                </div>
+            </section>
+        </main>
+        <footer></footer>
+    </body>
+</html>
