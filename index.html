@@ -4,19 +4,65 @@
     </head>
     <body>
         <style>
-            body {
+            :root {
+                --grid: 8px;
+                --page-min-size: 320px;
+                --page-max-size: 960px;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            html {
+                scroll-snap-type: y mandatory;
+            }
+            html, body {
                 margin: 0;
                 padding: 0;
+                font-family: "Monserrat", sans-serif;
+                font-size: 2vh;
+                line-height: 1.618;
+                color: #ffe;
             }
-            .hero {
-                position: relative;
+            h1 {
+                font-size: 4rem;
+                margin: 0 0 2rem 0;
+                padding: 0;
+            }
+            h2 {
+                font-size: 2.47rem;
+                margin: 0 0 2rem 0;
+                padding: 0;
+            }
+            h3 {
+                font-size: 1.53rem;
+                margin: 0 0 2rem 0;
+                padding: 0;
+            }
+            p {
+                font-size: 1rem;
+                margin: 0 0 2rem 0;
+                padding: 0;
+            }
+            section {
+                display: flex;
                 width: 100vw;
                 height: 100vh;
-                display: flex;
+                scroll-snap-align: start;
+            }
+            .wrapper {
+                width: 100%;
+                max-width: var(--page-max-size);
+                margin: 0 auto;
+            }
+            .box {
+                padding: var(--grid);
+            }
+            #hero {
+                background: #333;
                 justify-content: center;
                 align-items: center;
             }
-            .hero::before {
+            #hero::before {
                 content: "";
                 position: absolute;
                 top: 0;
@@ -29,46 +75,39 @@
                 background-position: center center;
                 filter: brightness(60%);
             }
-            .hero-content {
-                position: relative; 
-                font-family: "Monserrat", sans-serif;
-                color: white;
+            #hero .box {
                 text-align: center;
-                margin: 0.625rem;
             }
-            .hero-title {
-                font-size: 3rem;
-                font-weight: 600;
+            #hero h1 {
+                position: relative;
                 margin-bottom: 0;
             }
-            .hero-subtitle {
+            #hero h2 {
                 position: relative;
-                font-size: 2rem;
-                font-weight: 200;
-                margin-top: 1rem;
                 display: flex;
                 justify-content: space-between;
+                margin-top: var(--grid);
                 overflow: hidden;
             }
-            .hero-subtitle .animated-text-container {
+            #hero h2 .animated-text-container {
                 margin: 0;
                 padding: 0;
                 list-style: none;
                 position: relative;
             }
-            .hero-subtitle .animated-text-container li {
+            #hero h2 .animated-text-container li {
                 opacity: 0;
                 position: absolute;
                 top: 0;
                 right: 0;
             }
-            .hero-subtitle .animated-text-container li:nth-of-type(1) {
+            #hero h2 .animated-text-container li:nth-of-type(1) {
                 animation: slideIn 12s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
             }
-            .hero-subtitle .animated-text-container li:nth-of-type(2) {
+            #hero h2 .animated-text-container li:nth-of-type(2) {
                 animation: slideIn 12s 4s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
             }
-            .hero-subtitle .animated-text-container li:nth-of-type(3) {
+            #hero h2 .animated-text-container li:nth-of-type(3) {
                 animation: slideIn 12s 8s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
             }
             @keyframes slideIn {
@@ -97,11 +136,27 @@
                     opacity: 0;
                 }
             }
+            #about {
+                background: #333;
+                flex-flow: row nowrap;
+                overflow-x: scroll;
+                scroll-snap-type: x mandatory;
+            }
+
+            #about .item {
+                min-width: 100vw;
+                height: 100vh;
+                scroll-snap-align: start;
+                position: relative;
+            }
+            #contact {
+                background: #000435;
+            }
         </style>
         <header></header>
         <main>
-            <section class="hero">
-                <div class="hero-content">
+            <section id="hero">
+                <div class="box">
                     <h1 class="hero-title">
                         jakub sowinski
                     </h1>
@@ -113,6 +168,49 @@
                             <li>teacher</li>
                         </ul>
                     </h2>
+                </div>
+            </section>
+            <section id="about">
+                    <div class="item">
+                        <div class="wrapper box">
+                            <h1>Hello!</h1>
+                            <h3>My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.</h3>
+                            <h3>I can help you, your developers, development teams, and your software itself become better.</h3>
+                            <h3>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</h3>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="wrapper box">
+                            <h1>Developer</h1>
+                            <h3>I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.</h3>
+                            <h3>Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.</h3>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="wrapper box">
+                            <h1>Architect</h1>
+                            <h3>I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.</h3>
+                            <h3>Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.</h3>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="wrapper box">
+                            <h1>Teacher</h1>
+                            <h3>I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for "Software Architecture" classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.</h3>
+                            <h3>Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.</h3>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="wrapper box">
+                            <h1>Human being</h1>
+                            <h3>I love music, so check out my last.fm profile!</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="contact">
+                <div class="wrapper box">
+                    <h1>Contact me</h1>
                 </div>
             </section>
         </main>
