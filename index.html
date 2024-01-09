@@ -43,11 +43,29 @@
                 margin: 0 0 2rem 0;
                 padding: 0;
             }
+            .monospace {
+                font-family: "Monospace", monospace;
+            }
             section {
                 display: flex;
                 width: 100vw;
                 height: 100vh;
                 scroll-snap-align: start;
+            }
+            section.hero::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
+                filter: brightness(60%);
+            }
+            section.hero > * {
+                position: relative;
             }
             .wrapper {
                 width: 100%;
@@ -57,39 +75,23 @@
             .box {
                 padding: var(--grid);
             }
-            #hero {
+            #intro {
                 background: #333;
                 justify-content: center;
                 align-items: center;
             }
-            #hero::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
+            #intro::before {
                 background: url(me.jpg);
-                background-repeat: no-repeat;
-                background-size: cover;
-                background-position: center center;
-                filter: brightness(60%);
             }
-            #hero > * {
-                position: relative;
-            }
-            #hero h2 {
-                font-family: "Monospace", monospace;
-            }
-            #hero .blinker {
+            /* #intro .blinker {
                 animation: blink-animation 1s steps(5, start) infinite;
             }
             @keyframes blink-animation {
                 to {
                     visibility: hidden;
                 }
-            }
-            #hero .box {
+            } */
+            #intro .box {
                 text-align: center;
             }
             /* #hero h2 {
@@ -152,7 +154,6 @@
                 overflow-x: scroll;
                 scroll-snap-type: x mandatory;
             }
-
             #about .item {
                 min-width: 100vw;
                 height: 100vh;
@@ -165,10 +166,10 @@
         </style>
         <header></header>
         <main>
-            <section id="hero">
+            <section id="intro" class="hero">
                 <div class="box">
                     <h1>jakub sowinski</h1>
-                    <h2>> software<span class="text"></span><span class="blinker">_</span></h2>
+                    <h2 class="monospace">> software <span class="text"></span><span class="blinker">_</span></h2>
                     <!-- <h2 class="hero-subtitle">
                         <span>software</span>
                         <ul class="animated-text-container">
@@ -225,50 +226,82 @@
         </main>
         <footer></footer>
         <script>
-            const textContainer = document.querySelector('#hero h2 .text');
-            const texts = [' developer', ' architect', ' teacher'];
+            const initIntroTextSwitcher = () => {
+                const textContainer = document.querySelector('#intro h2 .text');
+                const blinker = document.querySelector('#intro h2 .blinker');
+                const texts = ['developer', 'architect', 'teacher'];
 
-            const forwardTimeoutRange = [100, 300];
-            const backwardTimeoutRange = [20, 80];
-            const fullWordTimeoutRange = [1000, 2000];
-            const noWordTimeoutRange = [500, 1000];
-            
-            let timeout = 0;
-            let currentTextId = 0;
-            let currentLetterId = 0;
-            let typeForward = true;
+                const forwardTimeoutRange = [150, 300];
+                const backwardTimeoutRange = [30, 60];
+                const blinkInterval = 500;
+                const fullWordBlinkCount = 6;
+                const noWordBlinkCount = 2;
+                
+                let timeout = 0;
+                let currentTextId = 0;
+                let currentLetterId = 0;
+                let currentBlinkCount = 0;
+                let mode = 0; // 0 - forward, 1 - blink when typed, 2 - backward, 3 - blink when empty
 
-            const type = () => {
-                if (typeForward) {
-                    currentLetterId++;
-                    if (currentLetterId > texts[currentTextId].length) {
-                        typeForward = false;
-                        timeout = getTimeout(fullWordTimeoutRange);
-                    } else {
-                        timeout = getTimeout(forwardTimeoutRange);
+                const type = () => {
+                    textContainer.innerText = texts[currentTextId].substr(0, currentLetterId);
+
+                    switch (mode) {
+                        case 0:
+                            currentLetterId++;
+                            timeout = getTimeout(forwardTimeoutRange);
+                            if (currentLetterId > texts[currentTextId].length) {
+                                mode = 1;
+                            }
+                            break;
+
+                        case 1:
+                            blink();
+                            currentBlinkCount++;
+                            timeout = blinkInterval;
+                            if (currentBlinkCount >= fullWordBlinkCount) {
+                                currentBlinkCount = 0;
+                                mode = 2;
+                            }
+                            break;
+
+                        case 2:
+                            currentLetterId--;
+                            timeout = getTimeout(backwardTimeoutRange);
+                            if (currentLetterId === 0) {
+                                mode = 3;
+                                currentTextId++;
+                                if (currentTextId >= texts.length) {
+                                    currentTextId = 0;
+                                }
+                            }
+                            break;
+
+                        case 3:
+                            blink();
+                            currentBlinkCount++;
+                            timeout = blinkInterval;
+                            if (currentBlinkCount >= noWordBlinkCount) {
+                                currentBlinkCount = 0;
+                                mode = 0;
+                            }
+                            break;
+
+                        default:
+                            break;
                     }
-                } else {
-                    currentLetterId--;
-                    if (currentLetterId === 0) {
-                        typeForward = true;
-                        timeout = getTimeout(noWordTimeoutRange);
-                        currentTextId++;
-                        if (currentTextId >= texts.length) {
-                            currentTextId = 0;
-                        }
-                    } else {
-                        timeout = getTimeout(backwardTimeoutRange);
-                    }
+
+                    setTimeout(type, timeout);
                 }
 
-                textContainer.innerText = texts[currentTextId].substr(0, currentLetterId);
+                const getTimeout = (range) => Math.random() * (range[1] - range[0]) + range[0];
+                const blink = () => blinker.style.visibility === 'hidden' ? blinker.style.visibility = '' : blinker.style.visibility = 'hidden';
 
-                setTimeout(() => type(), timeout);
+                type();
             }
 
-            const getTimeout = (range) => Math.random() * (range[1] - range[0]) + range[0];
-
-            type();
+            
+            initIntroTextSwitcher();
         </script>
     </body>
 </html>
