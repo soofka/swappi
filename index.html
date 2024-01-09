@@ -75,21 +75,31 @@
                 background-position: center center;
                 filter: brightness(60%);
             }
+            #hero > * {
+                position: relative;
+            }
+            #hero h2 {
+                font-family: "Monospace", monospace;
+            }
+            #hero .blinker {
+                animation: blink-animation 1s steps(5, start) infinite;
+            }
+            @keyframes blink-animation {
+                to {
+                    visibility: hidden;
+                }
+            }
             #hero .box {
                 text-align: center;
             }
-            #hero h1 {
-                position: relative;
-                margin-bottom: 0;
-            }
-            #hero h2 {
+            /* #hero h2 {
                 position: relative;
                 display: flex;
                 justify-content: space-between;
                 margin-top: var(--grid);
                 overflow: hidden;
-            }
-            #hero h2 .animated-text-container {
+            } */
+            /* #hero h2 .animated-text-container {
                 margin: 0;
                 padding: 0;
                 list-style: none;
@@ -135,7 +145,7 @@
                     transform: translate3d(50%, 0, 0);
                     opacity: 0;
                 }
-            }
+            } */
             #about {
                 background: #333;
                 flex-flow: row nowrap;
@@ -157,17 +167,16 @@
         <main>
             <section id="hero">
                 <div class="box">
-                    <h1 class="hero-title">
-                        jakub sowinski
-                    </h1>
-                    <h2 class="hero-subtitle">
+                    <h1>jakub sowinski</h1>
+                    <h2>> software<span class="text"></span><span class="blinker">_</span></h2>
+                    <!-- <h2 class="hero-subtitle">
                         <span>software</span>
                         <ul class="animated-text-container">
                             <li>developer</li>
                             <li>architect</li>
                             <li>teacher</li>
                         </ul>
-                    </h2>
+                    </h2> -->
                 </div>
             </section>
             <section id="about">
@@ -215,5 +224,51 @@
             </section>
         </main>
         <footer></footer>
+        <script>
+            const textContainer = document.querySelector('#hero h2 .text');
+            const texts = [' developer', ' architect', ' teacher'];
+
+            const forwardTimeoutRange = [100, 300];
+            const backwardTimeoutRange = [20, 80];
+            const fullWordTimeoutRange = [1000, 2000];
+            const noWordTimeoutRange = [500, 1000];
+            
+            let timeout = 0;
+            let currentTextId = 0;
+            let currentLetterId = 0;
+            let typeForward = true;
+
+            const type = () => {
+                if (typeForward) {
+                    currentLetterId++;
+                    if (currentLetterId > texts[currentTextId].length) {
+                        typeForward = false;
+                        timeout = getTimeout(fullWordTimeoutRange);
+                    } else {
+                        timeout = getTimeout(forwardTimeoutRange);
+                    }
+                } else {
+                    currentLetterId--;
+                    if (currentLetterId === 0) {
+                        typeForward = true;
+                        timeout = getTimeout(noWordTimeoutRange);
+                        currentTextId++;
+                        if (currentTextId >= texts.length) {
+                            currentTextId = 0;
+                        }
+                    } else {
+                        timeout = getTimeout(backwardTimeoutRange);
+                    }
+                }
+
+                textContainer.innerText = texts[currentTextId].substr(0, currentLetterId);
+
+                setTimeout(() => type(), timeout);
+            }
+
+            const getTimeout = (range) => Math.random() * (range[1] - range[0]) + range[0];
+
+            type();
+        </script>
     </body>
 </html>
