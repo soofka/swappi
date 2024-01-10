@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <meta name="supported-color-schemes" content="light dark">
-        <meta name="color-scheme" content="dark light">
+        <meta name="color-scheme" content="light dark">
         <meta name="theme-color" content="">
 
         <!-- <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)">
@@ -27,12 +27,12 @@
             <div class="wrapper box">
                 <nav>
                     <ul>
-                        <li><p><a href="#" data-t="navigation.home">Home</a></p></li>
-                        <li><p><a href="#about">About</a></p></li>
-                        <li><p><a href="#contact">Contact</a></p></li>
+                        <li><p><a href="#" data-t="navigation.home"></a></p></li>
+                        <li><p><a href="#about" data-t="navigation.about"></a></p></li>
+                        <li><p><a href="#contact" data-t="navigation.contact"></a></p></li>
                     </ul>
                     <ul>
-                        <li><p><a id="language-toggle">a</a></p></li>
+                        <li><p><a id="lang-toggle"></a></p></li>
                         <li><p><a id="theme-toggle"></a></p></li>
                     </ul>
                 </nav>
@@ -48,44 +48,44 @@
             <section id="about">
                     <div class="item">
                         <div class="wrapper box">
-                            <h1>Hello!</h1>
-                            <h3>My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.</h3>
-                            <p>I can help you, your developers, development teams, and your software itself become better.</p>
-                            <p>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</p>
+                            <h1 data-t="about.intro.head"></h1>
+                            <h3 data-t="about.intro.lead"></h3>
+                            <div data-t="about.intro.text"></div>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
-                            <h1>Developer</h1>
-                            <h3>I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.</h3>
-                            <p>Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.</p>
+                            <h1 data-t="about.developer.head"></h1>
+                            <h3 data-t="about.developer.lead"></h3>
+                            <div data-t="about.developer.text"></div>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
-                            <h1>Architect</h1>
-                            <h3>I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.</h3>
-                            <p>Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.</p>
+                            <h1 data-t="about.architect.head"></h1>
+                            <h3 data-t="about.architect.lead"></h3>
+                            <div data-t="about.architect.text"></div>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
-                            <h1>Teacher</h1>
-                            <h3>I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for "Software Architecture" classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.</h3>
-                            <p>Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.</p>
+                            <h1 data-t="about.teacher.head"></h1>
+                            <h3 data-t="about.teacher.lead"></h3>
+                            <div data-t="about.teacher.text"></div>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
-                            <h1>Human being</h1>
-                            <p>I love music, so check out my last.fm profile!</p>
+                            <h1 data-t="about.person.head"></h1>
+                            <h3 data-t="about.person.lead"></h3>
+                            <div data-t="about.person.text"></div>
                         </div>
                     </div>
                 </div>
             </section>
             <section id="contact">
                 <div class="wrapper box">
-                    <h1>Contact me</h1>
+                    <h1 data-t="contact.head"></h1>
                 </div>
             </section>
         </main>

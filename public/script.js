@@ -1,66 +1,61 @@
 let lang = 'en';
 let theme = 'light';
+let labels = {};
 
-const initTranslations = async () => {
-    // const translations = (await fetch(`${lang}.json`)).json();
-    // console.log('translations', translations);
-    const translations = {
-        "navigation": {
-            "home": "home",
-            "about": "about",
-            "contact": "contact"
-        },
-        "about": {
-            "intro": {
-                "head": "Hello!",
-                "lead": "My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.",
-                "text": [
-                    "<p>I can help you, your developers, development teams, and your software itself become better.</p>",
-                    "<p>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</p>"
-                ]
-            },
-            "developer": {
-                "head": "Developer",
-                "lead": "I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.",
-                "text": "Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub."
-            },
-            "architect": {
-                "head": "Architect",
-                "lead": "I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.",
-                "text": "Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture."
-            },
-            "teacher": {
-                "head": "Teacher",
-                "lead": "I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for \"Software Architecture\" classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.",
-                "text": "Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences."
-            },
-            "person": {
-                "head": "Person",
-                "lead": "I am human being.",
-                "text": "I love music, so check out my last.fm profile!"
-            }
-        }
-    };
+const initLabels = async () => {
+    if (localStorage.getItem('lang')) {
+        lang = localStorage.getItem('lang');
+    } else if (navigator.language && navigator.language.substring(0,2) === 'pl') {
+        lang = 'pl';
+    }
+
+    setLabels();
+
+    window.addEventListener('languagechange', () => {
+        const shortLang = navigator.language.substring(0,2);
+        lang = shortLang === 'en' ? 'en' : (shortLang === 'pl' ? 'pl' : 'en');
+        setLabels();
+    });
+
+    document.querySelector('#lang-toggle').addEventListener('click', () => {
+        lang = lang === 'en' ? 'pl' : 'en';
+        setLabels();
+    });
+}
+
+const setLabels = async () => {
+    if (!labels.hasOwnProperty(lang)) {
+        labels[lang] = await (await fetch(`${lang}.json`)).json();
+    }
+
+    console.log(labels);
 
     document.querySelectorAll('[data-t]').forEach((element) => {
-        let tempTranslation = translations;
+        let tempLabel = labels[lang];
         let value = element.dataset.t;
         const keys = value.split('.');
 
         for (let i = 0; i < keys.length; i++) {
-            if (tempTranslation.hasOwnProperty(keys[i])) {
-                tempTranslation = tempTranslation[keys[i]];
+            if (tempLabel.hasOwnProperty(keys[i])) {
+                tempLabel = tempLabel[keys[i]];
 
                 if (i === keys.length - 1) {
-                    value = tempTranslation;
+                    value = tempLabel;
                 }
             } else {
                 break;
             }
         }
 
+        if (Array.isArray(value)) {
+            value = value.join('');
+        }
+
         element.innerHTML = value;
     });
+
+    localStorage.setItem('lang', lang);
+    document.querySelector('#lang-toggle').innerText = lang === 'en' ? 'pl' : 'en';
 }
 
 const initTheme = () => {
@@ -78,6 +73,7 @@ const initTheme = () => {
         theme = e.matches ? 'dark' : 'light';
         setTheme();
     });
+
     document.querySelector('#theme-toggle').addEventListener('click', () => {
         theme = theme === 'dark' ? 'light' : 'dark';
         setTheme();
@@ -87,8 +83,6 @@ const initTheme = () => {
 }
 
 const setTheme = () => {
-    localStorage.setItem('theme', theme);
-
     const styleLink = document.querySelector('link[id="theme"]');
     styleLink.href = styleLink.attributes[`data-href-${theme}`].value;
 
@@ -101,6 +95,7 @@ const setTheme = () => {
     // const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     // themeColorMeta.content = theme === 'dark' ? '#000' : '#fff';
 
+    localStorage.setItem('theme', theme);
     document.querySelector('#theme-toggle').innerText = theme === 'dark' ? 'light' : 'dark';
 }
 
@@ -178,6 +173,6 @@ const initIntroTextSwitcher = () => {
     type();
 }
 
-initTranslations();
+initLabels();
 initTheme();
 initIntroTextSwitcher();
