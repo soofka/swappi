@@ -1,0 +1,14 @@
+{
+  "name": "swn.ski",
+  "version": "0.1.0",
+  "description": "swn.ski",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "swn.ski",
+  "license": "MIT",
+  "devDependencies": {
+    "express": "^4.18.2"
+  }
+}

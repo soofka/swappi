@@ -1,0 +1,9 @@
+{
+    "short_name": "swn.ski",
+    "name": "swn.ski",
+    "start_url": "/",
+    "background_color": "#000",
+    "theme_color": "#000",
+    "display": "standalone"
+  }
+  
