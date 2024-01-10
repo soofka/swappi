@@ -1,105 +1,157 @@
-let lang = 'en';
-let theme = 'light';
-let labels = {};
+const app = {
+    
+    lang: 'en',
+    theme: 'light',
+    labels: {},
+    elements: {},
 
-const initLabels = async () => {
-    if (localStorage.getItem('lang')) {
-        lang = localStorage.getItem('lang');
-    } else if (navigator.language && navigator.language.substring(0,2) === 'pl') {
-        lang = 'pl';
-    }
+    init: function() {
+        this.initLang();
+        this.initTheme();
+        initIntroTextSwitcher();
+    },
+    
+    initLang: function() {
+        let lang = navigator.language.substring(0,2);
 
-    setLabels();
+        if (localStorage.getItem('lang')) {
+            lang = localStorage.getItem('lang');
+        }
 
-    window.addEventListener('languagechange', () => {
-        const shortLang = navigator.language.substring(0,2);
-        lang = shortLang === 'en' ? 'en' : (shortLang === 'pl' ? 'pl' : 'en');
-        setLabels();
-    });
+        this.setLang(lang);
+    
+        window.addEventListener('languagechange', () => {
+            this.setLang(navigator.language.substring(0,2));
+        });
+    
+        document.querySelector('#lang-toggle').addEventListener('click', () => {
+            this.setLang(this.lang === 'en' ? 'pl' : 'en');
+        });
+    },
 
-    document.querySelector('#lang-toggle').addEventListener('click', () => {
-        lang = lang === 'en' ? 'pl' : 'en';
-        setLabels();
-    });
-}
+    setLang: function(lang) {
+        if ((lang === 'en' || lang === 'pl') && lang !== this.lang) {
+            this.lang = lang;
+            localStorage.setItem('lang', lang);
+            this.getElement('lang-toggle', '#lang-toggle').innerText = lang === 'en' ? 'pl' : 'en';
+            this.setLabels();
+        }
+    },
 
-const setLabels = async () => {
-    if (!labels.hasOwnProperty(lang)) {
-        labels[lang] = await (await fetch(`${lang}.json`)).json();
-    }
-
-    console.log(labels);
-
-    document.querySelectorAll('[data-t]').forEach((element) => {
-        let tempLabel = labels[lang];
-        let value = element.dataset.t;
-        const keys = value.split('.');
-
-        for (let i = 0; i < keys.length; i++) {
-            if (tempLabel.hasOwnProperty(keys[i])) {
-                tempLabel = tempLabel[keys[i]];
-
-                if (i === keys.length - 1) {
-                    value = tempLabel;
+    setLabels: async function() {
+        if (!this.labels.hasOwnProperty(this.lang)) {
+            this.labels[this.lang] = await (await fetch(`${this.lang}.json`)).json();
+        }
+    
+        this.getElements('labels', '[data-t]').forEach((element) => {
+            let tempLabel = this.labels[this.lang];
+            let value = element.dataset.t;
+            const keys = value.split('.');
+    
+            for (let i = 0; i < keys.length; i++) {
+                if (tempLabel.hasOwnProperty(keys[i])) {
+                    tempLabel = tempLabel[keys[i]];
+    
+                    if (i === keys.length - 1) {
+                        value = tempLabel;
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
+    
+            if (Array.isArray(value)) {
+                value = value.join('');
+            }
+    
+            element.innerHTML = value;
+        });
+    },
+
+    initTheme: function() {
+        let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    
+        if (localStorage.getItem('theme')) {
+            theme = localStorage.getItem('theme');
         }
+    
+        this.setTheme(theme);
+    
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            this.setTheme(e.matches ? 'dark' : 'light');
+        });
+    
+        document.querySelector('#theme-toggle').addEventListener('click', () => {
+            this.setTheme(this.theme === 'light' ? 'dark' : 'light');
+        });
+    },
 
-        if (Array.isArray(value)) {
-            value = value.join('');
+    setTheme: function(theme) {
+        if (theme === 'light' || theme === 'dark') {
+            this.theme = theme;
+            localStorage.setItem('theme', theme);
+            this.getElement('theme-toggle', '#theme-toggle').innerText = theme === 'light' ? 'dark' : 'light';
+            this.setStyle();
         }
+    },
 
-        element.innerHTML = value;
-    });
+    setStyle: function() {
+        const styleLink = document.querySelector('link[id="theme"]');
+        styleLink.href = styleLink.attributes[`data-href-${this.theme}`].value;
+    
+        // const manifestLink = document.querySelector('link[rel="manifest"]');
+        // manifestLink.href = manifestLink.attributes[`data-href-${theme}`].value;
+    
+        // const faviconLink = document.querySelectorAll('link[rel="icon"]');
+        // faviconLink.href = faviconLink.attributes[`data-href-${theme}`].value;
+    
+        // const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        // themeColorMeta.content = theme === 'dark' ? '#000' : '#fff';
+    },
 
-    localStorage.setItem('lang', lang);
-    document.querySelector('#lang-toggle').innerText = lang === 'en' ? 'pl' : 'en';
-}
+    getElement: function(name, selector) {
+        return this.getElements(name, selector)[0];
+    },
 
-const initTheme = () => {
-    document.documentElement.style.display = 'none';
+    getElements: function(name, selector) {
+        if (!Object.hasOwnProperty(this.elements, name)) {
+            this.elements[name] = document.querySelectorAll(selector);
+        }
+        return this.elements[name];
+    },
 
-    if (localStorage.getItem('theme')) {
-        theme = localStorage.getItem('theme');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        theme = 'dark';
-    }
+};
 
-    setTheme();
+app.init();
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        theme = e.matches ? 'dark' : 'light';
-        setTheme();
-    });
+// let lang = 'en';
+// let theme = 'light';
+// let labels = {};
 
-    document.querySelector('#theme-toggle').addEventListener('click', () => {
-        theme = theme === 'dark' ? 'light' : 'dark';
-        setTheme();
-    });
+// const setLabels = async () => {
+// }
 
-    document.documentElement.style.display = '';
-}
+// const initTheme = () => {
+// }
 
-const setTheme = () => {
-    const styleLink = document.querySelector('link[id="theme"]');
-    styleLink.href = styleLink.attributes[`data-href-${theme}`].value;
+// const setTheme = () => {
+//     const styleLink = document.querySelector('link[id="theme"]');
+//     styleLink.href = styleLink.attributes[`data-href-${theme}`].value;
 
-    // const manifestLink = document.querySelector('link[rel="manifest"]');
-    // manifestLink.href = manifestLink.attributes[`data-href-${theme}`].value;
+//     // const manifestLink = document.querySelector('link[rel="manifest"]');
+//     // manifestLink.href = manifestLink.attributes[`data-href-${theme}`].value;
 
-    // const faviconLink = document.querySelectorAll('link[rel="icon"]');
-    // faviconLink.href = faviconLink.attributes[`data-href-${theme}`].value;
+//     // const faviconLink = document.querySelectorAll('link[rel="icon"]');
+//     // faviconLink.href = faviconLink.attributes[`data-href-${theme}`].value;
 
-    // const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    // themeColorMeta.content = theme === 'dark' ? '#000' : '#fff';
+//     // const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+//     // themeColorMeta.content = theme === 'dark' ? '#000' : '#fff';
 
-    localStorage.setItem('theme', theme);
-    document.querySelector('#theme-toggle').innerText = theme === 'dark' ? 'light' : 'dark';
-}
+//     localStorage.setItem('theme', theme);
+//     document.querySelector('#theme-toggle').innerText = theme === 'dark' ? 'light' : 'dark';
+// }
 
-const initIntroTextSwitcher = () => {
+function initIntroTextSwitcher() {
     const textContainer = document.querySelector('#intro h3 .text');
     const blinker = document.querySelector('#intro h3 .blinker');
     const texts = ['developer', 'architect', 'teacher'];
@@ -172,7 +224,3 @@ const initIntroTextSwitcher = () => {
 
     type();
 }
-
-initLabels();
-initTheme();
-initIntroTextSwitcher();
