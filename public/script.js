@@ -18,7 +18,7 @@ const app = {
             lang = localStorage.getItem('lang');
         }
 
-        this.setLang(lang);
+        this.setLang(lang, true);
     
         window.addEventListener('languagechange', () => {
             this.setLang(navigator.language.substring(0,2));
@@ -29,8 +29,8 @@ const app = {
         });
     },
 
-    setLang: function(lang) {
-        if ((lang === 'en' || lang === 'pl') && lang !== this.lang) {
+    setLang: function(lang, force = false) {
+        if ((lang === 'en' || lang === 'pl') && (lang !== this.lang || force)) {
             this.lang = lang;
             localStorage.setItem('lang', lang);
             this.getElement('lang-toggle', '#lang-toggle').innerText = lang === 'en' ? 'pl' : 'en';
@@ -75,7 +75,7 @@ const app = {
             theme = localStorage.getItem('theme');
         }
     
-        this.setTheme(theme);
+        this.setTheme(theme, true);
     
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             this.setTheme(e.matches ? 'dark' : 'light');
@@ -86,8 +86,8 @@ const app = {
         });
     },
 
-    setTheme: function(theme) {
-        if (theme === 'light' || theme === 'dark') {
+    setTheme: function(theme, force = false) {
+        if ((theme === 'light' || theme === 'dark') && (theme !== this.theme || force)) {
             this.theme = theme;
             localStorage.setItem('theme', theme);
             this.getElement('theme-toggle', '#theme-toggle').innerText = theme === 'light' ? 'dark' : 'light';
