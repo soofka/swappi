@@ -1,183 +1,48 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>swn.ski</title>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">    
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="supported-color-schemes" content="light dark">
+        <meta name="color-scheme" content="dark light">
+        <meta name="theme-color" content="">
+
+        <!-- <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)">
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)"> -->
+
+        <!-- <link rel="stylesheet" href="light.css" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)" />
+        <link rel="stylesheet" href="dark.css" media="(prefers-color-scheme: dark)" /> -->
+        <link rel="manifest" href="" data-href-light="manifest-light.webmanifest" data-href-dark="manifest-dark.webmanifest" />
+        <link rel="stylesheet" id="theme" href="" data-href-light="light.css" data-href-dark="dark.css" />
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <style>
-            :root {
-                --grid: 8px;
-                --page-min-size: 320px;
-                --page-max-size: 960px;
-            }
-            * {
-                box-sizing: border-box;
-            }
-            html {
-                scroll-snap-type: y mandatory;
-            }
-            html, body {
-                margin: 0;
-                padding: 0;
-                font-family: "Monserrat", sans-serif;
-                font-size: 2vh;
-                line-height: 1.618;
-                color: #ffe;
-            }
-            h1 {
-                font-size: 4rem;
-                margin: 0 0 2rem 0;
-                padding: 0;
-            }
-            h2 {
-                font-size: 2.47rem;
-                margin: 0 0 2rem 0;
-                padding: 0;
-            }
-            h3 {
-                font-size: 1.53rem;
-                margin: 0 0 2rem 0;
-                padding: 0;
-            }
-            p {
-                font-size: 1rem;
-                margin: 0 0 2rem 0;
-                padding: 0;
-            }
-            .monospace {
-                font-family: "Monospace", monospace;
-            }
-            section {
-                display: flex;
-                width: 100vw;
-                height: 100vh;
-                scroll-snap-align: start;
-            }
-            section.hero::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-repeat: no-repeat;
-                background-size: cover;
-                background-position: center center;
-                filter: brightness(60%);
-            }
-            section.hero > * {
-                position: relative;
-            }
-            .wrapper {
-                width: 100%;
-                max-width: var(--page-max-size);
-                margin: 0 auto;
-            }
-            .box {
-                padding: var(--grid);
-            }
-            #intro {
-                background: #333;
-                justify-content: center;
-                align-items: center;
-            }
-            #intro::before {
-                background-image: url(me.jpg);
-            }
-            /* #intro .blinker {
-                animation: blink-animation 1s steps(5, start) infinite;
-            }
-            @keyframes blink-animation {
-                to {
-                    visibility: hidden;
-                }
-            } */
-            #intro .box {
-                text-align: center;
-            }
-            /* #hero h2 {
-                position: relative;
-                display: flex;
-                justify-content: space-between;
-                margin-top: var(--grid);
-                overflow: hidden;
-            } */
-            /* #hero h2 .animated-text-container {
-                margin: 0;
-                padding: 0;
-                list-style: none;
-                position: relative;
-            }
-            #hero h2 .animated-text-container li {
-                opacity: 0;
-                position: absolute;
-                top: 0;
-                right: 0;
-            }
-            #hero h2 .animated-text-container li:nth-of-type(1) {
-                animation: slideIn 12s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
-            }
-            #hero h2 .animated-text-container li:nth-of-type(2) {
-                animation: slideIn 12s 4s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
-            }
-            #hero h2 .animated-text-container li:nth-of-type(3) {
-                animation: slideIn 12s 8s forwards cubic-bezier(0.1, 0.67, 0.29, 0.98) infinite;
-            }
-            @keyframes slideIn {
-                0% {
-                    transform: translate3d(50%, 0, 0);
-                    opacity: 0;
-                }
-                6.66% {
-                    transform: translate3d(0, 0, 0);
-                    opacity: 1;
-                }
-                26.66% {
-                    transform: translate3d(0, 0, 0);
-                    opacity: 1;
-                }
-                33.30% {
-                    transform: translate3d(-50%, 0, 0);
-                    opacity: 0;
-                }
-                33.33% {
-                    transform: translate3d(50%, 0, 0);
-                    opacity: 0;
-                }
-                100% {
-                    transform: translate3d(50%, 0, 0);
-                    opacity: 0;
-                }
-            } */
-            #about {
-                background: #333;
-                flex-flow: row nowrap;
-                overflow-x: scroll;
-                scroll-snap-type: x mandatory;
-            }
-            #about .item {
-                min-width: 100vw;
-                height: 100vh;
-                scroll-snap-align: start;
-                position: relative;
-            }
-            #contact {
-                background: #000435;
-            }
         </style>
-        <header></header>
+        <header>
+            <div class="wrapper box">
+                <nav>
+                    <ul>
+                        <li><p><a href="#">Home</a></p></li>
+                        <li><p><a href="#about">About</a></p></li>
+                        <li><p><a href="#contact">Contact</a></p></li>
+                    </ul>
+                    <ul>
+                        <li><p><a id="language-toggle">a</a></p></li>
+                        <li><p><a id="theme-toggle"></a></p></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
         <main>
             <section id="intro" class="hero">
                 <div class="box">
-                    <h1>jakub sowinski</h1>
-                    <h2 class="monospace">> software <span class="text"></span><span class="blinker">_</span></h2>
-                    <!-- <h2 class="hero-subtitle">
-                        <span>software</span>
-                        <ul class="animated-text-container">
-                            <li>developer</li>
-                            <li>architect</li>
-                            <li>teacher</li>
-                        </ul>
-                    </h2> -->
+                    <h1>Jakub Sowiński</h1>
+                    <h3><code>software <span class="text"></span><span class="blinker">_</span></code></h3>
                 </div>
             </section>
             <section id="about">
@@ -185,35 +50,35 @@
                         <div class="wrapper box">
                             <h1>Hello!</h1>
                             <h3>My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.</h3>
-                            <h3>I can help you, your developers, development teams, and your software itself become better.</h3>
-                            <h3>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</h3>
+                            <p>I can help you, your developers, development teams, and your software itself become better.</p>
+                            <p>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</p>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
                             <h1>Developer</h1>
                             <h3>I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.</h3>
-                            <h3>Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.</h3>
+                            <p>Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.</p>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
                             <h1>Architect</h1>
                             <h3>I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.</h3>
-                            <h3>Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.</h3>
+                            <p>Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.</p>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
                             <h1>Teacher</h1>
                             <h3>I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for "Software Architecture" classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.</h3>
-                            <h3>Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.</h3>
+                            <p>Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.</p>
                         </div>
                     </div>
                     <div class="item">
                         <div class="wrapper box">
                             <h1>Human being</h1>
-                            <h3>I love music, so check out my last.fm profile!</h3>
+                            <p>I love music, so check out my last.fm profile!</p>
                         </div>
                     </div>
                 </div>
@@ -225,83 +90,6 @@
             </section>
         </main>
         <footer></footer>
-        <script>
-            const initIntroTextSwitcher = () => {
-                const textContainer = document.querySelector('#intro h2 .text');
-                const blinker = document.querySelector('#intro h2 .blinker');
-                const texts = ['developer', 'architect', 'teacher'];
-
-                const forwardTimeoutRange = [150, 300];
-                const backwardTimeoutRange = [30, 60];
-                const blinkInterval = 500;
-                const fullWordBlinkCount = 6;
-                const noWordBlinkCount = 2;
-                
-                let timeout = 0;
-                let currentTextId = 0;
-                let currentLetterId = 0;
-                let currentBlinkCount = 0;
-                let mode = 0; // 0 - forward, 1 - blink when typed, 2 - backward, 3 - blink when empty
-
-                const type = () => {
-                    textContainer.innerText = texts[currentTextId].substr(0, currentLetterId);
-
-                    switch (mode) {
-                        case 0:
-                            currentLetterId++;
-                            timeout = getTimeout(forwardTimeoutRange);
-                            if (currentLetterId > texts[currentTextId].length) {
-                                mode = 1;
-                            }
-                            break;
-
-                        case 1:
-                            blink();
-                            currentBlinkCount++;
-                            timeout = blinkInterval;
-                            if (currentBlinkCount >= fullWordBlinkCount) {
-                                currentBlinkCount = 0;
-                                mode = 2;
-                            }
-                            break;
-
-                        case 2:
-                            currentLetterId--;
-                            timeout = getTimeout(backwardTimeoutRange);
-                            if (currentLetterId === 0) {
-                                mode = 3;
-                                currentTextId++;
-                                if (currentTextId >= texts.length) {
-                                    currentTextId = 0;
-                                }
-                            }
-                            break;
-
-                        case 3:
-                            blink();
-                            currentBlinkCount++;
-                            timeout = blinkInterval;
-                            if (currentBlinkCount >= noWordBlinkCount) {
-                                currentBlinkCount = 0;
-                                mode = 0;
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    setTimeout(type, timeout);
-                }
-
-                const getTimeout = (range) => Math.random() * (range[1] - range[0]) + range[0];
-                const blink = () => blinker.style.visibility === 'hidden' ? blinker.style.visibility = '' : blinker.style.visibility = 'hidden';
-
-                type();
-            }
-
-            
-            initIntroTextSwitcher();
-        </script>
+        <script src="script.js"></script>
     </body>
 </html>
