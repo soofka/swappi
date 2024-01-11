@@ -4,5 +4,5 @@
     --fg-color-3: #8fa4c3;
     --bg-color-2: #586c91;
     --bg-color-1: #283347;
-    --hero-img-filter: sepia(100%) hue-rotate(180deg) brightness(60%);
+    --hero-img-filter: sepia(100%) hue-rotate(180deg) brightness(60%) contrast(120%);
 }

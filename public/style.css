@@ -52,6 +52,8 @@ p {
 }
 small {
     font-size: 0.6rem;
+    margin: 0;
+    padding: 0;
 }
 code {
     font-family: 'Roboto Mono', monospace;
@@ -136,21 +138,20 @@ footer {
     background: var(--bg-color-1);
     border-top: 1px solid var(--bg-color-2);
     margin: 0;
-    padding: var(--grid);
+    padding: 0;
     scroll-snap-align: end;
 }
 footer ul {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     justify-content: center;
-    column-gap: var(--grid);
     margin: 0;
     padding: 0;
     list-style: none;
 }
-footer ul li, footer ul li p {
+footer ul li {
     margin: 0;
-    padding: 0;
+    padding: calc(var(--grid) / 2);
 }
 .wrapper {
     position: relative;
@@ -160,6 +161,9 @@ footer ul li, footer ul li p {
 }
 .box {
     padding: var(--grid);
+}
+.link::before {
+    content: '»';
 }
 #loading-container {
     position: fixed;

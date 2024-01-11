@@ -52,6 +52,8 @@ const app = {
         if ((lang === 'en' || lang === 'pl') && (lang !== this.lang || force)) {
             this.lang = lang;
             localStorage.setItem('lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+            this.getElement('meta-lang', 'meta[http-equiv="content-language"]').setAttribute('content', lang);
             this.getElement('lang-toggle-text', '#lang-toggle p').innerText = lang === 'en' ? 'pl' : 'en';
             this.setLabels();
         }
@@ -115,21 +117,21 @@ const app = {
     },
 
     setStyle: function() {
-        document.documentElement.style.display = 'none';
+        // document.documentElement.style.display = 'none';
 
         const themeStyleLink = this.getElement('theme-style-link', 'link[id="theme"]');
         themeStyleLink.href = themeStyleLink.attributes[`data-href-${this.theme}`].value;
     
-        // const manifestLink = document.querySelector('link[rel="manifest"]');
-        // manifestLink.href = manifestLink.attributes[`data-href-${theme}`].value;
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        manifestLink.href = manifestLink.attributes[`data-href-${this.theme}`].value;
     
         // const faviconLink = document.querySelectorAll('link[rel="icon"]');
         // faviconLink.href = faviconLink.attributes[`data-href-${theme}`].value;
     
-        // const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        // themeColorMeta.content = theme === 'dark' ? '#000' : '#fff';
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        themeColorMeta.content = themeColorMeta.attributes[`data-content-${this.theme}`].value;
 
-        document.documentElement.style.display = '';
+        // document.documentElement.style.display = '';
     },
 
     initScrollAnchors: function() {

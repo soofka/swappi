@@ -1,12 +1,19 @@
 # swn.ski
 
 ## todo:
-* fix footer scroll snap
-* manifests
-* seo meta items
-* full translation with meta
+* aria tags
 * per page content
-* contact
+* full translation with meta
 * image optimization
 * minification
-* prerender
+* prerender + default settings with media queries
+* favicon
+* split into libraries
+    * scroll text
+    * anchors
+* test
+    * seo manifests etc
+    * history
+    * lighthouse
+    * w3c
+    * iphone
