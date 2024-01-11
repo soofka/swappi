@@ -37,7 +37,7 @@ const app = {
         if ((lang === 'en' || lang === 'pl') && (lang !== this.lang || force)) {
             this.lang = lang;
             localStorage.setItem('lang', lang);
-            this.getElement('lang-toggle', '#lang-toggle').innerText = lang === 'en' ? 'pl' : 'en';
+            this.getElement('lang-toggle-text', '#lang-toggle p').innerText = lang === 'en' ? 'pl' : 'en';
             this.setLabels();
         }
     },
@@ -94,7 +94,7 @@ const app = {
         if ((theme === 'light' || theme === 'dark') && (theme !== this.theme || force)) {
             this.theme = theme;
             localStorage.setItem('theme', theme);
-            this.getElement('theme-toggle', '#theme-toggle').innerText = theme === 'light' ? 'dark' : 'light';
+            this.getElement('theme-toggle-text', '#theme-toggle p').innerText = theme === 'light' ? 'dark' : 'light';
             this.setStyle();
         }
     },
@@ -134,18 +134,19 @@ const app = {
             });
         }
 
-
-        const checkHash = (anchor) => `#${anchor.hash}` === window.location.hash;
-        let anchor = this.anchorMap.y.find(checkHash);
+        const checkHash = (anchor) => anchor.hash === this.getHash();
+        let anchor = this.anchorMap.y.find((x) => checkHash(x));
         if (anchor) {
             this.scroll(anchor.start);
         } else {
-            anchor = this.anchorMap.x.find(checkHash);
+            anchor = this.anchorMap.x.find((x) => checkHash(x));
             if (anchor) {
                 this.scroll(anchor.parent.start);
                 this.scroll(0, anchor.start, anchor.parent.ref);
             }
         }
+        
+        this.highlightActiveMenuItem();
     },
 
     calculateAnchorMap: function() {
@@ -167,15 +168,31 @@ const app = {
         }));
     },
 
+    getHash: function() {
+        return window.location.hash ? window.location.hash.substring(1) : '';
+    },
+
     setHash: function() {
-        this.anchorMap.y.forEach((element) => {
-            if (window.scrollY >= element.start && window.scrollY < element.end) {
-                window.location.hash = element.hash;
+        this.anchorMap.y.forEach((anchor) => {
+            if (window.scrollY >= anchor.start && window.scrollY < anchor.end) {
+                window.location.hash = anchor.hash;
+                this.highlightActiveMenuItem();
             }
         });
-        this.anchorMap.x.forEach((element) => {
-            if (window.scrollY >= element.parent.start && window.scrollY < element.parent.end && element.parent.ref.scrollLeft >= element.start && element.parent.ref.scrollLeft < element.end) {
-                window.location.hash = element.hash;
+
+        this.anchorMap.x.forEach((anchor) => {
+            if (window.scrollY >= anchor.parent.start && window.scrollY < anchor.parent.end && anchor.parent.ref.scrollLeft >= anchor.start && anchor.parent.ref.scrollLeft < anchor.end) {
+                window.location.hash = anchor.hash;
+            }
+        });
+    },
+
+    highlightActiveMenuItem: function() {     
+        this.getElements('menu-links', 'header nav #menu a').forEach((element) => {
+            if (`#${this.getHash().split('-')[0]}` === element.getAttribute('href')) {
+                element.classList.add('active');
+            } else {
+                element.classList.remove('active');
             }
         });
     },

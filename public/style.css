@@ -109,14 +109,21 @@ header nav {
 header nav ul {
     display: flex;
     flex-flow: row nowrap;
-    column-gap: var(--grid);
+    /* column-gap: var(--grid); */
     margin: 0;
     padding: 0;
     list-style: none;
 }
-header nav ul li, header nav ul li p {
+header nav ul li {
+    margin: 0;
+    padding: var(--grid);
+}
+header nav ul li p {
     margin: 0;
     padding: 0;
+}
+header nav #menu a.active {
+    background: var(--fg-color-3);
 }
 footer {
     background: var(--bg-color-1);
