@@ -8,7 +8,7 @@
 }
 * {
     box-sizing: border-box;
-    /* transition: color 0.5s ease, background-color 0.5s ease; */
+    transition: color 0.5s ease, background-color 0.5s ease;
 }
 html {
     scroll-behavior: smooth;
@@ -80,6 +80,7 @@ section.hero::before {
     background-size: cover;
     background-position: center center;
     filter: var(--hero-img-filter);
+    transition: 0.5s ease;
     z-index: 0;
 }
 section.hero > * {
@@ -133,6 +134,7 @@ footer ul li, footer ul li p {
     padding: 0;
 }
 .wrapper {
+    position: relative;
     width: 100%;
     max-width: var(--page-max-size);
     margin: 0 auto;
@@ -151,8 +153,8 @@ footer ul li, footer ul li p {
     position: relative;
     top: 20%;
     text-align: center;
-    text-shadow: -2px 2px 0 var(--bg-color-1),
-        2px 2px 0 var(--bg-color-1),
+    text-shadow: 2px 2px 0 var(--bg-color-1),
+        -2px 2px 0 var(--bg-color-1),
         2px -2px 0 var(--bg-color-1),
         -2px -2px 0 var(--bg-color-1);
 }
@@ -164,12 +166,37 @@ footer ul li, footer ul li p {
     flex-flow: row nowrap;
     overflow-x: scroll;
     scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+#about::-webkit-scrollbar {
+    display: none;
 }
 #about .item {
-    min-width: 100vw;
-    height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
     scroll-snap-align: start;
-    position: relative;
+}
+#about .item .wrapper {
+    height: 100%;
+}
+#about .item .wrapper::before, #about .item .wrapper::after {
+    position: absolute;
+    bottom: var(--grid);
+    font-size: 2rem;
+}
+#about .item .wrapper::before {
+    content: "←";
+    left: var(--grid);
+}
+#about .item .wrapper::after {
+    content: "→";
+    right: var(--grid);
+}
+#about .item:first-of-type .wrapper::before {
+    display: none;
+}
+#about .item:last-of-type .wrapper::after {
+    display: none;
 }
 #contact {
 }
