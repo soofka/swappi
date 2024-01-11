@@ -7,12 +7,27 @@ const app = {
     anchorMap: {},
 
     init: function() {
+        this.updateLoadingBar(0.1);
         this.initLang();
+        this.updateLoadingBar(0.25);
         this.initTheme();
+        this.updateLoadingBar(0.4);
         this.initScrollAnchors();
+        this.updateLoadingBar(0.6);
         this.initIntroTextSwitcher();
+        this.updateLoadingBar(0.75);
         this.initAboutScroll();
+        this.updateLoadingBar(0.9);
         this.initMisc();
+        this.updateLoadingBar(1);
+    },
+
+    updateLoadingBar: function(percentage) {
+        this.getElement('loading-bar', '#loading-bar').style.width = `${percentage * 100}%`;
+        if (percentage === 1) {
+            this.getElement('body', 'body').classList.remove('loading');
+            this.getElement('loading-container', '#loading-container').remove();
+        }
     },
     
     initLang: function() {
@@ -305,6 +320,7 @@ const app = {
     },
 
     scroll: function(top, left = 0, container = window) {
+        console.log('scroll', top, left);
         container.scroll({ top, left, behavior: 'smooth' });
     },
 

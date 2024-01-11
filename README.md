@@ -1,7 +1,7 @@
 # swn.ski
 
 ## todo:
-* loader
+* fix footer scroll snap
 * manifests
 * seo meta items
 * full translation with meta
