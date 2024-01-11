@@ -1,7 +1,9 @@
 # swn.ski
 
 ## todo:
-* scroll anchors
+* scroll anchors detection
+* active element in menu
+* loader
 * manifests
 * seo meta items
 * full translation with meta

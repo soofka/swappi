@@ -37,14 +37,14 @@
             </div>
         </header>
         <main>
-            <section id="intro" class="hero">
+            <section class="hero" id="intro" data-anchor-y="">
                 <div class="wrapper box">
                     <h1>Jakub Sowiński</h1>
                     <h3 id="intro-text-switcher" data-texts="developer,architect,teacher"><code>software <span class="text"></span><span class="blinker">_</span></code></h3>
                 </div>
             </section>
-            <section id="about">
-                <div class="item">
+            <section id="about" data-anchor-y="about" data-anchor-x-container>
+                <div class="item" data-anchor-x="about-intro">
                     <div class="wrapper box">
                         <button class="scroll" id="scroll-right">&rarr;</button>
                         <h1 data-t="about.intro.head"></h1>
@@ -52,7 +52,7 @@
                         <div data-t="about.intro.text"></div>
                     </div>
                 </div>
-                <div class="item">
+                <div class="item" data-anchor-x="about-developer">
                     <div class="wrapper box">
                         <button class="scroll" id="scroll-left">&larr;</button>
                         <button class="scroll" id="scroll-right">&rarr;</button>
@@ -61,7 +61,7 @@
                         <div data-t="about.developer.text"></div>
                     </div>
                 </div>
-                <div class="item">
+                <div class="item" data-anchor-x="about-architect">
                     <div class="wrapper box">
                         <button class="scroll" id="scroll-left">&larr;</button>
                         <button class="scroll" id="scroll-right">&rarr;</button>
@@ -70,7 +70,7 @@
                         <div data-t="about.architect.text"></div>
                     </div>
                 </div>
-                <div class="item">
+                <div class="item" data-anchor-x="about-teacher">
                     <div class="wrapper box">
                         <button class="scroll" id="scroll-left">&larr;</button>
                         <button class="scroll" id="scroll-right">&rarr;</button>
@@ -79,7 +79,7 @@
                         <div data-t="about.teacher.text"></div>
                     </div>
                 </div>
-                <div class="item">
+                <div class="item" data-anchor-x="about-person">
                     <div class="wrapper box">
                         <button class="scroll" id="scroll-left">&larr;</button>
                         <h1 data-t="about.person.head"></h1>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
             </section>
-            <section id="contact">
+            <section id="contact" data-anchor-y="contact">
                 <div class="wrapper box">
                     <h1 data-t="contact.head"></h1>
                 </div>
