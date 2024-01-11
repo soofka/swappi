@@ -4,6 +4,7 @@ const app = {
     theme: 'light',
     labels: {},
     elements: {},
+    anchorMap: {},
 
     init: function() {
         this.initLang();
@@ -117,13 +118,44 @@ const app = {
     },
 
     initScrollAnchors: function() {
-        const anchorMapY = Array.from(this.getElements('vertical-anchors', '[data-anchor-y]')).map((element) => ({
+        this.calculateAnchorMap();
+        window.addEventListener('resize', () => this.calculateAnchorMap());
+
+        if ('onscrollend' in window) {
+            [window, ...this.getElements('horizontal-anchors-containers', '[data-anchor-x-container]')].forEach((element) => {
+                element.addEventListener('scrollend', () => this.setHash());
+            });
+        } else {
+            [window, ...this.getElements('horizontal-anchors-containers', '[data-anchor-x-container]')].forEach((element) => {
+                element.addEventListener('scroll', () => {
+                    clearTimeout(window.scrollEndTimeout);
+                    window.scrollEndTimeout = setTimeout(() => this.setHash(), 500);
+                });
+            });
+        }
+
+
+        const checkHash = (anchor) => `#${anchor.hash}` === window.location.hash;
+        let anchor = this.anchorMap.y.find(checkHash);
+        if (anchor) {
+            this.scroll(anchor.start);
+        } else {
+            anchor = this.anchorMap.x.find(checkHash);
+            if (anchor) {
+                this.scroll(anchor.parent.start);
+                this.scroll(0, anchor.start, anchor.parent.ref);
+            }
+        }
+    },
+
+    calculateAnchorMap: function() {
+        this.anchorMap.y = Array.from(this.getElements('vertical-anchors', '[data-anchor-y]')).map((element) => ({
             start: element.offsetTop,
             end: element.offsetTop + element.offsetHeight,
-            anchor: element.dataset.anchorY,
+            hash: element.dataset.anchorY,
         }));
-        
-        const anchorMapX = Array.from(this.getElements('horizontal-anchors', '[data-anchor-x]')).map((element) => ({
+
+        this.anchorMap.x = Array.from(this.getElements('horizontal-anchors', '[data-anchor-x]')).map((element) => ({
             parent: {
                 start: element.parentElement.offsetTop,
                 end: element.parentElement.offsetTop + element.parentElement.offsetHeight,
@@ -131,38 +163,21 @@ const app = {
             },
             start: element.offsetLeft,
             end: element.offsetLeft + element.offsetWidth,
-            anchor: element.dataset.anchorX,
+            hash: element.dataset.anchorX,
         }));
+    },
 
-        const callback = () => {
-            console.log('detecting');
-            anchorMapY.forEach((element) => {
-                console.log('y', window.scrollY, element);
-                if (window.scrollY >= element.start && window.scrollY < element.end) {
-                    window.location.hash = element.anchor;
-                }
-            });
-            anchorMapX.forEach((element) => {
-                console.log('x', window.scrollY, element.parent.ref.scrollLeft, element);
-                if (window.scrollY >= element.parent.start && window.scrollY < element.parent.end && element.parent.ref.scrollLeft >= element.start && element.parent.ref.scrollLeft < element.end) {
-                    window.location.hash = element.anchor;
-                }
-            });
-        }
-
-        if ('onscrollend' in window) {
-            console.log('scrollend supported');
-            [window, ...this.getElements('horizontal-anchors-containers', '[data-anchor-x-container]')].forEach((element) => {
-                element.addEventListener('scrollend', callback);
-            });
-        } else {
-            [window, ...this.getElements('horizontal-anchors-containers', '[data-anchor-x-container]')].forEach((element) => {
-                element.addEventListener('scroll', () => {
-                    clearTimeout(window.scrollEndTimeout);
-                    window.scrollEndTimeout = setTimeout(callback, 500);
-                });
-            });
-        }
+    setHash: function() {
+        this.anchorMap.y.forEach((element) => {
+            if (window.scrollY >= element.start && window.scrollY < element.end) {
+                window.location.hash = element.hash;
+            }
+        });
+        this.anchorMap.x.forEach((element) => {
+            if (window.scrollY >= element.parent.start && window.scrollY < element.parent.end && element.parent.ref.scrollLeft >= element.start && element.parent.ref.scrollLeft < element.end) {
+                window.location.hash = element.hash;
+            }
+        });
     },
 
     initIntroTextSwitcher: function() {
@@ -248,19 +263,11 @@ const app = {
             const scrollRight = this.getElement(`about-item-${index}-scroll-right`, '#scroll-right', item);
 
             if (scrollLeft) {
-                scrollLeft.addEventListener('click', () => container.scroll({
-                    top: 0,
-                    left: item.scrollWidth * (index - 1),
-                    behavior: 'smooth',
-                }));
+                scrollLeft.addEventListener('click', () => this.scroll(0, item.scrollWidth * (index - 1), container));
             }
 
             if (scrollRight) {
-                scrollRight.addEventListener('click', () => container.scroll({
-                    top: 0,
-                    left: item.scrollWidth * (index + 1),
-                    behavior: 'smooth',
-                }));
+                scrollRight.addEventListener('click', () => this.scroll(0, item.scrollWidth * (index + 1), container));
             }
         });
     },
@@ -278,6 +285,10 @@ const app = {
             this.elements[name] = parent.querySelectorAll(selector);
         }
         return this.elements[name];
+    },
+
+    scroll: function(top, left = 0, container = window) {
+        container.scroll({ top, left, behavior: 'smooth' });
     },
 
 };
