@@ -59,6 +59,11 @@ a:hover, a:active, a:focus {
     text-decoration: none;
     color: var(--fg-color-1);
 }
+button {
+    color: var(--fg-color-1);
+    background: none;
+    border: none;
+}
 section {
     display: flex;
     width: 100vw;
@@ -185,8 +190,6 @@ footer ul li, footer ul li p {
     cursor: pointer;
     opacity: 0.5;
     font-size: 4rem;
-    background: none;
-    border: none;
 }
 #about .item .wrapper .scroll:hover, #about .item .wrapper .scroll:active, #about .item .wrapper .scroll:focus {
     opacity: 1;
