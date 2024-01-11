@@ -44,6 +44,9 @@ h3 {
 p {
     font-size: 1rem;
 }
+small {
+    font-size: 0.6rem;
+}
 code {
     font-family: 'Roboto Mono', monospace;
 }
@@ -105,12 +108,29 @@ header nav ul {
     padding: 0;
     list-style: none;
 }
-header nav ul li {
+header nav ul li, header nav ul li p {
     margin: 0;
     padding: 0;
 }
-header nav ul li p {
+footer {
+    background: var(--bg-color-1);
+    border-top: 1px solid var(--bg-color-2);
     margin: 0;
+    padding: var(--grid);
+    scroll-snap-align: end;
+}
+footer ul {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    column-gap: var(--grid);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+footer ul li, footer ul li p {
+    margin: 0;
+    padding: 0;
 }
 .wrapper {
     width: 100%;

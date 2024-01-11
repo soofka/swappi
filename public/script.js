@@ -9,6 +9,7 @@ const app = {
         this.initLang();
         this.initTheme();
         this.initIntroTextSwitcher();
+        this.initMisc();
     },
     
     initLang: function() {
@@ -114,7 +115,6 @@ const app = {
     },
 
     initIntroTextSwitcher: function() {
-        console.log('updated');
         const container = this.getElement('intro-text-switcher', '#intro-text-switcher');
         const texts = container.dataset.texts.split(',');
         const text = this.getElement('intro-text-switcher-text', '.text', container);
@@ -187,6 +187,10 @@ const app = {
         const blink = () => blinker.style.visibility === 'hidden' ? blinker.style.visibility = '' : blinker.style.visibility = 'hidden';
     
         type();
+    },
+
+    initMisc: function() {
+        this.getElement('current-year', '#current-year').innerText = new Date().getFullYear();
     },
 
     getElement: function(name, selector, parent = document) {
