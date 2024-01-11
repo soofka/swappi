@@ -190,14 +190,18 @@ const app = {
     setHash: function() {
         this.anchorMap.y.forEach((anchor) => {
             if (window.scrollY >= anchor.start && window.scrollY < anchor.end) {
-                window.location.hash = anchor.hash;
+                console.log('setting hash', anchor.hash);
+                history.pushState({}, '', `#${anchor.hash}`);
+                // window.location.hash = anchor.hash;
                 this.highlightActiveMenuItem();
             }
         });
 
         this.anchorMap.x.forEach((anchor) => {
             if (window.scrollY >= anchor.parent.start && window.scrollY < anchor.parent.end && anchor.parent.ref.scrollLeft >= anchor.start && anchor.parent.ref.scrollLeft < anchor.end) {
-                window.location.hash = anchor.hash;
+                console.log('setting hash', anchor.hash);
+                history.pushState({}, '', `#${anchor.hash}`);
+                // window.location.hash = anchor.hash;
             }
         });
     },
@@ -320,7 +324,7 @@ const app = {
     },
 
     scroll: function(top, left = 0, container = window) {
-        console.log('scroll', top, left);
+        console.log('scrolling', top, left);
         container.scroll({ top, left, behavior: 'smooth' });
     },
 
