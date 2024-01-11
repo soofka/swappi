@@ -179,24 +179,23 @@ footer ul li, footer ul li p {
 #about .item .wrapper {
     height: 100%;
 }
-#about .item .wrapper::before, #about .item .wrapper::after {
+#about .item .wrapper .scroll {
     position: absolute;
     bottom: var(--grid);
-    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 4rem;
+    background: none;
+    border: none;
 }
-#about .item .wrapper::before {
-    content: "←";
+#about .item .wrapper .scroll:hover, #about .item .wrapper .scroll:active, #about .item .wrapper .scroll:focus {
+    opacity: 1;
+}
+#about .item .wrapper #scroll-left {
     left: var(--grid);
 }
-#about .item .wrapper::after {
-    content: "→";
+#about .item .wrapper #scroll-right {
     right: var(--grid);
-}
-#about .item:first-of-type .wrapper::before {
-    display: none;
-}
-#about .item:last-of-type .wrapper::after {
-    display: none;
 }
 #contact {
 }

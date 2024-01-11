@@ -9,6 +9,7 @@ const app = {
         this.initLang();
         this.initTheme();
         this.initIntroTextSwitcher();
+        this.initAboutScroll();
         this.initMisc();
     },
     
@@ -187,6 +188,31 @@ const app = {
         const blink = () => blinker.style.visibility === 'hidden' ? blinker.style.visibility = '' : blinker.style.visibility = 'hidden';
     
         type();
+    },
+
+    initAboutScroll() {
+        const container = this.getElement('about-section', '#about');
+
+        this.getElements('about-items', '.item', container).forEach((item, index, array) => {
+            const scrollLeft = this.getElement(`about-item-${index}-scroll-left`, '#scroll-left', item);
+            const scrollRight = this.getElement(`about-item-${index}-scroll-right`, '#scroll-right', item);
+
+            if (scrollLeft) {
+                scrollLeft.addEventListener('click', () => container.scroll({
+                    top: 0,
+                    left: item.scrollWidth * (index - 1),
+                    behavior: 'smooth',
+                }));
+            }
+
+            if (scrollRight) {
+                scrollRight.addEventListener('click', () => container.scroll({
+                    top: 0,
+                    left: item.scrollWidth * (index + 1),
+                    behavior: 'smooth',
+                }));
+            }
+        });
     },
 
     initMisc: function() {

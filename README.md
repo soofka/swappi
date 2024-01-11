@@ -1,7 +1,6 @@
 # swn.ski
 
 ## todo:
-* full scroll controls with JS
 * scroll anchors
 * manifests
 * seo meta items
