@@ -2,103 +2,221 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { minify } from 'minify';
+import { config } from './config.js';
 
-const SRC = path.resolve('src');
-const DIST = path.resolve('dist');
+const builder = {
+    
+    config: {},
+    files: {
+        html: [],
+        css: [],
+        js: [],
+        json: [],
+        img: [],
+        other: [],
+    },
+    imgMap: {},
 
-const IMAGE_WIDTHS = [256, 320, 640, 1280, 1920, 2560];
-const MINIFY_OPTIONS = {
-    js: {
-        mangle: true,
-        mangleClassNames: true,
-        removeUnusedVariables: true,
-        removeConsole: true,
-        removeUselessSpread: true,
+    init: function(config) {
+        // include config validation or sth
+        this.config = config;
+        this.build();
     },
-    img: {
-        maxSize: 4096,
-    },
-    html: {
-        removeComments: false,
-        removeCommentsFromCDATA: true,
-        removeCDATASectionsFromCDATA: true,
-        collapseWhitespace: true,
-        collapseBooleanAttributes: true,
-        removeAttributeQuotes: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeEmptyElements: false,
-        removeOptionalTags: false,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        minifyJS: true,
-        minifyCSS: true,
-    },
-    css: {
-        compatibility: '*',
-    },
-};
 
-async function build() {
-    await resetDistDir();
-    const files = sortDir(await readDir(SRC));
-    console.log(files);
-    const imgMap = await parseImgFiles(files.img);
-    console.log(imgMap);
-    // await parseHtmlFiles(files.html);
-    // await parseCssFiles(files.css);
-    // await parseJsFiles(files.js);
-    // await parseJsonFiles(files.json);
-    // await parseOtherFiles(files.other);
-}
+    build: async function() {
+        await this.initDistDir();
+        await this.initSrcFiles();
+        console.log(this.files);
+        await this.parseImgFiles();
+        console.log(this.imgMap);
+        await this.parseHtmlFiles();
+        await this.parseCssFiles();
+        await this.parseJsFiles();
+        await this.parseJsonFiles();
+        await this.parseOtherFiles();
+    },
 
-async function resetDistDir() {
-    // make it remove dist
-    try {
-        await fs.stat(DIST);
-    } catch(e) {
-        if (e.code !== 'ENOENT') {
-            throw e;
+    initDistDir: async function() {
+        // make it remove dist
+        try {
+            await fs.stat(this.config.dist);
+        } catch(e) {
+            if (e.code !== 'ENOENT') {
+                throw e;
+            }
+            await fs.mkdir(this.config.dist);
         }
-        fs.mkdir(DIST);
-    }
+    },
+
+    initSrcFiles: async function() {
+        this.files = await groupDirByFileType(this.config.src, {
+            html: ['.html'],
+            css: ['.css'],
+            js: ['.js'],
+            json: ['.json', '.webmanifest'],
+            img: ['.png', '.jpg', '.jpeg'],
+        });
+    },
+
+    parseImgFiles: async function() {
+        for (let file of this.files.img) {
+            const srcFileRelPath = path.join(file.relPath, `${file.name}${file.type}`);
+
+            // deduplicate with current
+            // or just fuck current
+            let imageWidths = ['current'];
+            if (this.config.options.resizeImages) {
+                imageWidths = [...this.config.options.resizedImagesWidths, ...imageWidths];
+            }
+
+            let imageTypes = ['current']; 
+            if (this.config.options.optimizeImages) {
+                imageTypes = [...this.config.options.optimizedImagesTypes, ...imageTypes];
+            }
+            
+            const imgWidthVersions = [];
+        
+            for (let width of imageWidths) {
+                const isCurrentWidth = width === 'current';
+                const distFileName = isCurrentWidth ? file.name : `${file.name}-${width}`;
+
+                const imgTypeVersions = {};
+
+                for (let type of imageTypes) {
+                    const isCurrentType = type === 'current';
+                    const distFileFullName = isCurrentType ? `${distFileName}${file.type}` : `${distFileName}.${type}`;
+                    const distFileRelPath = path.join(file.relPath, distFileFullName);
+
+                    let parseFunction;
+                    if (!isCurrentWidth && !isCurrentType) {
+                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width)[type]().toBuffer();
+                    } else if (!isCurrentWidth && isCurrentType) {
+                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width).toBuffer();
+                    } else if (isCurrentWidth && !isCurrentType) {
+                        parseFunction = async (srcPath) => await sharp(srcPath)[type]().toBuffer();
+                    }
+
+                    await this.parseFile(
+                        this.getFileSrcAbsPath(file),
+                        this.getFileDistAbsPath(file, distFileFullName),
+                        parseFunction,
+                    );
+
+                    imgTypeVersions[type] = distFileRelPath;
+                }
+    
+                imgWidthVersions.push(imgTypeVersions);
+            }
+    
+            this.imgMap[srcFileRelPath] = imgWidthVersions;
+        }
+    },
+
+    parseHtmlFiles: async function () {
+        for (let file of this.files.html) {
+            // substitute variables from config
+            // replace imgs with responsive
+            // prepopulate labels
+            // set defaults to styling
+            await this.minifyFile(file);
+        }
+    },
+    
+    parseCssFiles: async function() {
+        for (let file of this.files.css) {
+            // substitute variables from config
+            // replace imgs with responsive
+            await this.minifyFile(file);
+        }
+    },
+    
+    parseJsFiles: async function() {
+        for (let file of this.files.js) {
+            await this.minifyFile(file);
+        }
+    },
+    
+    parseJsonFiles: async function() {
+        for (let file of this.files.json) {
+            await this.parseFile(
+                this.getFileSrcAbsPath(file),
+                this.getFileDistAbsPath(file),
+                async (srcPath) => {
+                    const fileContent = await fs.readFile(srcPath);
+                    return JSON.stringify(JSON.parse(fileContent));
+                },
+            );
+        }
+    },
+    
+    parseOtherFiles: async function() {
+        for (let file of this.files.other) {
+            await this.parseFile(
+                this.getFileSrcAbsPath(file),
+                this.getFileDistAbsPath(file),
+            );
+        }
+    },
+    
+    minifyFile: function(file) {
+        return this.parseFile(
+            this.getFileSrcAbsPath(file),
+            this.getFileDistAbsPath(file),
+            async (srcPath) => await minify(srcPath, this.config.options.minify),
+        );
+    },
+
+    parseFile: function(srcAbsPath, distAbsPath, parseFunction) {
+        return parseFile(srcAbsPath, distAbsPath, parseFunction, fs.copyFile);
+    },
+
+    getFileSrcAbsPath: function(file) {
+        return path.join(file.absPath, `${file.name}${file.type}`);
+    },
+
+    getFileDistAbsPath: function(file, newFullName = undefined) {
+        return path.join(this.config.dist, file.relPath, newFullName ? newFullName : `${file.name}${file.type}`);
+    },
+
 }
 
-function sortDir(dir, files = undefined) {
-    if (!files) {
-        files = {
-            html: [],
-            css: [],
-            js: [],
-            json: [],
-            img: [],
-            other: [],
-        };
-    }
+builder.init(config);
 
+async function groupDirByFileType(rootDirAbsPath, fileTypeGroups, includeOther = true) {
+    const dir = await readDirRec(rootDirAbsPath);
+    const fileGroups = await groupDirByFileTypeRec(dir, fileTypeGroups, includeOther);
+    return fileGroups;
+}
+
+async function groupDirByFileTypeRec(dir, fileTypeGroups, includeOther, fileGroups = {}) {
     for (let item of dir.content) {
         if (item.isDir) {
-            sortDir(item, files);
-        } else if (item.type === '.html') {
-            files.html.push(item);
-        } else if (item.type === '.css') {
-            files.css.push(item);
-        } else if (item.type === '.js') {
-            files.js.push(item);
-        } else if (['.json', '.webmanifest'].includes(item.type)) {
-            files.json.push(item);
-        } else if (['.png', '.jpg', '.jpeg'].includes(item.type)) {
-            files.img.push(item);
+            fileGroups = await groupDirByFileTypeRec(item, fileTypeGroups, includeOther, fileGroups);
         } else {
-            files.other.push(item);
+            let matched = false;
+            for (let group of Object.keys(fileTypeGroups)) {
+                if (!fileGroups.hasOwnProperty(group)) {
+                    fileGroups[group] = [];
+                }
+                if (fileTypeGroups[group].includes(item.type)) {
+                    matched = true;
+                    fileGroups[group].push(item);
+                }
+            }
+            if (!matched) {
+                if (!fileGroups.hasOwnProperty('other')) {
+                    fileGroups.other = [];
+                }
+                fileGroups.other.push(item);
+            }
         }
     }
 
-    return files;
+    return fileGroups;
 }
 
-async function readDir(rootDirAbsPath, currentDirRelPath = '') {
+async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
+    console.log('hmm', rootDirAbsPath, currentDirRelPath);
     const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
     const dir = await fs.readdir(dirPath, { withFileTypes: true });
     const dirMap = {
@@ -119,119 +237,29 @@ async function readDir(rootDirAbsPath, currentDirRelPath = '') {
                 type: ext,
             });
         } else if (item.isDirectory()) {
-            dirMap.content.push(await readDir(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
+            dirMap.content.push(await readDirRec(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
         }
     }
 
     return dirMap;
 }
 
-async function parseImgFiles(imgFiles) {
-    const imgMap = {};
-
-    for (let file of imgFiles) {
-        const srcFileAbsPath = path.join(file.absPath, `${file.name}${file.type}`);
-        const srcFileRelPath = path.join(file.relPath, `${file.name}${file.type}`);
-        const imgWidthVersions = [];
-    
-        for (let width of IMAGE_WIDTHS) {
-            const imgTypeVersions = {};
-            const distFileName = `${file.name}-${width}`;
-
-            const webpDistRelPath = path.join(file.relPath, `${distFileName}.webp`);
-            await parseFile(
-                srcFileAbsPath,
-                path.join(DIST, webpDistRelPath),
-                async (srcPath) => await sharp(srcPath).resize(width).webp().toBuffer(),
-            );
-            imgTypeVersions.webp = webpDistRelPath;
-
-            const avifDistRelPath = path.join(file.relPath, `${distFileName}.avif`);
-            await parseFile(
-                srcFileAbsPath,
-                path.join(DIST, avifDistRelPath),
-                async (srcPath) => await sharp(srcPath).resize(width).avif().toBuffer(),
-            );
-            imgTypeVersions.avif = avifDistRelPath;
-
-            const jpegDistRelPath = path.join(file.relPath, `${distFileName}.jpeg`);            
-            await parseFile(
-                srcFileAbsPath,
-                path.join(DIST, jpegDistRelPath),
-                async (srcPath) => await sharp(srcPath).resize(width).jpeg().toBuffer(),
-            );
-            imgTypeVersions.jpeg = jpegDistRelPath;
-
-            imgWidthVersions.push(imgTypeVersions);
-        }
-
-        imgMap[srcFileRelPath] = imgWidthVersions;
-    }
-
-    return imgMap;
-}
-
-async function parseHtmlFiles(htmlFiles) {
-    for (let file of htmlFiles) {
-        // substitute variables from config
-        // replace imgs with responsive
-        // prepopulate labels
-        // set defaults to styling
-        await minifyFile(file);
-    }
-}
-
-async function parseCssFiles(cssFiles) {
-    for (let file of cssFiles) {
-        // substitute variables from config
-        // replace imgs with responsive
-        await minifyFile(file);
-    }
-}
-
-async function parseJsFiles(jsFiles) {
-    for (let file of jsFiles) {
-        await minifyFile(file);
-    }
-}
-
-async function parseJsonFiles(jsonFiles) {
-    for (let file of jsonFiles) {
-        await parseFile(
-            path.join(SRC, file),
-            path.join(DIST, file),
-            async (srcPath) => {
-                const fileContent = await fs.readFile(srcPath);
-                return JSON.stringify(JSON.parse(fileContent));
-            },
-        );
-    }
-}
-
-async function parseOtherFiles(otherFiles) {
-    for (let file of otherFiles) {
-        await parseFile(path.join(SRC, file), path.join(DIST, file));
-    }
-}
-
-async function minifyFile(file) {
-    await parseFile(
-        path.join(SRC, file),
-        path.join(DIST, file),
-        async (srcPath) => await minify(srcPath, MINIFY_OPTIONS),
-    );
-}
-
-async function parseFile(srcPath, distPath, parseFunction = fs.readFile) {
+async function parseFile(srcPath, distPath, parseFunction = fs.readFile, fallbackFunction = undefined) {
+    // handle creation of directories???
     console.log(`Trying to parse file ${srcPath} to ${distPath}`);
     try {
         await fs.writeFile(distPath, await parseFunction(srcPath));
         console.log(`Successfully parsed file ${srcPath} to ${distPath}`);
     } catch(e) {
         console.warn(`Failed to parse file ${srcPath}: ${e}`);
-        await fs.copyFile(srcPath, distPath);
-        console.log(`Successfully copied file ${srcPath} to ${distPath}`);
+
+        if (fallbackFunction) {
+            try {
+                await fallbackFunction(srcPath, distPath);
+                console.log(`Successfully executed fallback function for file ${srcPath} to ${distPath}`);
+            } catch(e) {
+                console.warn(`Failed to parse file ${srcPath}: ${e}`);
+            }
+        }
     }
 }
-
-build();
