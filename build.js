@@ -40,26 +40,189 @@ const MINIFY_OPTIONS = {
     },
 };
 
-try {
-    await fs.stat(DIST);
-} catch(e) {
-    if (e.code === 'ENOENT') {
+async function build() {
+    await resetDistDir();
+    const files = sortDir(await readDir(SRC));
+    console.log(files);
+    const imgMap = await parseImgFiles(files.img);
+    console.log(imgMap);
+    // await parseHtmlFiles(files.html);
+    // await parseCssFiles(files.css);
+    // await parseJsFiles(files.js);
+    // await parseJsonFiles(files.json);
+    // await parseOtherFiles(files.other);
+}
+
+async function resetDistDir() {
+    // make it remove dist
+    try {
+        await fs.stat(DIST);
+    } catch(e) {
+        if (e.code !== 'ENOENT') {
+            throw e;
+        }
         fs.mkdir(DIST);
-    } else {
-        console.error(e);
     }
 }
 
-const files = {
-    html: [],
-    css: [],
-    js: [],
-    json: [],
-    img: [],
-    others: [],
-};
+function sortDir(dir, files = undefined) {
+    if (!files) {
+        files = {
+            html: [],
+            css: [],
+            js: [],
+            json: [],
+            img: [],
+            other: [],
+        };
+    }
 
-const parseFile = async (srcPath, distPath, parseFunction = fs.readFile) => {
+    for (let item of dir.content) {
+        if (item.isDir) {
+            sortDir(item, files);
+        } else if (item.type === '.html') {
+            files.html.push(item);
+        } else if (item.type === '.css') {
+            files.css.push(item);
+        } else if (item.type === '.js') {
+            files.js.push(item);
+        } else if (['.json', '.webmanifest'].includes(item.type)) {
+            files.json.push(item);
+        } else if (['.png', '.jpg', '.jpeg'].includes(item.type)) {
+            files.img.push(item);
+        } else {
+            files.other.push(item);
+        }
+    }
+
+    return files;
+}
+
+async function readDir(rootDirAbsPath, currentDirRelPath = '') {
+    const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
+    const dir = await fs.readdir(dirPath, { withFileTypes: true });
+    const dirMap = {
+        isDir: true,
+        name: path.basename(dirPath),
+        absPath: path.dirname(dirPath),
+        relPath: currentDirRelPath,
+        content: [],
+    };
+
+    for (let item of dir) {
+        if (item.isFile()) {
+            const ext = path.extname(item.name);
+            dirMap.content.push({
+                absPath: dirPath,
+                relPath: currentDirRelPath,
+                name: path.basename(item.name, ext),
+                type: ext,
+            });
+        } else if (item.isDirectory()) {
+            dirMap.content.push(await readDir(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
+        }
+    }
+
+    return dirMap;
+}
+
+async function parseImgFiles(imgFiles) {
+    const imgMap = {};
+
+    for (let file of imgFiles) {
+        const srcFileAbsPath = path.join(file.absPath, `${file.name}${file.type}`);
+        const srcFileRelPath = path.join(file.relPath, `${file.name}${file.type}`);
+        const imgWidthVersions = [];
+    
+        for (let width of IMAGE_WIDTHS) {
+            const imgTypeVersions = {};
+            const distFileName = `${file.name}-${width}`;
+
+            const webpDistRelPath = path.join(file.relPath, `${distFileName}.webp`);
+            await parseFile(
+                srcFileAbsPath,
+                path.join(DIST, webpDistRelPath),
+                async (srcPath) => await sharp(srcPath).resize(width).webp().toBuffer(),
+            );
+            imgTypeVersions.webp = webpDistRelPath;
+
+            const avifDistRelPath = path.join(file.relPath, `${distFileName}.avif`);
+            await parseFile(
+                srcFileAbsPath,
+                path.join(DIST, avifDistRelPath),
+                async (srcPath) => await sharp(srcPath).resize(width).avif().toBuffer(),
+            );
+            imgTypeVersions.avif = avifDistRelPath;
+
+            const jpegDistRelPath = path.join(file.relPath, `${distFileName}.jpeg`);            
+            await parseFile(
+                srcFileAbsPath,
+                path.join(DIST, jpegDistRelPath),
+                async (srcPath) => await sharp(srcPath).resize(width).jpeg().toBuffer(),
+            );
+            imgTypeVersions.jpeg = jpegDistRelPath;
+
+            imgWidthVersions.push(imgTypeVersions);
+        }
+
+        imgMap[srcFileRelPath] = imgWidthVersions;
+    }
+
+    return imgMap;
+}
+
+async function parseHtmlFiles(htmlFiles) {
+    for (let file of htmlFiles) {
+        // substitute variables from config
+        // replace imgs with responsive
+        // prepopulate labels
+        // set defaults to styling
+        await minifyFile(file);
+    }
+}
+
+async function parseCssFiles(cssFiles) {
+    for (let file of cssFiles) {
+        // substitute variables from config
+        // replace imgs with responsive
+        await minifyFile(file);
+    }
+}
+
+async function parseJsFiles(jsFiles) {
+    for (let file of jsFiles) {
+        await minifyFile(file);
+    }
+}
+
+async function parseJsonFiles(jsonFiles) {
+    for (let file of jsonFiles) {
+        await parseFile(
+            path.join(SRC, file),
+            path.join(DIST, file),
+            async (srcPath) => {
+                const fileContent = await fs.readFile(srcPath);
+                return JSON.stringify(JSON.parse(fileContent));
+            },
+        );
+    }
+}
+
+async function parseOtherFiles(otherFiles) {
+    for (let file of otherFiles) {
+        await parseFile(path.join(SRC, file), path.join(DIST, file));
+    }
+}
+
+async function minifyFile(file) {
+    await parseFile(
+        path.join(SRC, file),
+        path.join(DIST, file),
+        async (srcPath) => await minify(srcPath, MINIFY_OPTIONS),
+    );
+}
+
+async function parseFile(srcPath, distPath, parseFunction = fs.readFile) {
     console.log(`Trying to parse file ${srcPath} to ${distPath}`);
     try {
         await fs.writeFile(distPath, await parseFunction(srcPath));
@@ -71,102 +234,4 @@ const parseFile = async (srcPath, distPath, parseFunction = fs.readFile) => {
     }
 }
 
-Array.from(await fs.readdir(SRC)).forEach((file) => {
-    const fileType = file.substring(file.lastIndexOf('.') + 1);
-
-    switch (fileType) {
-        case 'html':
-            files.html.push(file);
-            break;
-
-        case 'css':
-            files.css.push(file);
-            break;
-
-        case 'js':
-            files.js.push(file);
-            break;
-
-        case 'json':
-        case 'webmanifest':
-            files.json.push(file);
-            break;
-
-        case 'png':
-        case 'jpg':
-        case 'jpeg':
-            files.img.push(file);
-            break;
-
-        default:
-            files.others.push(file);
-            break;
-    }
-});
-
-files.img.forEach(async (file) => {
-    // build map for html and css?
-    const srcFilePath = path.join(SRC, file);
-    const srcFileName = file.substring(0, file.lastIndexOf('.'));
-
-    IMAGE_WIDTHS.forEach(async (width) => {
-        await parseFile(
-            srcFilePath,
-            path.join(DIST, `${srcFileName}-${width}.webp`),
-            async (srcPath) => await sharp(srcPath).resize(width).webp().toBuffer(),
-        );
-        await parseFile(
-            srcFilePath,
-            path.join(DIST, `${srcFileName}-${width}.avif`),
-            async (srcPath) => await sharp(srcPath).resize(width).avif().toBuffer(),
-        );
-        await parseFile(
-            srcFilePath,
-            path.join(DIST, `${srcFileName}-${width}.jpeg`),
-            async (srcPath) => await sharp(srcPath).resize(width).jpeg().toBuffer(),
-        );
-    });
-});
-
-files.html.forEach(async (file) => {
-    // replace imgs with responsive
-    // prepopulate labels
-    // set defaults to styling
-    await parseFile(
-        path.join(SRC, file),
-        path.join(DIST, file),
-        async (srcPath) => await minify(srcPath, MINIFY_OPTIONS),
-    );
-});
-
-files.css.forEach(async (file) => {
-    // replace imgs with responsive
-    await parseFile(
-        path.join(SRC, file),
-        path.join(DIST, file),
-        async (srcPath) => await minify(srcPath, MINIFY_OPTIONS),
-    );
-});
-
-files.js.forEach(async (file) => {
-    await parseFile(
-        path.join(SRC, file),
-        path.join(DIST, file),
-        async (srcPath) => await minify(srcPath, MINIFY_OPTIONS),
-    );
-});
-
-files.json.forEach(async (file) => {
-    await parseFile(
-        path.join(SRC, file),
-        path.join(DIST, file),
-        async (srcPath) => {
-            const fileContent = await fs.readFile(srcPath);
-            return JSON.stringify(JSON.parse(fileContent));
-        },
-    );
-});
-
-files.others.forEach(async (file) => {
-    await parseFile(path.join(SRC, file), path.join(DIST, file));
-});
+build();
