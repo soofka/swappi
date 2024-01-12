@@ -1,12 +1,11 @@
 # swn.ski
 
 ## todo:
+* scroll anchor bug again
+* build as per comments
 * aria tags
 * per page content
 * full translation with meta
-* image optimization
-* minification
-* prerender + default settings with media queries
 * favicon
 * split into libraries
     * scroll text
