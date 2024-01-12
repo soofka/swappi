@@ -189,7 +189,7 @@ footer ul li {
     align-items: center;
 }
 #intro::before {
-    background-image: url(me.jpg);
+    background-image: url('./me.jpg');
 }
 #intro .box {
     position: relative;
