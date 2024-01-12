@@ -37,15 +37,14 @@ const builder = {
     },
 
     initDistDir: async function() {
-        // make it remove dist
         try {
-            await fs.stat(this.config.dist);
+            await fs.rm(this.config.dist, { recursive: true });
         } catch(e) {
             if (e.code !== 'ENOENT') {
                 throw e;
             }
-            await fs.mkdir(this.config.dist);
         }
+        await fs.mkdir(this.config.dist, { recursive: true });
     },
 
     initSrcFiles: async function() {
@@ -59,41 +58,43 @@ const builder = {
     },
 
     parseImgFiles: async function() {
+        const CURRENT = 'CURRENT';
+
         for (let file of this.files.img) {
             const srcFileRelPath = path.join(file.relPath, `${file.name}${file.type}`);
 
-            // deduplicate with current
-            // or just fuck current
-            let imageWidths = ['current'];
+            let imageWidths = [CURRENT];
             if (this.config.options.resizeImages) {
-                imageWidths = [...this.config.options.resizedImagesWidths, ...imageWidths];
+                imageWidths = this.config.options.resizedImagesWidths;
             }
 
-            let imageTypes = ['current']; 
+            let imageTypes = [CURRENT]; 
             if (this.config.options.optimizeImages) {
-                imageTypes = [...this.config.options.optimizedImagesTypes, ...imageTypes];
+                imageTypes = this.config.options.optimizedImagesTypes;
             }
             
             const imgWidthVersions = [];
         
             for (let width of imageWidths) {
-                const isCurrentWidth = width === 'current';
+                const isCurrentWidth = width === CURRENT;
                 const distFileName = isCurrentWidth ? file.name : `${file.name}-${width}`;
 
                 const imgTypeVersions = {};
 
                 for (let type of imageTypes) {
-                    const isCurrentType = type === 'current';
+                    const isCurrentType = type === CURRENT;
                     const distFileFullName = isCurrentType ? `${distFileName}${file.type}` : `${distFileName}.${type}`;
                     const distFileRelPath = path.join(file.relPath, distFileFullName);
 
                     let parseFunction;
-                    if (!isCurrentWidth && !isCurrentType) {
-                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width)[type]().toBuffer();
-                    } else if (!isCurrentWidth && isCurrentType) {
-                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width).toBuffer();
+                    if (isCurrentWidth && isCurrentType) {
+                        continue;
                     } else if (isCurrentWidth && !isCurrentType) {
                         parseFunction = async (srcPath) => await sharp(srcPath)[type]().toBuffer();
+                    } else if (!isCurrentWidth && isCurrentType) {
+                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width).toBuffer();
+                    } else if (!isCurrentWidth && !isCurrentType) {
+                        parseFunction = async (srcPath) => await sharp(srcPath).resize(width)[type]().toBuffer();
                     }
 
                     await this.parseFile(
@@ -216,7 +217,6 @@ async function groupDirByFileTypeRec(dir, fileTypeGroups, includeOther, fileGrou
 }
 
 async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
-    console.log('hmm', rootDirAbsPath, currentDirRelPath);
     const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
     const dir = await fs.readdir(dirPath, { withFileTypes: true });
     const dirMap = {
@@ -244,22 +244,25 @@ async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
     return dirMap;
 }
 
-async function parseFile(srcPath, distPath, parseFunction = fs.readFile, fallbackFunction = undefined) {
-    // handle creation of directories???
-    console.log(`Trying to parse file ${srcPath} to ${distPath}`);
+async function parseFile(srcPath, distPath, parseFunction = fs.readFile) {
+    try {
+        await fs.stat(distPath);
+    } catch(e) {
+        if (e.code !== 'ENOENT') {
+            throw e;
+        }
+        fs.mkdir(path.dirname(distPath), { recursive: true });
+    }
+
     try {
         await fs.writeFile(distPath, await parseFunction(srcPath));
-        console.log(`Successfully parsed file ${srcPath} to ${distPath}`);
     } catch(e) {
         console.warn(`Failed to parse file ${srcPath}: ${e}`);
-
-        if (fallbackFunction) {
-            try {
-                await fallbackFunction(srcPath, distPath);
-                console.log(`Successfully executed fallback function for file ${srcPath} to ${distPath}`);
-            } catch(e) {
-                console.warn(`Failed to parse file ${srcPath}: ${e}`);
-            }
+        console.warn(`Falling back to copying file to ${distPath}`);
+        try {
+            await fs.copyFile(srcPath, distPath);
+        } catch(e) {
+            console.warn(`Failed to copy file ${srcPath} to ${distPath}`);
         }
     }
 }
