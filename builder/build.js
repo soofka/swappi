@@ -70,14 +70,28 @@ const builder = {
 
             if (typeof moduleDefault === 'function') {
                 const resultContent = moduleDefault(this.config.data);
-                const resultPath = path.join(this.config.src, template.relPath, template.name);
+                const resultPath = path.join(this.config.templatesOutput, template.relPath, template.name);
+                try {
+                    await fs.mkdir(path.dirname(resultPath), { recursive: true });
+                } catch(e) {
+                    if (e !== 'EEXIST') {
+                        throw e;
+                    }
+                }
                 await fs.writeFile(resultPath, resultContent);
             } else if (typeof moduleDefault === 'object') {
                 for (let key of Object.keys(moduleDefault)) {
                     const resultContent = moduleDefault[key](this.config.data);
                     const dotIndex = template.name.lastIndexOf('.');
                     const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
-                    const resultPath = path.join(this.config.src, template.relPath, resultName);
+                    const resultPath = path.join(this.config.templatesOutput, template.relPath, resultName);
+                    try {
+                        await fs.mkdir(path.dirname(resultPath), { recursive: true });
+                    } catch(e) {
+                        if (e !== 'EEXIST') {
+                            throw e;
+                        }
+                    }
                     await fs.writeFile(resultPath, resultContent);
                 }
             }

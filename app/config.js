@@ -4,7 +4,9 @@ const appPath = path.resolve('app');
 export const config = {
     src: path.join(appPath, 'src', 'public'),
     dist: path.join(appPath, 'dist'),
+
     templates: path.join(appPath, 'src', 'templates'),
+    templatesOutput: path.join(appPath, 'src', 'public', 'generated'),
 
     options: {
         resizeImages: true,
@@ -49,6 +51,18 @@ export const config = {
     },
 
     data: {
-        title: 'swn.ski',
+        en: {
+            title: 'swn.ski',
+            decription: 'swn.ski description',
+            keywords: ['swn.ski', 'key', 'word'],
+            author: 'swn.ski en',
+        },
+        pl: {
+            title: 'swn.ski',
+            decription: 'swn.ski opis',
+            keywords: ['swn.ski', 'słowo', 'kluczowe'],
+            author: 'swn.ski pl',
+        },
+        colors: ['#f4f7fc', '#dfe7f2', '#8fa4c3', '#586c91', '#283347'],
     },
 }

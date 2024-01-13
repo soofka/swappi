@@ -1,2 +1,3 @@
-dist
+app/dist
+app/src/public/generated
 node_modules
