@@ -1,8 +1,10 @@
 import path from 'path';
 
+const appPath = path.resolve('app');
 export const config = {
-    src: path.resolve('src'),
-    dist: path.resolve('dist'),
+    src: path.join(appPath, 'src', 'public'),
+    dist: path.join(appPath, 'dist'),
+    templates: path.join(appPath, 'src', 'templates'),
 
     options: {
         resizeImages: true,
@@ -44,5 +46,9 @@ export const config = {
                 compatibility: '*',
             },
         },
+    },
+
+    data: {
+        title: 'swn.ski',
     },
 }

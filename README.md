@@ -1,6 +1,7 @@
 # swn.ski
 
-## todo:
+## app
+### todo:
 * scroll anchor bug again
 * build as per comments
 * aria tags
@@ -16,3 +17,6 @@
     * lighthouse
     * w3c
     * iphone
+
+## builder
+### todo

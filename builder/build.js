@@ -2,7 +2,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { minify } from 'minify';
-import { config } from './config.js';
+
+export const build = (config) => builder.init(config);
 
 const builder = {
     
@@ -18,22 +19,24 @@ const builder = {
     imgMap: {},
 
     init: function(config) {
-        // include config validation or sth
+        // include config validation/default
         this.config = config;
         this.build();
     },
 
     build: async function() {
         await this.initDistDir();
+        await this.initTemplates();
         await this.initSrcFiles();
-        console.log(this.files);
-        await this.parseImgFiles();
-        console.log(this.imgMap);
-        await this.parseHtmlFiles();
-        await this.parseCssFiles();
-        await this.parseJsFiles();
-        await this.parseJsonFiles();
-        await this.parseOtherFiles();
+        console.log('files:', this.files);
+        // await this.parseImgFiles();
+        // console.log(this.imgMap);
+        // await this.parseHtmlFiles();
+        // await this.parseCssFiles();
+        // await this.parseJsFiles();
+        // await this.parseJsonFiles();
+        // await this.parseOtherFiles();
+        // rewrite build to use path.parse?
     },
 
     initDistDir: async function() {
@@ -48,13 +51,27 @@ const builder = {
     },
 
     initSrcFiles: async function() {
-        this.files = await groupDirByFileType(this.config.src, {
+        const dir = await readDirRec(this.config.src);
+        this.files = await groupDirByFileTypeRec(dir, {
             html: ['.html'],
             css: ['.css'],
             js: ['.js'],
             json: ['.json', '.webmanifest'],
             img: ['.png', '.jpg', '.jpeg'],
         });
+    },
+
+    initTemplates: async function() {
+        const dir = await readDirRec(this.config.templates);
+        for (let template of dir.content) {
+            // is is cross-env?
+            const modulePath = path.join('file:///', template.absPath, `${template.name}${template.type}`);
+            const module = await import(modulePath);
+            const result = module.default(this.config.data);
+
+            const resultPath = path.join(this.config.src, template.relPath, template.name);
+            await fs.writeFile(resultPath, result);
+        }
     },
 
     parseImgFiles: async function() {
@@ -181,15 +198,7 @@ const builder = {
 
 }
 
-builder.init(config);
-
-async function groupDirByFileType(rootDirAbsPath, fileTypeGroups, includeOther = true) {
-    const dir = await readDirRec(rootDirAbsPath);
-    const fileGroups = await groupDirByFileTypeRec(dir, fileTypeGroups, includeOther);
-    return fileGroups;
-}
-
-async function groupDirByFileTypeRec(dir, fileTypeGroups, includeOther, fileGroups = {}) {
+async function groupDirByFileTypeRec(dir, fileTypeGroups, includeOther = true, fileGroups = {}) {
     for (let item of dir.content) {
         if (item.isDir) {
             fileGroups = await groupDirByFileTypeRec(item, fileTypeGroups, includeOther, fileGroups);
