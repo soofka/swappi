@@ -28,7 +28,6 @@ const builder = {
         await this.initDistDir();
         await this.initTemplates();
         await this.initSrcFiles();
-        console.log('files:', this.files);
         // await this.parseImgFiles();
         // console.log(this.imgMap);
         // await this.parseHtmlFiles();
@@ -67,10 +66,21 @@ const builder = {
             // is is cross-env?
             const modulePath = path.join('file:///', template.absPath, `${template.name}${template.type}`);
             const module = await import(modulePath);
-            const result = module.default(this.config.data);
+            const moduleDefault = module.default;
 
-            const resultPath = path.join(this.config.src, template.relPath, template.name);
-            await fs.writeFile(resultPath, result);
+            if (typeof moduleDefault === 'function') {
+                const resultContent = moduleDefault(this.config.data);
+                const resultPath = path.join(this.config.src, template.relPath, template.name);
+                await fs.writeFile(resultPath, resultContent);
+            } else if (typeof moduleDefault === 'object') {
+                for (let key of Object.keys(moduleDefault)) {
+                    const resultContent = moduleDefault[key](this.config.data);
+                    const dotIndex = template.name.lastIndexOf('.');
+                    const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
+                    const resultPath = path.join(this.config.src, template.relPath, resultName);
+                    await fs.writeFile(resultPath, resultContent);
+                }
+            }
         }
     },
 
