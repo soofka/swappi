@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
-import { minify } from 'minify';
+import * as cheerio from 'cheerio';
+import { minify as htmlMinify } from 'html-minifier';
 
 export const build = (config) => builder.init(config);
 
@@ -28,9 +29,10 @@ const builder = {
         await this.initDistDir();
         await this.initTemplates();
         await this.initSrcFiles();
-        // await this.parseImgFiles();
-        // console.log(this.imgMap);
-        // await this.parseHtmlFiles();
+        console.log(this.files);
+        await this.parseImgFiles();
+        console.log(this.imgMap);
+        await this.parseHtmlFiles();
         // await this.parseCssFiles();
         // await this.parseJsFiles();
         // await this.parseJsonFiles();
@@ -160,7 +162,53 @@ const builder = {
             // replace imgs with responsive
             // prepopulate labels
             // set defaults to styling
-            await this.minifyFile(file);
+            const html = await readFile(this.getFileSrcAbsPath(file), { encoding: 'utf8' });
+            const qs = cheerio.load(html);
+
+            for (let img of qs('img')) {
+                for (let attr of img.attributes) {
+                    if (attr.name === 'src' && Object.keys(this.imgMap).includes(attr.value)) {
+                        const imgObject = this.imgMap[attr.value];
+                        const imgElement = qs(img);
+                        imgElement.replaceWith(() => {
+                            let picture = '<picture>';
+                            for (let type of this.config.options.optimizedImagesTypes) {
+                                picture += '<source srcet="';
+                                for (let widthIndex in this.config.options.resizedImagesWidths) {
+                                    picture += `${imgObject[widthIndex][type]} `;
+                                    picture += `${this.config.options.resizedImagesWidths[widthIndex]}w`;
+                                    if (widthIndex < this.config.options.resizedImagesWidths.length - 1) {
+                                        picture += ', ';
+                                    }
+                                }
+                                picture += `" type="image/${type}">`
+                            }
+                            picture += '</picture>';
+                            return picture;
+                        });
+                        //         <picture>
+                        //         ${this.config.options.optimizedImagesTypes.map((type) => `
+                        //             <source
+                        //                 srcset="${this.config.options.resizedImagesWidths.map((width, index) => `
+                        //                     ${imgObject[index][type]} ${width}w
+                        //                 `)}"
+                        //                 type="image/${type}"
+                        //             >
+                        //         `)}
+                        //         <!-- img fallback to be added -->
+                        //     </picture>
+                        // `);
+                    }
+                }
+                // console.log('image from', file.name, img.attributes);
+            }
+
+            // qs('title').text('PARSOWANY ' + file.name);
+
+            await writeFile(
+                this.getFileDistAbsPath(file),
+                htmlMinify(qs.html(), this.config.options.minify.html),
+            );
         }
     },
     
@@ -204,7 +252,7 @@ const builder = {
         return this.parseFile(
             this.getFileSrcAbsPath(file),
             this.getFileDistAbsPath(file),
-            async (srcPath) => await minify(srcPath, this.config.options.minify),
+            async (srcPath) => {},//await minify(srcPath, this.config.options.minify),
         );
     },
 
@@ -275,6 +323,24 @@ async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
     }
 
     return dirMap;
+}
+
+async function readFile(srcPath, options = {}) {
+    const fileContent = await fs.readFile(srcPath, options);
+    return fileContent;
+}
+
+async function writeFile(distPath, content) {
+    try {
+        await fs.stat(distPath);
+    } catch(e) {
+        if (e.code !== 'ENOENT') {
+            throw e;
+        }
+        fs.mkdir(path.dirname(distPath), { recursive: true });
+    }
+    const result = await fs.writeFile(distPath, content);
+    return result;
 }
 
 async function parseFile(srcPath, distPath, parseFunction = fs.readFile) {
