@@ -5,18 +5,12 @@ export const config = {
     src: path.join(appPath, 'src', 'public'),
     dist: path.join(appPath, 'dist'),
 
+    partials: path.join(appPath, 'src', 'partials'),
     templates: path.join(appPath, 'src', 'templates'),
     templatesOutput: path.join(appPath, 'src', 'public', 'generated'),
 
     options: {
-        resizeImages: true,
-        resizeImagesInHtml: true,
-        resizedImagesWidths: [256, 320, 640, 1280, 1920, 2560],
-        optimizeImages: true,
-        optimizeImagesInHtml: true,
-        optimizedImagesTypes: ['webp', 'avif', 'jpeg'],
-
-        minify: {
+        optimize: {
             js: {
                 mangle: true,
                 mangleClassNames: true,
@@ -25,7 +19,8 @@ export const config = {
                 removeUselessSpread: true,
             },
             img: {
-                maxSize: 4096,
+                widths: [256, 320, 640, 1280, 1920, 2560],
+                types: ['webp', 'avif', 'jpeg'],
             },
             html: {
                 removeComments: false,

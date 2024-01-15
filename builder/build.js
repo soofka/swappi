@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
-import { minify as htmlMinify } from 'html-minifier';
+import { minify as minifyHtml } from 'html-minifier';
 
 export const build = (config) => builder.init(config);
 
@@ -11,6 +11,7 @@ const builder = {
     config: {},
     srcFiles: {},
     distFiles: {},
+    partialFiles: {},
     templateFiles: {},
     filesGroupMap: {
         html: ['.html'],
@@ -29,16 +30,19 @@ const builder = {
 
     build: async function() {
         await this.initDistDir();
+        await this.initPartials();
+        // console.log(this.partialFiles);
         await this.initTemplates();
+        // console.log(this.templateFiles);
         await this.initSrcFiles();
+        // console.log(this.srcFiles);
         await this.parseImgFiles();
-        console.log('gonna emit', this.distFiles);
+        // console.log(this.distFiles);
         await this.parseHtmlFiles();
         // await this.parseCssFiles();
         // await this.parseJsFiles();
         // await this.parseJsonFiles();
         // await this.parseOtherFiles();
-        // rewrite build to use path.parse?
     },
 
     initDistDir: async function() {
@@ -54,29 +58,36 @@ const builder = {
 
     initTemplates: async function() {
         const dir = await readDirRec(this.config.templates);
-        await this.runTemplates(dir.content);
-        this.templateFiles = dir.content; //groupDirByFileTypeRec(dir, this.filesGroupMap);
+        this.templateFiles = groupDirByFileTypeRec(dir, this.filesGroupMap, 2);
+
+        for (let group of Object.keys(this.filesGroupMap)) {
+            for (let template of this.templateFiles[group]) {
+                // is is cross-env?
+                const module = await loadModule(template.full);
+                if (typeof module === 'function') {
+                    const resultContent = module(this.config.data);
+                    const resultPath = path.join(this.config.templatesOutput, template.rel, template.name);
+                    await writeFile(resultPath, resultContent);
+                } else if (typeof module === 'object') {
+                    for (let key of Object.keys(module)) {
+                        const resultContent = module[key](this.config.data);
+                        const dotIndex = template.name.lastIndexOf('.');
+                        const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
+                        const resultPath = path.join(this.config.templatesOutput, template.rel, resultName);
+                        await writeFile(resultPath, resultContent);
+                    }
+                }
+            }
+        }
     },
 
-    runTemplates: async function(templates) {
-        for (let template of templates) {
-            // is is cross-env?
-            const modulePath = path.join('file:///', template.full);
-            const module = await import(modulePath);
-            const moduleDefault = module.default;
+    initPartials: async function() {
+        const dir = await readDirRec(this.config.partials);
+        this.partialFiles = groupDirByFileTypeRec(dir, this.filesGroupMap, 2);
 
-            if (typeof moduleDefault === 'function') {
-                const resultContent = moduleDefault(this.config.data);
-                const resultPath = path.join(this.config.templatesOutput, template.rel, template.name);
-                await writeFile(resultPath, resultContent);
-            } else if (typeof moduleDefault === 'object') {
-                for (let key of Object.keys(moduleDefault)) {
-                    const resultContent = moduleDefault[key](this.config.data);
-                    const dotIndex = template.name.lastIndexOf('.');
-                    const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
-                    const resultPath = path.join(this.config.templatesOutput, template.rel, resultName);
-                    await writeFile(resultPath, resultContent);
-                }
+        for (let group of Object.keys(this.filesGroupMap)) {
+            for (let partial of this.partialFiles[group]) {
+                partial.module = await loadModule(partial.full);
             }
         }
     },
@@ -92,21 +103,11 @@ const builder = {
         this.distFiles.img = [];
 
         for (let file of this.srcFiles.img) {
-            let imageWidths = [CURRENT];
-            if (this.config.options.resizeImages) {
-                imageWidths = this.config.options.resizedImagesWidths;
-            }
-
-            let imageTypes = [CURRENT]; 
-            if (this.config.options.optimizeImages) {
-                imageTypes = this.config.options.optimizedImagesTypes;
-            }
-        
-            for (let width of imageWidths) {
+            for (let width of [CURRENT, ...this.config.options.optimize.img.widths]) {
                 const isCurrentWidth = width === CURRENT;
                 const distFileName = isCurrentWidth ? file.name : `${file.name}-${width}`;
 
-                for (let type of imageTypes) {
+                for (let type of [CURRENT, ...this.config.options.optimize.img.types]) {
                     const isCurrentType = type === CURRENT;
                     const distFileFullName = isCurrentType ? `${distFileName}${file.ext}` : `${distFileName}.${type}`;
                     const distFileAbsPath = this.getFileDistAbsPath(file, distFileFullName);
@@ -122,7 +123,8 @@ const builder = {
                         parseFunction = async (srcPath) => await sharp(srcPath).resize(width)[type]().toBuffer();
                     }
 
-                    await this.parseFile(file.full, distFileAbsPath, parseFunction);
+                    const distFileContent = await parseFunction(file.full);
+                    await writeFile(distFileAbsPath, distFileContent);
                     this.distFiles.img.push(createFileObject(distFileAbsPath, file.rel));
                 }
             }
@@ -131,54 +133,23 @@ const builder = {
 
     parseHtmlFiles: async function () {
         for (let file of this.srcFiles.html) {
-            // substitute variables from config
-            // replace imgs with responsive
-            // prepopulate labels
-            // set defaults to styling
             const html = await readFile(file.full, { encoding: 'utf8' });
             const qs = cheerio.load(html);
 
-            // for (let img of qs('img')) {
-            //     for (let attr of img.attributes) {
-            //         if (attr.name === 'src' && Object.keys(this.imgMap).includes(attr.value)) {
-            //             const imgObject = this.imgMap[attr.value];
-            //             const imgElement = qs(img);
-            //             imgElement.replaceWith(() => {
-            //                 let picture = '<picture>';
-            //                 for (let type of this.config.options.optimizedImagesTypes) {
-            //                     picture += '<source srcet="';
-            //                     for (let widthIndex in this.config.options.resizedImagesWidths) {
-            //                         picture += `${imgObject[widthIndex][type]} `;
-            //                         picture += `${this.config.options.resizedImagesWidths[widthIndex]}w`;
-            //                         if (widthIndex < this.config.options.resizedImagesWidths.length - 1) {
-            //                             picture += ', ';
-            //                         }
-            //                     }
-            //                     picture += `" type="image/${type}">`
-            //                 }
-            //                 picture += '</picture>';
-            //                 return picture;
-            //             });
-            //             //         <picture>
-            //             //         ${this.config.options.optimizedImagesTypes.map((type) => `
-            //             //             <source
-            //             //                 srcset="${this.config.options.resizedImagesWidths.map((width, index) => `
-            //             //                     ${imgObject[index][type]} ${width}w
-            //             //                 `)}"
-            //             //                 type="image/${type}"
-            //             //             >
-            //             //         `)}
-            //             //         <!-- img fallback to be added -->
-            //             //     </picture>
-            //             // `);
-            //         }
-            //     }
-            //     // console.log('image from', file.name, img.attributes);
-            // }
+            for (let partial of this.partialFiles.html) {
+                const partialName = partial.name.substring(0, partial.name.lastIndexOf('.'));
 
-            // qs('title').text('PARSOWANY ' + file.name);
+                for (let partialObject of qs('[partial]')) {
+                    if (partialObject.attribs['partial'] === partialName) {
+                        const partialElement = qs(partialObject);
+                        partialElement.replaceWith(
+                            partial.module(partialElement, partialObject.attribs, this.config, this.distFiles),
+                        );
+                    }
+                }
+            }
 
-            await writeFile(this.getFileDistAbsPath(file), htmlMinify(qs.html(), this.config.options.minify.html));
+            await writeFile(this.getFileDistAbsPath(file), minifyHtml(qs.html(), this.config.options.optimize.html));
         }
     },
     
@@ -186,48 +157,44 @@ const builder = {
         for (let file of this.files.css) {
             // substitute variables from config
             // replace imgs with responsive
-            await this.minifyFile(file);
+            // await this.minifyFile(file);
         }
     },
     
     parseJsFiles: async function() {
         for (let file of this.files.js) {
-            await this.minifyFile(file);
+            // await this.minifyFile(file);
         }
     },
     
     parseJsonFiles: async function() {
-        for (let file of this.files.json) {
-            await this.parseFile(
-                this.getFileSrcAbsPath(file),
-                this.getFileDistAbsPath(file),
-                async (srcPath) => {
-                    const fileContent = await fs.readFile(srcPath);
-                    return JSON.stringify(JSON.parse(fileContent));
-                },
-            );
-        }
+        // for (let file of this.files.json) {
+        //     await this.parseFile(
+        //         this.getFileSrcAbsPath(file),
+        //         this.getFileDistAbsPath(file),
+        //         async (srcPath) => {
+        //             const fileContent = await fs.readFile(srcPath);
+        //             return JSON.stringify(JSON.parse(fileContent));
+        //         },
+        //     );
+        // }
     },
     
     parseOtherFiles: async function() {
         for (let file of this.files.other) {
-            await this.parseFile(
-                this.getFileSrcAbsPath(file),
-                this.getFileDistAbsPath(file),
-            );
+            // await this.parseFile(
+            //     this.getFileSrcAbsPath(file),
+            //     this.getFileDistAbsPath(file),
+            // );
         }
     },
     
     minifyFile: function(file) {
-        return this.parseFile(
-            this.getFileSrcAbsPath(file),
-            this.getFileDistAbsPath(file),
-            async (srcPath) => {},//await minify(srcPath, this.config.options.minify),
-        );
-    },
-
-    parseFile: function(srcAbsPath, distAbsPath, parseFunction) {
-        return parseFile(srcAbsPath, distAbsPath, parseFunction, fs.copyFile);
+        // return this.parseFile(
+        //     this.getFileSrcAbsPath(file),
+        //     this.getFileDistAbsPath(file),
+        //     async (srcPath) => {},//await minify(srcPath, this.config.options.minify),
+        // );
     },
 
     getFileDistAbsPath: function(file, newFullName = undefined) {
@@ -236,25 +203,35 @@ const builder = {
 
 }
 
-function groupDirByFileTypeRec(dir, fileTypeGroups, includeOther = true, fileGroups = {}) {
+function groupDirByFileTypeRec(dir, fileTypeGroups, extLevel = 1, includeOther = true, fileGroups = {}) {
+    for (let group of Object.keys(fileTypeGroups)) {
+        if (!fileGroups.hasOwnProperty(group)) {
+            fileGroups[group] = [];
+        }
+    }
+
+    if (includeOther) {
+        fileGroups.other = [];
+    }
+
     for (let item of dir.content) {
         if (item.isDir) {
-            fileGroups = groupDirByFileTypeRec(item, fileTypeGroups, includeOther, fileGroups);
+            fileGroups = groupDirByFileTypeRec(item, fileTypeGroups, extLevel, includeOther, fileGroups);
         } else {
             let matched = false;
-            for (let group of Object.keys(fileTypeGroups)) {
-                if (!fileGroups.hasOwnProperty(group)) {
-                    fileGroups[group] = [];
-                }
-                if (fileTypeGroups[group].includes(item.ext)) {
-                    matched = true;
-                    fileGroups[group].push(item);
+            const baseSections = item.base.split('.');
+
+            if (extLevel <= baseSections.length) {
+                const ext = `.${baseSections[baseSections.length - extLevel]}`;
+                for (let group of Object.keys(fileTypeGroups)) {
+                    if (fileTypeGroups[group].includes(ext)) {
+                        fileGroups[group].push(item);
+                        matched = true;
+                        break;
+                    }
                 }
             }
-            if (!matched) {
-                if (!fileGroups.hasOwnProperty('other')) {
-                    fileGroups.other = [];
-                }
+            if (!matched && includeOther) {
                 fileGroups.other.push(item);
             }
         }
@@ -313,25 +290,7 @@ async function writeFile(distPath, content) {
     return result;
 }
 
-async function parseFile(srcPath, distPath, parseFunction = fs.readFile) {
-    try {
-        await fs.stat(distPath);
-    } catch(e) {
-        if (e.code !== 'ENOENT') {
-            throw e;
-        }
-        fs.mkdir(path.dirname(distPath), { recursive: true });
-    }
-
-    try {
-        await fs.writeFile(distPath, await parseFunction(srcPath));
-    } catch(e) {
-        console.warn(`Failed to parse file ${srcPath}: ${e}`);
-        console.warn(`Falling back to copying file to ${distPath}`);
-        try {
-            await fs.copyFile(srcPath, distPath);
-        } catch(e) {
-            console.warn(`Failed to copy file ${srcPath} to ${distPath}`);
-        }
-    }
+async function loadModule(absPath) {
+    const module = await import(path.join('file:///', absPath));
+    return module.default;
 }
