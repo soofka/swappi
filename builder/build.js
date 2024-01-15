@@ -3,6 +3,8 @@ import path from 'path';
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
 import { minify as minifyHtml } from 'html-minifier';
+import css from 'css';
+import CleanCSS from 'clean-css';
 
 export const build = (config) => builder.init(config);
 
@@ -38,10 +40,10 @@ const builder = {
         // console.log(this.srcFiles);
         await this.parseImgFiles();
         // console.log(this.distFiles);
-        await this.parseHtmlFiles();
-        // await this.parseCssFiles();
+        await this.parseCssFiles();
         // await this.parseJsFiles();
         // await this.parseJsonFiles();
+        await this.parseHtmlFiles();
         // await this.parseOtherFiles();
     },
 
@@ -154,10 +156,30 @@ const builder = {
     },
     
     parseCssFiles: async function() {
-        for (let file of this.files.css) {
-            // substitute variables from config
-            // replace imgs with responsive
-            // await this.minifyFile(file);
+        const cssMinifier = new CleanCSS(this.config.options.optimize.css);
+        for (let file of this.srcFiles.css) {
+            const fileContent = await fs.readFile(file.full, 'utf8');
+            const fileContentParsed = css.parse(fileContent);
+
+            for (let partial of this.partialFiles.css) {
+                const partialName = partial.name.substring(0, partial.name.lastIndexOf('.'));
+
+                for (let rule of fileContentParsed.stylesheet.rules) {
+                    if (rule.type === 'rule') {
+                        for (let declaration of rule.declarations) {
+                            if (declaration.type === 'declaration') {
+                                const declarationName = declaration.value.substring(1).split(':')[0];
+
+                                if (declaration.property === 'partial' && declarationName === partialName) {
+                                    declaration = partial.module(declaration, this.config, this.distFiles);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            await writeFile(this.getFileDistAbsPath(file), cssMinifier.minify(css.stringify(fileContentParsed)).styles);
         }
     },
     

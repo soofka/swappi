@@ -1,4 +1,4 @@
-const label = (element, attributes, config) => {
+const label = (htmlElement, attributes, config) => {
     let tempLabel = config.data.labels.en;
     let value = attributes['label-id'];
     const keys = value.split('.');
@@ -19,8 +19,8 @@ const label = (element, attributes, config) => {
         value = value.join('');
     }
 
-    element.html(value);
-    return element;
+    htmlElement.html(value);
+    return htmlElement;
 };
 
 export default label;
