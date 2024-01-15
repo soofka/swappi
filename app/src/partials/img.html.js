@@ -1,7 +1,9 @@
 const img = (element, attributes, config, files) => {
-    let picture = '<picture ';
+    let picture = '<picture';
     for (let key of Object.keys(attributes)) {
-        picture += `${key}="${attributes[key]}"`;
+        if (key !== 'name' && key !== 'src') {
+            picture += ` ${key}="${attributes[key]}"`;
+        }
     }
     picture += '>';
 
@@ -22,7 +24,7 @@ const img = (element, attributes, config, files) => {
         picture += `" type="image/${type}">`
     }
 
-    return picture + element.html() + '</picture>';
+    return picture + '</picture>';
 }
 
 export default img;

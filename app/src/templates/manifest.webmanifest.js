@@ -1,8 +1,8 @@
 const manifest = (data, lang, theme) => {
     const color = theme === 'dark' ? data.colors[4] : data.colors[0];
     return JSON.stringify({
-        name: data[lang].title,
-        short_name: data[lang].title,
+        name: data.labels[lang].title,
+        short_name: data.labels[lang].title,
         start_url: '/',
         theme_color: color,
         background_color: color,
