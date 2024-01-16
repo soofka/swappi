@@ -13,13 +13,7 @@ export const config = {
 
     options: {
         optimize: {
-            js: {
-                mangle: true,
-                mangleClassNames: true,
-                removeUnusedVariables: true,
-                removeConsole: true,
-                removeUselessSpread: true,
-            },
+            js: {},
             img: {
                 widths: [256, 320, 640, 1280, 1920, 2560],
                 types: ['webp', 'avif', 'jpeg'],
