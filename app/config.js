@@ -1,6 +1,8 @@
 import path from 'path';
 
 const appPath = path.resolve('app');
+const colors = ['#f4f7fc', '#dfe7f2', '#8fa4c3', '#586c91', '#283347'];
+
 export const config = {
     src: path.join(appPath, 'src', 'public'),
     dist: path.join(appPath, 'dist'),
@@ -46,14 +48,20 @@ export const config = {
     },
 
     data: {
-        colors: ['#f4f7fc', '#dfe7f2', '#8fa4c3', '#586c91', '#283347'],
+        name: 'swn.ski', 
+        type: 'website',
+        url: 'https://swn.ski',
+        author: 'Jakub Sowiński <j@swn.ski> (https://swn.ski)',
+
+        themes: [{ name: 'light', color: colors[0] }, { name: 'dark', color: colors[4] }],
+        langs: ['en', 'pl'],
+        colors,
+
         labels: {
             en: {
                 'meta': {
                     'title': 'swn.ski',
-                    'decription': 'swn.ski description',
-                    'keywords': ['swn.ski', 'key', 'word'],
-                    'author': 'swn.ski en',
+                    'description': 'swn.ski description',
                 },
                 'navigation': {
                     'home': 'home',
@@ -97,9 +105,7 @@ export const config = {
             pl: {
                 'meta': {
                     'title': 'swn.ski',
-                    'decription': 'swn.ski opis',
-                    'keywords': ['swn.ski', 'słowo', 'kluczowe'],
-                    'author': 'swn.ski pl',
+                    'description': 'swn.ski opis',
                 },
                 'navigation': {
                     'home': 'home',

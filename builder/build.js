@@ -37,6 +37,7 @@ const builder = {
         await this.initTemplates();
         // console.log(this.templateFiles);
         await this.initSrcFiles();
+        await this.initDistFiles();
         // console.log(this.srcFiles);
         await this.parseImgFiles();
         // console.log(this.distFiles);
@@ -97,12 +98,17 @@ const builder = {
     initSrcFiles: async function() {
         const dir = await readDirRec(this.config.src);
         this.srcFiles = await groupDirByFileTypeRec(dir, this.filesGroupMap);
+    },
+
+    initDistFiles: function() {
         this.distFiles = {};
+        for (let group of Object.keys(this.filesGroupMap)) {
+            this.distFiles[group] = [];
+        }
     },
 
     parseImgFiles: async function() {
         const CURRENT = 'CURRENT';
-        this.distFiles.img = [];
 
         for (let file of this.srcFiles.img) {
             for (let width of [CURRENT, ...this.config.options.optimize.img.widths]) {
@@ -126,8 +132,7 @@ const builder = {
                     }
 
                     const distFileContent = await parseFunction(file.full);
-                    await writeFile(distFileAbsPath, distFileContent);
-                    this.distFiles.img.push(createFileObject(distFileAbsPath, file.rel));
+                    await this.saveFile(file, 'img', distFileAbsPath, distFileContent);
                 }
             }
         }
@@ -144,14 +149,18 @@ const builder = {
                 for (let partialObject of qs('[partial]')) {
                     if (partialObject.attribs['partial'] === partialName) {
                         const partialElement = qs(partialObject);
-                        partialElement.replaceWith(
-                            partial.module(partialElement, partialObject.attribs, this.config, this.distFiles),
-                        );
+                        const replacement = partial.module(partialElement, partialObject.attribs, this.config, this.distFiles);
+                        partialElement.replaceWith(replacement);
                     }
                 }
             }
 
-            await writeFile(this.getFileDistAbsPath(file), minifyHtml(qs.html(), this.config.options.optimize.html));
+            await this.saveFile(
+                file,
+                'html',
+                this.getFileDistAbsPath(file),
+                minifyHtml(qs.html(), this.config.options.optimize.html),
+            );
         }
     },
     
@@ -179,7 +188,12 @@ const builder = {
                 }
             }
 
-            await writeFile(this.getFileDistAbsPath(file), cssMinifier.minify(css.stringify(fileContentParsed)).styles);
+            await this.saveFile(
+                file,
+                'css',
+                this.getFileDistAbsPath(file),
+                cssMinifier.minify(css.stringify(fileContentParsed)).styles,
+            );
         }
     },
     
@@ -210,13 +224,10 @@ const builder = {
             // );
         }
     },
-    
-    minifyFile: function(file) {
-        // return this.parseFile(
-        //     this.getFileSrcAbsPath(file),
-        //     this.getFileDistAbsPath(file),
-        //     async (srcPath) => {},//await minify(srcPath, this.config.options.minify),
-        // );
+
+    saveFile: async function(file, group, absPath, content) {
+        this.distFiles[group].push(createFileObject(absPath, file.rel));
+        await writeFile(absPath, content);
     },
 
     getFileDistAbsPath: function(file, newFullName = undefined) {

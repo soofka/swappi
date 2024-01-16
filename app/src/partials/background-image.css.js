@@ -9,7 +9,7 @@ const backgroundImage = (cssDeclaration, config, files) => {
             const newFileName = `${originalFileName}-${width}.${type}`;
             const imgFile = files.img.find((file) => file.base === newFileName);
             if (imgFile) {
-                value += `url("${newFileName}") type("image/${type}") ${widthIndex + 1}x`
+                value += `url("${newFileName}") type("image/${type}") ${(parseInt(widthIndex) + 1)}x`
                 if (widthIndex < config.options.optimize.img.widths.length - 1) {
                     value += ', ';
                 }

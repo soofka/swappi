@@ -1,12 +1,19 @@
 const manifest = (data, lang, theme) => {
     const color = theme === 'dark' ? data.colors[4] : data.colors[0];
     return JSON.stringify({
+        background_color: color,
+        categories: '',
+        description: '',
+        display: 'standalone',
+        icons: [],
         name: data.labels[lang].title,
+        orientation: '',
+        scope: '/',
+        screenshots: [],
         short_name: data.labels[lang].title,
+        shortcuts: [],
         start_url: '/',
         theme_color: color,
-        background_color: color,
-        display: 'standalone',
     });
 }
 

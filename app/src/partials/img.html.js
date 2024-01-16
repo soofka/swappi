@@ -14,8 +14,7 @@ const img = (element, attributes, config, files) => {
             const fileName = `${attributes.src.substring(0, attributes.src.lastIndexOf('.'))}-${width}.${type}`;
             const imgFile = files.img.find((file) => file.base === fileName);
             if (imgFile) {
-                picture += `${imgFile.base} `;
-                picture += `${width}w`;
+                picture += `${imgFile.base} ${width}w`;
                 if (widthIndex < config.options.optimize.img.widths.length - 1) {
                     picture += ', ';
                 }
