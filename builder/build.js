@@ -1,5 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
+
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
 import { minify as minifyHtml } from 'html-minifier';
@@ -27,6 +29,7 @@ const CONFIG_DEFAULT = {
     templatesOutput: path.resolve('generated'),
 
     options: {
+        hash: true,
         optimize: {
             js: {},
             img: {
@@ -66,7 +69,6 @@ const builder = {
     templateFiles: {},
 
     init: function(config) {
-        // include config validation/default
         this.config = deepMerge(CONFIG_DEFAULT, config);
         this.build();
     },
@@ -155,11 +157,7 @@ const builder = {
 
                 for (let type of [CURRENT, ...this.config.options.optimize.img.types]) {
                     const isCurrentType = type === CURRENT;
-                    const newFile = { ...file, name: distFileName };
-                    if (!isCurrentType) {
-                        newFile.ext = `.${type}`;
-                    }
-                    newFile.base = `${newFile.name}${newFile.ext}`;
+                    const newFile = renameFileObject(file, distFileName, isCurrentType ? file.ext : `.${type}`);
 
                     let newFileContent = '';
                     if (isCurrentWidth && isCurrentType) {
@@ -251,6 +249,9 @@ const builder = {
     },
 
     saveFile: async function(file, content) {
+        if (this.config.options.hash) {
+            file = renameFileObject(file, `${file.name}-${crypto.createHash('sha256').update(content).digest('hex')}`);
+        }
         const absPath = path.join(this.config.dist, file.rel, file.base);
         const fileGroup = Object.keys(FILES_GROUP_MAP).find((key) => FILES_GROUP_MAP[key].includes(file.ext)) || OTHER;
         this.distFiles[fileGroup].push(createFileObject(absPath, file.rel));
@@ -313,7 +314,7 @@ async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
 }
 
 
-function createFileObject (fullPath, relPath, isDir = false) {
+function createFileObject(fullPath, relPath, isDir = false) {
     const fileObject = {
         ...path.parse(fullPath),
         full: fullPath,
@@ -326,6 +327,15 @@ function createFileObject (fullPath, relPath, isDir = false) {
     }
 
     return fileObject;
+}
+
+function renameFileObject(fileObject, name, ext = undefined) {
+    const newFileObject = {...fileObject, name};
+    if (ext) {
+        newFileObject.ext = ext;
+    }
+    newFileObject.base = `${newFileObject.name}${newFileObject.ext}`;
+    return newFileObject;
 }
 
 async function readFile(srcPath, options = { encoding: 'utf8' }) {

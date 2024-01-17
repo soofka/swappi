@@ -21,7 +21,6 @@
 ## builder
 ### todo
 * honor config options
-* add hashes to files
 * figure out image width vs pixel density
 * service worker
 * verbosity logs
