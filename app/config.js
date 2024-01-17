@@ -11,36 +11,6 @@ export const config = {
     templates: path.join(appPath, 'src', 'templates'),
     templatesOutput: path.join(appPath, 'src', 'public', 'generated'),
 
-    options: {
-        optimize: {
-            js: {},
-            img: {
-                widths: [256, 320, 640, 1280, 1920, 2560],
-                types: ['webp', 'avif', 'jpeg'],
-            },
-            html: {
-                removeComments: false,
-                removeCommentsFromCDATA: true,
-                removeCDATASectionsFromCDATA: true,
-                collapseWhitespace: true,
-                collapseBooleanAttributes: true,
-                removeAttributeQuotes: true,
-                removeRedundantAttributes: true,
-                useShortDoctype: true,
-                removeEmptyAttributes: true,
-                removeEmptyElements: false,
-                removeOptionalTags: false,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                minifyJS: true,
-                minifyCSS: true,
-            },
-            css: {
-                compatibility: '*',
-            },
-        },
-    },
-
     data: {
         name: 'swn.ski', 
         type: 'website',

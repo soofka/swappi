@@ -18,6 +18,44 @@ const FILES_GROUP_MAP = {
     json: ['.json', '.webmanifest'],
     img: ['.avif', '.webp', '.gif', '.png', '.jpg', '.jpeg', '.svg'],
 };
+const CONFIG_DEFAULT = {
+    src: path.resolve('src'),
+    dist: path.resolve('dist'),
+
+    partials: path.resolve('partials'),
+    templates: path.resolve('templates'),
+    templatesOutput: path.resolve('generated'),
+
+    options: {
+        optimize: {
+            js: {},
+            img: {
+                widths: [256, 320, 640, 1280, 1920, 2560],
+                types: ['webp', 'avif', 'jpeg'],
+            },
+            html: {
+                removeComments: false,
+                removeCommentsFromCDATA: true,
+                removeCDATASectionsFromCDATA: true,
+                collapseWhitespace: true,
+                collapseBooleanAttributes: true,
+                removeAttributeQuotes: true,
+                removeRedundantAttributes: true,
+                useShortDoctype: true,
+                removeEmptyAttributes: true,
+                removeEmptyElements: false,
+                removeOptionalTags: false,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                minifyJS: true,
+                minifyCSS: true,
+            },
+            css: {
+                compatibility: '*',
+            },
+        },
+    },
+};
 
 const builder = {
     
@@ -29,7 +67,7 @@ const builder = {
 
     init: function(config) {
         // include config validation/default
-        this.config = config;
+        this.config = deepMerge(CONFIG_DEFAULT, config);
         this.build();
     },
 
@@ -117,21 +155,24 @@ const builder = {
 
                 for (let type of [CURRENT, ...this.config.options.optimize.img.types]) {
                     const isCurrentType = type === CURRENT;
-                    file.name = isCurrentType ? `${distFileName}${file.ext}` : `${distFileName}.${type}`;
-                    file.base = `${file.name}${file.ext}`;
+                    const newFile = { ...file, name: distFileName };
+                    if (!isCurrentType) {
+                        newFile.ext = `.${type}`;
+                    }
+                    newFile.base = `${newFile.name}${newFile.ext}`;
 
-                    let fileContent = '';
+                    let newFileContent = '';
                     if (isCurrentWidth && isCurrentType) {
                         continue;
                     } else if (isCurrentWidth && !isCurrentType) {
-                        fileContent = await sharp(file.full)[type]().toBuffer();
+                        newFileContent = await sharp(newFile.full)[type]().toBuffer();
                     } else if (!isCurrentWidth && isCurrentType) {
-                        fileContent = await sharp(file.full).resize(width).toBuffer();
+                        newFileContent = await sharp(newFile.full).resize(width).toBuffer();
                     } else if (!isCurrentWidth && !isCurrentType) {
-                        fileContent = await sharp(file.full).resize(width)[type]().toBuffer();
+                        newFileContent = await sharp(newFile.full).resize(width)[type]().toBuffer();
                     }
 
-                    await this.saveFile(file, fileContent);
+                    await this.saveFile(newFile, newFileContent);
                 }
             }
         }
@@ -308,4 +349,28 @@ async function writeFile(distPath, content) {
 async function loadModule(absPath) {
     const module = await import(path.join('file:///', absPath));
     return module.default;
+}
+
+function isObject(obj){
+    return obj && typeof obj === 'object';
+}
+
+function deepMerge(target, source) { 
+    if (!isObject(target) || !isObject(source)) {
+        return source;
+    }
+
+    for (let key of Object.keys(source)) {
+        const targetValue = target[key];
+        const sourceValue = source[key];
+
+        // if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+        //     target[key] = targetValue.concat(sourceValue);
+        // }
+        target[key] = isObject(targetValue) && isObject(sourceValue)
+            ? deepMerge(Object.assign({}, targetValue), sourceValue)
+            : target[key] = sourceValue;
+    }
+
+    return target;
 }
