@@ -9,10 +9,13 @@ import css from 'css';
 import CleanCSS from 'clean-css';
 import { minify as minifyJs } from 'terser';
 
-export const build = (config) => builder.init(config);
+export const build = (config) => builder.init(config).build();
 
 const OTHER = 'other';
-const CURRENT = 'CURRENT';
+const HASH_ALGORITHM = 'sha256';
+const HASH_SEPARATOR = '+';
+const HTML_PARTIAL_ATTRIBUTE = 'data-swapp-partial';
+const CSS_PARTIAL_DECLARATION = '-swapp-partial';
 const FILES_GROUP_MAP = {
     html: ['.html'],
     css: ['.css'],
@@ -20,66 +23,79 @@ const FILES_GROUP_MAP = {
     json: ['.json', '.webmanifest'],
     img: ['.avif', '.webp', '.gif', '.png', '.jpg', '.jpeg', '.svg'],
 };
-const CONFIG_DEFAULT = {
-    src: path.resolve('src'),
-    dist: path.resolve('dist'),
-
-    partials: path.resolve('partials'),
-    templates: path.resolve('templates'),
-    templatesOutput: path.resolve('generated'),
-
-    options: {
-        hash: true,
-        optimize: {
-            js: {},
-            img: {
-                widths: [256, 320, 640, 1280, 1920, 2560],
-                types: ['webp', 'avif', 'jpeg'],
-            },
-            html: {
-                removeComments: false,
-                removeCommentsFromCDATA: true,
-                removeCDATASectionsFromCDATA: true,
-                collapseWhitespace: true,
-                collapseBooleanAttributes: true,
-                removeAttributeQuotes: true,
-                removeRedundantAttributes: true,
-                useShortDoctype: true,
-                removeEmptyAttributes: true,
-                removeEmptyElements: false,
-                removeOptionalTags: false,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                minifyJS: true,
-                minifyCSS: true,
-            },
-            css: {
-                compatibility: '*',
-            },
-        },
-    },
-};
 
 const builder = {
     
-    config: {},
-    srcFiles: {},
-    distFiles: {},
-    partialFiles: {},
-    templateFiles: {},
+    config: {
+        paths: {
+            src: path.resolve('src'),
+            dist: path.resolve('dist'),
+            static: path.resolve(path.join('src','static')),
+            partials: path.resolve(path.join('src','partials')),
+            templates: path.resolve(path.join('src','tempaltes')),
+            generated: path.resolve(path.join('src','generated')),
+        },
+    
+        options: {
+            hash: true,
+            force: false,
 
-    init: function(config) {
-        this.config = deepMerge(CONFIG_DEFAULT, config);
-        this.build();
+            optimize: {
+                js: {},
+                img: {
+                    widths: [256, 320, 640, 1280, 1920, 2560],
+                    types: ['webp', 'avif', 'jpeg'],
+                },
+                html: {
+                    removeComments: false,
+                    removeCommentsFromCDATA: true,
+                    removeCDATASectionsFromCDATA: true,
+                    collapseWhitespace: true,
+                    collapseBooleanAttributes: true,
+                    removeAttributeQuotes: true,
+                    removeRedundantAttributes: true,
+                    useShortDoctype: true,
+                    removeEmptyAttributes: true,
+                    removeEmptyElements: false,
+                    removeOptionalTags: false,
+                    removeScriptTypeAttributes: true,
+                    removeStyleLinkTypeAttributes: true,
+                    minifyJS: true,
+                    minifyCSS: true,
+                },
+                css: {
+                    compatibility: '*',
+                },
+            },
+        },
+    },
+
+    files: {
+        src: {
+            static: {},
+            partials: {},
+            templates: {},
+            generated: {},
+        },
+        dist: {
+            old: {},
+            new: {},
+        },
+    },
+
+    // srcFiles: {},
+    // distFiles: {},
+    // partialFiles: {},
+    // templateFiles: {},
+
+    init: async function(config) {
+        this.initConfig(config);
+        await this.initSrc();
+        await this.initDist();
+        return this;
     },
 
     build: async function() {
-        await this.initPartials();
-        await this.initTemplates();
-        await this.initSrcFiles();
-        await this.initDistDir();
-        await this.initDistFiles();
-
         await this.parseImgFiles();
         await this.parseCssFiles();
         await this.parseJsFiles();
@@ -88,35 +104,34 @@ const builder = {
         await this.parseOtherFiles();
     },
 
-    initDistDir: async function() {
-        try {
-            await fs.rm(this.config.dist, { recursive: true });
-        } catch(e) {
-            if (e.code !== 'ENOENT') {
-                throw e;
-            }
-        }
-        await fs.mkdir(this.config.dist, { recursive: true });
+    initConfig: function(config) {
+        this.config = deepMerge(this.config, config);
+    },
+
+    initSrc: async function() {
+        await this.initTemplates();
+        await this.initPartials();
+        await this.initStatics();
     },
 
     initTemplates: async function() {
-        const dir = await readDirRec(this.config.templates);
-        this.templateFiles = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
+        const dir = await readDirRec(this.config.paths.templates);
+        this.files.src.templates = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
 
         for (let group of Object.keys(FILES_GROUP_MAP)) {
-            for (let template of this.templateFiles[group]) {
+            for (let template of this.files.src.templates[group]) {
                 // is is cross-env?
                 const module = await loadModule(template.full);
                 if (typeof module === 'function') {
                     const resultContent = module(this.config.data);
-                    const resultPath = path.join(this.config.templatesOutput, template.rel, template.name);
+                    const resultPath = path.join(this.config.paths.generated, template.rel, template.name);
                     await writeFile(resultPath, resultContent);
                 } else if (typeof module === 'object') {
                     for (let key of Object.keys(module)) {
                         const resultContent = module[key](this.config.data);
                         const dotIndex = template.name.lastIndexOf('.');
                         const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
-                        const resultPath = path.join(this.config.templatesOutput, template.rel, resultName);
+                        const resultPath = path.join(this.config.paths.generated, template.rel, resultName);
                         await writeFile(resultPath, resultContent);
                     }
                 }
@@ -125,11 +140,11 @@ const builder = {
     },
 
     initPartials: async function() {
-        const dir = await readDirRec(this.config.partials);
-        this.partialFiles = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
+        const dir = await readDirRec(this.config.paths.partials);
+        this.files.src.partials = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
 
         for (let group of Object.keys(FILES_GROUP_MAP)) {
-            for (let partial of this.partialFiles[group]) {
+            for (let partial of this.files.src.partials[group]) {
                 if (!partial.module) {
                     partial.module = await loadModule(partial.full);
                 }
@@ -137,40 +152,70 @@ const builder = {
         }
     },
 
-    initSrcFiles: async function() {
+    initStatics: async function() {
         const dir = await readDirRec(this.config.src);
-        this.srcFiles = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER);
+        this.files.src.static = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER);
     },
 
-    initDistFiles: function() {
-        this.distFiles = {};
+    initDist: async function() {
+        await this.initOldDist();
+        this.initNewDist();
+    },
+
+    initOldDist: async function() {
+        const dir = await readDirRec(this.config.paths.dist);
+        this.files.dist.old = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER);
+    },
+
+    initNewDist: function() {
+        this.files.dist.new = {};
         for (let group of Object.keys(FILES_GROUP_MAP)) {
-            this.distFiles[group] = [];
+            this.files.dist.new[group] = [];
         }
     },
 
     parseImgFiles: async function() {
-        for (let file of this.srcFiles.img) {
+        const CURRENT = 'CURRENT';
+        for (let file of this.files.src.static.img) {
+            const srcFileContent = await readFile(file.full);
+            file.hash = getFileHash(srcFileContent, HASH_ALGORITHM);
+
+            const srcFileUnchanged = this.files.dist.old.img.some(
+                (oldFile) => oldFile.name === file.name && oldFile.ext === file.ext && oldFile.hash === file.hash
+            );
+
             for (let width of [CURRENT, ...this.config.options.optimize.img.widths]) {
                 const isCurrentWidth = width === CURRENT;
                 const distFileName = isCurrentWidth ? file.name : `${file.name}-${width}`;
 
                 for (let type of [CURRENT, ...this.config.options.optimize.img.types]) {
+                    const newFile = {...file};
+                    newFile.name = distFileName;
+
                     const isCurrentType = type === CURRENT;
-                    const newFile = renameFileObject(file, distFileName, isCurrentType ? file.ext : `.${type}`);
-
-                    let newFileContent = '';
-                    if (isCurrentWidth && isCurrentType) {
-                        continue;
-                    } else if (isCurrentWidth && !isCurrentType) {
-                        newFileContent = await sharp(newFile.full)[type]().toBuffer();
-                    } else if (!isCurrentWidth && isCurrentType) {
-                        newFileContent = await sharp(newFile.full).resize(width).toBuffer();
-                    } else if (!isCurrentWidth && !isCurrentType) {
-                        newFileContent = await sharp(newFile.full).resize(width)[type]().toBuffer();
+                    if (!isCurrentType) {
+                        newFile.ext = `.${type}`;
                     }
+                    newFile.base = `${newFile.name}${newFile.ext}`;
 
-                    await this.saveFile(newFile, newFileContent);
+                    const distFileExists = this.files.dist.old.img.some(
+                        (oldFile) => oldFile.name === newFile.name && oldFile.ext === newFile.ext
+                    );
+
+                    if (this.config.options.force || !srcFileUnchanged || !distFileExists) {
+                        let newFileContent = '';
+                        if (isCurrentWidth && isCurrentType) {
+                            newFileContent = await readFile(newFile.full);
+                        } else if (isCurrentWidth && !isCurrentType) {
+                            newFileContent = await sharp(newFile.full)[type]().toBuffer();
+                        } else if (!isCurrentWidth && isCurrentType) {
+                            newFileContent = await sharp(newFile.full).resize(width).toBuffer();
+                        } else if (!isCurrentWidth && !isCurrentType) {
+                            newFileContent = await sharp(newFile.full).resize(width)[type]().toBuffer();
+                        }
+
+                        await this.saveFile(newFile, newFileContent);
+                    }
                 }
             }
         }
@@ -184,8 +229,8 @@ const builder = {
             for (let partial of this.partialFiles.html) {
                 const partialName = partial.name.substring(0, partial.name.lastIndexOf('.'));
 
-                for (let partialObject of qs('[partial]')) {
-                    if (partialObject.attribs['partial'] === partialName) {
+                for (let partialObject of qs(`[${HTML_PARTIAL_ATTRIBUTE}]`)) {
+                    if (partialObject.attribs[HTML_PARTIAL_ATTRIBUTE] === partialName) {
                         const partialElement = qs(partialObject);
                         partialElement.replaceWith(
                             partial.module(partialElement, partialObject.attribs, this.config, this.distFiles),
@@ -213,7 +258,7 @@ const builder = {
                             if (declaration.type === 'declaration') {
                                 const declarationName = declaration.value.substring(1).split(':')[0];
 
-                                if (declaration.property === 'partial' && declarationName === partialName) {
+                                if (declaration.property === CSS_PARTIAL_DECLARATION && declarationName === partialName) {
                                     declaration = partial.module(declaration, this.config, this.distFiles);
                                 }
                             }
@@ -250,7 +295,8 @@ const builder = {
 
     saveFile: async function(file, content) {
         if (this.config.options.hash) {
-            file = renameFileObject(file, `${file.name}-${crypto.createHash('sha256').update(content).digest('hex')}`);
+            file.hash = getFileHash(content, HASH_ALGORITHM);
+            file.base = `${file.name}${HASH_SEPARATOR}${file.hash}${file.ext}`;
         }
         const absPath = path.join(this.config.dist, file.rel, file.base);
         const fileGroup = Object.keys(FILES_GROUP_MAP).find((key) => FILES_GROUP_MAP[key].includes(file.ext)) || OTHER;
@@ -258,6 +304,22 @@ const builder = {
         await writeFile(absPath, content);
     },
 
+}
+
+async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
+    const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
+    const dir = await fs.readdir(dirPath, { withFileTypes: true });
+    const dirMap = createFileObject(dirPath, currentDirRelPath, true);
+
+    for (let item of dir) {
+        if (item.isFile()) {
+            dirMap.content.push(createFileObject(path.join(item.path, item.name), currentDirRelPath));
+        } else if (item.isDirectory()) {
+            dirMap.content.push(await readDirRec(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
+        }
+    }
+
+    return dirMap;
 }
 
 function groupDirByFileTypeRec(dir, fileTypeGroups, other = false, extLevel = 1, fileGroups = {}) {
@@ -297,22 +359,6 @@ function groupDirByFileTypeRec(dir, fileTypeGroups, other = false, extLevel = 1,
     return fileGroups;
 }
 
-async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
-    const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
-    const dir = await fs.readdir(dirPath, { withFileTypes: true });
-    const dirMap = createFileObject(dirPath, currentDirRelPath, true);
-
-    for (let item of dir) {
-        if (item.isFile()) {
-            dirMap.content.push(createFileObject(path.join(item.path, item.name), currentDirRelPath));
-        } else if (item.isDirectory()) {
-            dirMap.content.push(await readDirRec(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
-        }
-    }
-
-    return dirMap;
-}
-
 
 function createFileObject(fullPath, relPath, isDir = false) {
     const fileObject = {
@@ -320,6 +366,12 @@ function createFileObject(fullPath, relPath, isDir = false) {
         full: fullPath,
         rel: relPath,
     };
+
+    const hashSeparatorIndex = fileObject.name.lastIndexOf(HASH_SEPARATOR);
+    if (hashSeparatorIndex >= 0) {
+        fileObject.hash = fileObject.name.substring(hashSeparatorIndex + 1);
+        fileObject.name = fileObject.name.substring(0, hashSeparatorIndex);
+    }
 
     if (isDir) {
         fileObject.isDir = true;
@@ -329,13 +381,8 @@ function createFileObject(fullPath, relPath, isDir = false) {
     return fileObject;
 }
 
-function renameFileObject(fileObject, name, ext = undefined) {
-    const newFileObject = {...fileObject, name};
-    if (ext) {
-        newFileObject.ext = ext;
-    }
-    newFileObject.base = `${newFileObject.name}${newFileObject.ext}`;
-    return newFileObject;
+function getFileHash(content, algorithm) {
+    return crypto.createHash(algorithm).update(content).digest('hex');
 }
 
 async function readFile(srcPath, options = { encoding: 'utf8' }) {
@@ -359,6 +406,17 @@ async function writeFile(distPath, content) {
 async function loadModule(absPath) {
     const module = await import(path.join('file:///', absPath));
     return module.default;
+}
+
+async function resetDir(absPath) {
+    try {
+        await fs.rm(absPath, { recursive: true });
+    } catch(e) {
+        if (e.code !== 'ENOENT') {
+            throw e;
+        }
+    }
+    await fs.mkdir(absPath, { recursive: true });
 }
 
 function isObject(obj){

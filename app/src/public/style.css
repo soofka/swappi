@@ -189,7 +189,7 @@ footer ul li {
     align-items: center;
 }
 #intro::before {
-    partial: "background-image:me.jpg"
+    -swapp-partial: "background-image:me.jpg"
 }
 #intro .box {
     position: relative;
