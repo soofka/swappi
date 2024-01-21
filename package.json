@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node app/build.js",
     "start": "node app/start.js",
-    "test": "node test.js"
+    "test": "echo \"no tests yet\""
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.12",

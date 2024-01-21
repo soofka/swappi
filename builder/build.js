@@ -30,9 +30,9 @@ const builder = {
         paths: {
             src: path.resolve('src'),
             dist: path.resolve('dist'),
-            static: path.resolve(path.join('src','static')),
+            public: path.resolve(path.join('src','public')),
             partials: path.resolve(path.join('src','partials')),
-            templates: path.resolve(path.join('src','tempaltes')),
+            templates: path.resolve(path.join('src','templates')),
             generated: path.resolve(path.join('src','generated')),
         },
     
@@ -72,7 +72,7 @@ const builder = {
 
     files: {
         src: {
-            static: {},
+            public: {},
             partials: {},
             templates: {},
             generated: {},
@@ -82,11 +82,6 @@ const builder = {
             new: {},
         },
     },
-
-    // srcFiles: {},
-    // distFiles: {},
-    // partialFiles: {},
-    // templateFiles: {},
 
     init: async function(config) {
         this.initConfig(config);
@@ -108,30 +103,37 @@ const builder = {
         this.config = deepMerge(this.config, config);
     },
 
+    initPreviousBuildData: function() {
+
+    },
+
     initSrc: async function() {
         await this.initTemplates();
         await this.initPartials();
-        await this.initStatics();
+        await this.initPublic();
     },
 
     initTemplates: async function() {
         const dir = await readDirRec(this.config.paths.templates);
         this.files.src.templates = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
 
-        for (let group of Object.keys(FILES_GROUP_MAP)) {
-            for (let template of this.files.src.templates[group]) {
+        for (let group of Object.keys(this.files.src.templates)) {
+            for (let file of this.files.src.templates[group]) {
                 // is is cross-env?
-                const module = await loadModule(template.full);
-                if (typeof module === 'function') {
-                    const resultContent = module(this.config.data);
-                    const resultPath = path.join(this.config.paths.generated, template.rel, template.name);
+                const module = await loadModule(file.full);
+                const moduleDefault = module.default;
+                file.hash = getFileHash(module, HASH_ALGORITHM)
+                
+                if (typeof moduleDefault === 'function') {
+                    const resultContent = moduleDefault(this.config.data);
+                    const resultPath = path.join(this.config.paths.generated, file.rel, file.name);
                     await writeFile(resultPath, resultContent);
-                } else if (typeof module === 'object') {
+                } else if (typeof moduleDefault === 'object') {
                     for (let key of Object.keys(module)) {
-                        const resultContent = module[key](this.config.data);
-                        const dotIndex = template.name.lastIndexOf('.');
-                        const resultName = `${template.name.substring(0, dotIndex)}${key}${template.name.substring(dotIndex)}`;
-                        const resultPath = path.join(this.config.paths.generated, template.rel, resultName);
+                        const resultContent = moduleDefault[key](this.config.data);
+                        const dotIndex = file.name.lastIndexOf('.');
+                        const resultName = `${file.name.substring(0, dotIndex)}${key}${file.name.substring(dotIndex)}`;
+                        const resultPath = path.join(this.config.paths.generated, file.rel, resultName);
                         await writeFile(resultPath, resultContent);
                     }
                 }
@@ -143,18 +145,27 @@ const builder = {
         const dir = await readDirRec(this.config.paths.partials);
         this.files.src.partials = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
 
-        for (let group of Object.keys(FILES_GROUP_MAP)) {
-            for (let partial of this.files.src.partials[group]) {
-                if (!partial.module) {
-                    partial.module = await loadModule(partial.full);
+        for (let group of Object.keys(this.files.src.partials)) {
+            for (let file of this.files.src.partials[group]) {
+                if (!file.module) {
+                    const module = await loadModule(file.full);
+                    file.module = module.default;
+                    file.hash = getFileHash(file, HASH_ALGORITHM);
                 }
             }
         }
     },
 
-    initStatics: async function() {
-        const dir = await readDirRec(this.config.src);
-        this.files.src.static = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER);
+    initPublic: async function() {
+        const dir = await readDirRec(this.config.paths.public);
+        this.files.src.public = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER);
+
+        for (let group of Object.keys(this.files.src.public)) {
+            for (let file of this.files.src.public[group]) {
+                file.content = await readFile(file.full);
+                file.hash = getFileHash(file.content, HASH_ALGORITHM);
+            }
+        }
     },
 
     initDist: async function() {
@@ -169,53 +180,47 @@ const builder = {
 
     initNewDist: function() {
         this.files.dist.new = {};
-        for (let group of Object.keys(FILES_GROUP_MAP)) {
+        for (let group of [...Object.keys(FILES_GROUP_MAP), OTHER]) {
             this.files.dist.new[group] = [];
         }
     },
 
     parseImgFiles: async function() {
         const CURRENT = 'CURRENT';
-        for (let file of this.files.src.static.img) {
-            const srcFileContent = await readFile(file.full);
-            file.hash = getFileHash(srcFileContent, HASH_ALGORITHM);
-
-            const srcFileUnchanged = this.files.dist.old.img.some(
-                (oldFile) => oldFile.name === file.name && oldFile.ext === file.ext && oldFile.hash === file.hash
-            );
+        for (let file of this.files.src.public.img) {
+            const srcFileUnchanged = this.checkIfFileUnchanged('img', file);
 
             for (let width of [CURRENT, ...this.config.options.optimize.img.widths]) {
                 const isCurrentWidth = width === CURRENT;
                 const distFileName = isCurrentWidth ? file.name : `${file.name}-${width}`;
 
                 for (let type of [CURRENT, ...this.config.options.optimize.img.types]) {
-                    const newFile = {...file};
-                    newFile.name = distFileName;
-
                     const isCurrentType = type === CURRENT;
+
+                    const newFile = {...file, name: distFileName};
                     if (!isCurrentType) {
                         newFile.ext = `.${type}`;
                     }
-                    newFile.base = `${newFile.name}${newFile.ext}`;
 
                     const distFileExists = this.files.dist.old.img.some(
                         (oldFile) => oldFile.name === newFile.name && oldFile.ext === newFile.ext
                     );
 
                     if (this.config.options.force || !srcFileUnchanged || !distFileExists) {
-                        let newFileContent = '';
-                        if (isCurrentWidth && isCurrentType) {
-                            newFileContent = await readFile(newFile.full);
-                        } else if (isCurrentWidth && !isCurrentType) {
-                            newFileContent = await sharp(newFile.full)[type]().toBuffer();
+                        if (isCurrentWidth && !isCurrentType) {
+                            newFile.content = await sharp(newFile.content)[type]().toBuffer();
                         } else if (!isCurrentWidth && isCurrentType) {
-                            newFileContent = await sharp(newFile.full).resize(width).toBuffer();
+                            newFile.content = await sharp(newFile.content).resize(width).toBuffer();
                         } else if (!isCurrentWidth && !isCurrentType) {
-                            newFileContent = await sharp(newFile.full).resize(width)[type]().toBuffer();
+                            newFile.content = await sharp(newFile.content).resize(width)[type]().toBuffer();
                         }
 
-                        await this.saveFile(newFile, newFileContent);
+                        newFile.changed = true;
+                    } else {
+                        newFile.changed = false;
                     }
+
+                    this.moveFileToDist(newFile);
                 }
             }
         }
@@ -223,10 +228,10 @@ const builder = {
 
     parseHtmlFiles: async function () {
         for (let file of this.srcFiles.html) {
-            const html = await readFile(file.full);
-            const qs = cheerio.load(html);
+            const srcFileUnchanged = this.checkIfFileUnchanged('html', file);
+            const qs = cheerio.load(file.content);
 
-            for (let partial of this.partialFiles.html) {
+            for (let partial of this.files.src.partials.html) {
                 const partialName = partial.name.substring(0, partial.name.lastIndexOf('.'));
 
                 for (let partialObject of qs(`[${HTML_PARTIAL_ATTRIBUTE}]`)) {
@@ -245,7 +250,7 @@ const builder = {
     
     parseCssFiles: async function() {
         const cssMinifier = new CleanCSS(this.config.options.optimize.css);
-        for (let file of this.srcFiles.css) {
+        for (let file of this.files.src.public.css) {
             const fileContent = await readFile(file.full);
             const fileContentParsed = css.parse(fileContent);
 
@@ -293,9 +298,28 @@ const builder = {
         }
     },
 
+    checkIfFileUnchanged: function(group, file) {
+        return this.files.dist.old[group].some((oldFile) => oldFile.name === file.name && oldFile.ext === file.ext && oldFile.hash === file.hash);
+    },
+
+    moveFileToDist: function(file) {
+        const absPath = path.join(this.config.dist, file.rel, file.base);
+        const fileGroup = Object.keys(FILES_GROUP_MAP).find((key) => FILES_GROUP_MAP[key].includes(file.ext)) || OTHER;
+        this.files.dist.new[fileGroup].push(createFileObject(absPath, file.rel));
+    },
+
+    saveFiles: function() {
+        for (let group of Object.keys(this.files.dist.new)) {
+            for (let file of this.files.dist.new[group]) {
+                if (file.changed) {
+                    // hmm)
+                }
+            }
+        }
+    },
+
     saveFile: async function(file, content) {
         if (this.config.options.hash) {
-            file.hash = getFileHash(content, HASH_ALGORITHM);
             file.base = `${file.name}${HASH_SEPARATOR}${file.hash}${file.ext}`;
         }
         const absPath = path.join(this.config.dist, file.rel, file.base);
@@ -405,7 +429,7 @@ async function writeFile(distPath, content) {
 
 async function loadModule(absPath) {
     const module = await import(path.join('file:///', absPath));
-    return module.default;
+    return module;
 }
 
 async function resetDir(absPath) {
