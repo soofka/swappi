@@ -2,6 +2,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 
+import TemplateFile from './files/TemplateFile';
+import groupDirByFileType from './helpers/groupDirByFileType';
+
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
 import { minify as minifyHtml } from 'html-minifier';
@@ -114,16 +117,11 @@ const builder = {
     },
 
     initTemplates: async function() {
-        const dir = await readDirRec(this.config.paths.templates);
-        this.files.src.templates = groupDirByFileTypeRec(dir, FILES_GROUP_MAP, OTHER, 2);
+        this.files.src.templates = await groupDirByFileType(this.config.paths.templates, FILES_GROUP_MAP, OTHER, 2, true);
 
         for (let group of Object.keys(this.files.src.templates)) {
             for (let file of this.files.src.templates[group]) {
                 // is is cross-env?
-                const module = await loadModule(file.full);
-                const moduleDefault = module.default;
-                file.hash = getFileHash(module, HASH_ALGORITHM)
-                
                 if (typeof moduleDefault === 'function') {
                     const resultContent = moduleDefault(this.config.data);
                     const resultPath = path.join(this.config.paths.generated, file.rel, file.name);
@@ -312,7 +310,7 @@ const builder = {
         for (let group of Object.keys(this.files.dist.new)) {
             for (let file of this.files.dist.new[group]) {
                 if (file.changed) {
-                    // hmm)
+                    // hmm
                 }
             }
         }
@@ -328,59 +326,6 @@ const builder = {
         await writeFile(absPath, content);
     },
 
-}
-
-async function readDirRec(rootDirAbsPath, currentDirRelPath = '') {
-    const dirPath = path.join(rootDirAbsPath, currentDirRelPath);
-    const dir = await fs.readdir(dirPath, { withFileTypes: true });
-    const dirMap = createFileObject(dirPath, currentDirRelPath, true);
-
-    for (let item of dir) {
-        if (item.isFile()) {
-            dirMap.content.push(createFileObject(path.join(item.path, item.name), currentDirRelPath));
-        } else if (item.isDirectory()) {
-            dirMap.content.push(await readDirRec(rootDirAbsPath, path.join(currentDirRelPath, item.name)));
-        }
-    }
-
-    return dirMap;
-}
-
-function groupDirByFileTypeRec(dir, fileTypeGroups, other = false, extLevel = 1, fileGroups = {}) {
-    for (let group of Object.keys(fileTypeGroups)) {
-        if (!fileGroups.hasOwnProperty(group)) {
-            fileGroups[group] = [];
-        }
-    }
-
-    if (other) {
-        fileGroups[other] = [];
-    }
-
-    for (let item of dir.content) {
-        if (item.isDir) {
-            fileGroups = groupDirByFileTypeRec(item, fileTypeGroups, other, extLevel, fileGroups);
-        } else {
-            let matched = false;
-            const baseSections = item.base.split('.');
-
-            if (extLevel <= baseSections.length) {
-                const ext = `.${baseSections[baseSections.length - extLevel]}`;
-                for (let group of Object.keys(fileTypeGroups)) {
-                    if (fileTypeGroups[group].includes(ext)) {
-                        fileGroups[group].push(item);
-                        matched = true;
-                        break;
-                    }
-                }
-            }
-            if (!matched && other) {
-                fileGroups[other].push(item);
-            }
-        }
-    }
-
-    return fileGroups;
 }
 
 
