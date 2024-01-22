@@ -1,6 +1,6 @@
 import Directory from '../files/Directory.js';
 
-export async function groupDirByFileType(absPath, fileTypeGroups, other = false, extLevel = 1, runable = false) {
+export async function groupDirByFileType(absPath, fileTypeGroups, other = false, extLevel = 1) {
     const directory = new Directory(absPath, '', fileType);
     await directory.load();
     return groupDirByFileTypeRec(directory, fileTypeGroups, other, extLevel);

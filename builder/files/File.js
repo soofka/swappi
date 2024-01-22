@@ -1,106 +1,29 @@
+import fs from 'fs/promises';
 import Dirent from './Dirent.js';
 
 export class File extends Dirent {
 
-    #srcExt;
-    #srcContent;
-    #srcContentHash;
-
-    _distExt;
-    _distContent;
-    _distContentHash;
-
-    constructor(absPath, relPath) {
-        super(absPath, relPath);
-        this.#srcExt = this.obj.ext;
+    constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
+        super(srcAbsPath, distAbsPaths, relPath);
     }
 
     async load() {
-        if (!this.#srcContent) {
-            this.#srcContent = await fs.readFile(this.srcAbs, { encoding: 'utf8' });
+        this.src.content = await fs.readFile(this.src.abs, { encoding: 'utf8' });
+    }
+
+    async executeAndSave(data) {
+        for (let dist of this.dist) {
+            await this.execute(dist, data);
+            await this.save(dist, data);
         }
     }
 
-    async parse() {
-        this._distContent = this.#srcContent;
-        this._distContentHash = this.#srcContentHash;
+    async execute(dist) {
+        dist.content = this.src.content;
     }
 
-    async save() {
-        try {
-            await fs.stat(this.distAbs);
-        } catch(e) {
-            if (e.code !== 'ENOENT') {
-                throw e;
-            }
-            fs.mkdir(path.dirname(this.distAbs), { recursive: true });
-        }
-        await fs.writeFile(this.distAbs, this._distContent);
-    }
-
-    calculateContentHash(content) {
-        return crypto.createHash('sha256').update(content).digest('hex');;
-    }
-
-    get srcExt() {
-        return this.#srcExt;
-    }
-
-    get srcFull() {
-        return `${this.srcName}${this.#srcExt}`;
-    }
-
-    get srcAbs() {
-        return path.join(this.srcDir, this.srcFull);
-    }
-
-    get srcContent() {
-        return this.#srcContent;
-    }
-
-    set srcContent(content) {
-        this.#srcContent = content;
-        this.#srcContentHash = this.calculateContentHash(this.#srcContent);
-    }
-
-    get srcContentHash() {
-        return this.#srcContentHash;
-    }
-
-    get distExt() {
-        return this._distExt;
-    }
-
-    set distExt(ext) {
-        this._distExt = ext;
-    }
-
-    get distName() {
-        return this._distName;
-    }
-
-    set distName(name) {
-        this._distName = name;
-    }
-
-    get distFull() {
-        return `${this._distName}${this._distExt}`;
-    }
-
-    get distAbs() {
-        return path.join(this._distDir, this.distFull);
-    }
-
-    get distContent() {
-        return this._distContent;
-    }
-
-    set distContent(content) {
-        this._distContent = content;
-    }
-
-    get distContentHash() {
-        return this._distContentHash;
+    async save(dist) {
+        await fs.writeFile(dist.abs, dist.content);
     }
 
     isDir() {
@@ -110,3 +33,25 @@ export class File extends Dirent {
 }
 
 export default File;
+
+
+
+
+for (let group of Object.keys(this.files.src.templates)) {
+    for (let file of this.files.src.templates[group]) {
+        // is is cross-env?
+        if (typeof moduleDefault === 'function') {
+            const resultContent = moduleDefault(this.config.data);
+            const resultPath = path.join(this.config.paths.generated, file.rel, file.name);
+            await writeFile(resultPath, resultContent);
+        } else if (typeof moduleDefault === 'object') {
+            for (let key of Object.keys(module)) {
+                const resultContent = moduleDefault[key](this.config.data);
+                const dotIndex = file.name.lastIndexOf('.');
+                const resultName = `${file.name.substring(0, dotIndex)}${key}${file.name.substring(dotIndex)}`;
+                const resultPath = path.join(this.config.paths.generated, file.rel, resultName);
+                await writeFile(resultPath, resultContent);
+            }
+        }
+    }
+}

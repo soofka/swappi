@@ -7,7 +7,6 @@
   "scripts": {
     "build": "node app/build.js",
     "start": "node app/start.js",
-    "dupa": "node test.js",
     "test": "echo \"no tests yet\""
   },
   "devDependencies": {

@@ -8,7 +8,13 @@ import ImgFile from './ImgFile.js';
 
 export class FileFactory {
 
-    static async getFile(absPath, relPath = '') {
+    #filesGroupMap;
+
+    constructor(filesGroupMap) {
+        this.#filesGroupMap = filesGroupMap;
+    }
+
+    getFile(absPath, relPath = '') {
         const obj = path.parse(absPath);
 
         switch(obj.ext) {

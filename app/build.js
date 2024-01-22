@@ -1,4 +1,4 @@
 import { config } from './config.js';
-import { build } from '../builder/build.js';
+import Builder from '../builder/Builder.js';
 
-build(config);
+new Builder(config);

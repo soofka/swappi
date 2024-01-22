@@ -4,12 +4,13 @@ const appPath = path.resolve('app');
 const colors = ['#f4f7fc', '#dfe7f2', '#8fa4c3', '#586c91', '#283347'];
 
 export const config = {
-    src: path.join(appPath, 'src', 'public'),
-    dist: path.join(appPath, 'dist'),
-
-    partials: path.join(appPath, 'src', 'partials'),
-    templates: path.join(appPath, 'src', 'templates'),
-    templatesOutput: path.join(appPath, 'src', 'public', 'generated'),
+    paths: {
+        dist: path.join(appPath, 'dist'),
+        public: path.join(appPath, 'src', 'public'),
+        partials: path.join(appPath, 'src', 'partials'),
+        templates: path.join(appPath, 'src', 'templates'),
+        generated: path.join(appPath, 'src', 'public', 'generated'),
+    },
 
     data: {
         name: 'swn.ski', 

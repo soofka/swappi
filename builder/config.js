@@ -2,7 +2,6 @@ import path from 'path';
 
 export const config = {
     paths: {
-        src: path.resolve('src'),
         dist: path.resolve('dist'),
         public: path.resolve(path.join('src','public')),
         partials: path.resolve(path.join('src','partials')),

@@ -1,6 +1,6 @@
 import File from './File.js';
 
-export class JsFile extends File {
+export class HtmlFile extends File {
 
     constructor(absPath, relPath) {
         super(absPath, relPath);
@@ -11,4 +11,4 @@ export class JsFile extends File {
 
 }
 
-export default JsFile;
+export default HtmlFile;
