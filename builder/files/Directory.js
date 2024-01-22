@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-
 import Dirent from './Dirent.js';
 
 export class Directory extends Dirent {
@@ -19,7 +18,7 @@ export class Directory extends Dirent {
                 const srcPath = path.join(this.src.abs, item.name);
                 const distPaths = this.dist.map((dist) => path.join(dist.abs, item.name));
                 const fileClass = this.#getFileClass(item);
-                const file = new fileClass(srcPath, distPaths, relPath);
+                const file = new fileClass(srcPath, distPaths, this.src.rel);
                 this.src.content.push(file);
                 await file.load();
             } else if (item.isDirectory()) {
@@ -30,7 +29,7 @@ export class Directory extends Dirent {
         }
     }
 
-    async executeAndSave() {
+    async executeAndSave(data) {
         for (let dist of this.dist) {
             try {
                 await fs.stat(dist.abs);
@@ -42,10 +41,13 @@ export class Directory extends Dirent {
             }
         }
 
+        const result = [];
         for (let dirent of this.src.content) {
-            await dirent.executeAndSave();
-            this.dist.content.push(dirent);
+            await dirent.executeAndSave(data);
+            result.push(dirent);
         }
+
+        return result;
     }
 
     get getFileClass() {

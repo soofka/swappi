@@ -36,7 +36,7 @@ export class Builder {
 
         await this.#files.src.templates.load();
         // compare and mark those to be redone
-        this.#files.src.generated = await this.#files.src.templates.executeAndSave();
+        this.#files.src.generated = await this.#files.src.templates.executeAndSave(this.#config.data);
     }
 
     async initPartials() {

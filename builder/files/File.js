@@ -33,25 +33,3 @@ export class File extends Dirent {
 }
 
 export default File;
-
-
-
-
-for (let group of Object.keys(this.files.src.templates)) {
-    for (let file of this.files.src.templates[group]) {
-        // is is cross-env?
-        if (typeof moduleDefault === 'function') {
-            const resultContent = moduleDefault(this.config.data);
-            const resultPath = path.join(this.config.paths.generated, file.rel, file.name);
-            await writeFile(resultPath, resultContent);
-        } else if (typeof moduleDefault === 'object') {
-            for (let key of Object.keys(module)) {
-                const resultContent = moduleDefault[key](this.config.data);
-                const dotIndex = file.name.lastIndexOf('.');
-                const resultName = `${file.name.substring(0, dotIndex)}${key}${file.name.substring(dotIndex)}`;
-                const resultPath = path.join(this.config.paths.generated, file.rel, resultName);
-                await writeFile(resultPath, resultContent);
-            }
-        }
-    }
-}

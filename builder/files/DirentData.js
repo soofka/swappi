@@ -8,6 +8,7 @@ export class DirentData {
     #name;
     #ext;
     #rel;
+    #module;
     #content = '';
     #hash = '';
 
@@ -27,13 +28,12 @@ export class DirentData {
     
     clone() {
         const clone = new DirentData();
-        clone.obj = this.#obj;
         clone.dir = this.#dir;
         clone.name = this.#name;
         clone.ext = this.#ext;
         clone.rel = this.#rel;
+        clone.module = this.#module;
         clone.content = this.#content;
-        clone.hash = this.#hash;
         return clone;
     }
 
@@ -71,6 +71,18 @@ export class DirentData {
 
     set rel(rel) {
         this.#rel = rel;
+    }
+
+    get module() {
+        return this.#module;
+    }
+
+    set module(module) {
+        this.#module = module;
+    }
+
+    setModule(module) {
+        this.#module = module;
     }
 
     get content() {

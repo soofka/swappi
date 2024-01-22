@@ -25,6 +25,10 @@ export class Dirent {
         return this.#dist;
     }
 
+    set dist(dist) {
+        this.#dist = dist;
+    }
+
 }
 
 export default Dirent;
