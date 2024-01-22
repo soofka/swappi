@@ -354,11 +354,6 @@ function getFileHash(content, algorithm) {
     return crypto.createHash(algorithm).update(content).digest('hex');
 }
 
-async function readFile(srcPath, options = { encoding: 'utf8' }) {
-    const fileContent = await fs.readFile(srcPath, options);
-    return fileContent;
-}
-
 async function writeFile(distPath, content) {
     try {
         await fs.stat(distPath);
@@ -372,11 +367,6 @@ async function writeFile(distPath, content) {
     return result;
 }
 
-async function loadModule(absPath) {
-    const module = await import(path.join('file:///', absPath));
-    return module;
-}
-
 async function resetDir(absPath) {
     try {
         await fs.rm(absPath, { recursive: true });
@@ -386,28 +376,4 @@ async function resetDir(absPath) {
         }
     }
     await fs.mkdir(absPath, { recursive: true });
-}
-
-function isObject(obj){
-    return obj && typeof obj === 'object';
-}
-
-function deepMerge(target, source) { 
-    if (!isObject(target) || !isObject(source)) {
-        return source;
-    }
-
-    for (let key of Object.keys(source)) {
-        const targetValue = target[key];
-        const sourceValue = source[key];
-
-        // if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-        //     target[key] = targetValue.concat(sourceValue);
-        // }
-        target[key] = isObject(targetValue) && isObject(sourceValue)
-            ? deepMerge(Object.assign({}, targetValue), sourceValue)
-            : target[key] = sourceValue;
-    }
-
-    return target;
 }

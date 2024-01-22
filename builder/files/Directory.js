@@ -2,38 +2,35 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import Dirent from './Dirent.js';
-import File from './File.js';
-import RunableFile from './RunableFile.js';
+import FileFactory from './FileFactory.js';
 
 export class Directory extends Dirent {
 
-    dirents;
-    fileType;
+    #dirents;
 
-    constructor(absPath, relPath, runable = false) {
+    constructor(absPath, relPath) {
         super(absPath, relPath);
-        this.dirents = [];
-        this.fileType = runable ? RunableFile : File;
+        this.#dirents = [];
     }
 
     async load() {
-        for (let item of await fs.readdir(this.abs, { withFileTypes: true })) {
+        for (let item of await fs.readdir(this.srcAbs, { withFileTypes: true })) {
             if (item.isFile()) {
-                this.dirents.push(new this.fileType(path.join(item.path, item.name), this.rel));
+                this.#dirents.push(FileFactory.getFile(path.join(item.path, item.name), this.distRel));
             } else if (item.isDirectory()) {
-                const directory = new Directory(item.path, path.join(this.rel, item.name), this.fileType);
-                this.dirents.push(directory);
+                const directory = new Directory(item.path, path.join(this.distRel, item.name));
+                this.#dirents.push(directory);
                 await directory.load();
             }
         }
     }
 
-    isDir() {
-        return true;
+    get dirents() {
+        return this.#dirents;
     }
 
-    getDirents() {
-        return this.dirents;
+    isDir() {
+        return true;
     }
 
 }
