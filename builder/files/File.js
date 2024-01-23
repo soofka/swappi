@@ -21,11 +21,11 @@ export class File extends Dirent {
         }
     }
 
-    async execute() {
+    async execute(dist, index, data) {
         return this.content;
     }
 
-    async save(dist, content) {
+    async save(dist, distIndex, content, data) {
         await fs.writeFile(dist.abs, content);
     }
 

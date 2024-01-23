@@ -34,24 +34,20 @@ export class Directory extends Dirent {
     }
 
     async executeAndSave(data) {
-        for (let dist of this.dist) {
-            try {
-                await fs.stat(dist.abs);
-            } catch(e) {
-                if (e.code !== 'ENOENT') {
-                    throw e;
-                }
-                fs.mkdir(path.dirname(dist.abs), { recursive: true });
-            }
-        }
-
-        const result = [];
         for (let dirent of this.content) {
             await dirent.executeAndSave(data);
-            result.push(dirent);
         }
+    }
 
-        return result;
+    async removeFromDist() {
+
+    }
+
+    async resetDist() {
+        for (let dist of this.dist) {
+            await fs.rm(dist.abs, { recursive: true, force: true });
+            await fs.mkdir(dist.abs, { recursive: true });
+        }
     }
 
     serializeAll(src = true, dist = true, fileContent = true) {
