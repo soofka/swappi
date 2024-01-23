@@ -1,3 +1,4 @@
+import fs from 'fs/promises';
 import path from 'path';
 import defaultConfig from './config.js';
 import Logger from './Logger.js';
@@ -20,7 +21,6 @@ export class Builder {
             public: {},
             partials: {},
             templates: {},
-            generated: {}, // do i need this?
         },
         dist: {
             old: {},
@@ -39,14 +39,14 @@ export class Builder {
         this.#logger.log(1, 'Initializing');
         this.#logger.log(2, 'Config:', this.#config);
 
-        await this.initTemplates();
-        await this.initPartials();
-        await this.initPublic();
+        await this.#initTemplates();
+        await this.#initPartials();
+        await this.#initPublic();
 
         this.#logger.log(1, 'Initializing finished');
     }
 
-    async initTemplates() {
+    async #initTemplates() {
         this.#logger.log(2, 'Initializing templates');
 
         this.#files.src.templates = new Directory(
@@ -71,7 +71,7 @@ export class Builder {
         this.#logger.log(2, 'Initializing templates finished');
     }
 
-    async initPartials() {
+    async #initPartials() {
         this.#logger.log(2, 'Initializing partials');
 
         this.#files.src.partials = new Directory(
@@ -90,7 +90,7 @@ export class Builder {
         this.#logger.log(2, 'Initializing partials finished');
     }
 
-    async initPublic() {
+    async #initPublic() {
         this.#logger.log(2, 'Initializing public');
 
         this.#files.src.public = new Directory(
@@ -128,9 +128,23 @@ export class Builder {
     async build() {
         this.#logger.log(1, 'Building');
 
+        this.#logger.log(3, 'Executing and saving public');
         await this.#files.src.public.executeAndSave(this.#config);
+        this.#logger.log(3, 'Executing and saving public finished');
+
+        this.#logger.log(3, 'Saving build report');
+        await this.#saveBuildReport();
+        this.#logger.log(3, 'Saving build report finished');
 
         this.#logger.log(1, 'Building finished');
+    }
+
+    async #saveBuildReport() {
+        let report = {};
+        for (let key of Object.keys(this.#files.src)) {
+            report[key] = this.#files.src[key].serializeAll(true, true, false);
+        }
+        await fs.writeFile(this.#config.paths.report, JSON.stringify(report));
     }
 
 }

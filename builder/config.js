@@ -7,7 +7,7 @@ export const config = {
         partials: path.resolve(path.join('src','partials')),
         templates: path.resolve(path.join('src','templates')),
         generated: path.resolve(path.join('src','generated')),
-        report: path.resolve('report.json'),
+        report: 'report.json',
     },
 
     options: {
