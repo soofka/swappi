@@ -6,9 +6,6 @@ export class CssFile extends File {
         super(absPath, relPath);
     }
 
-    async parse() {
-    }
-
 }
 
 export default CssFile;

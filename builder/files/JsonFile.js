@@ -6,9 +6,6 @@ export class JsonFile extends File {
         super(absPath, relPath);
     }
 
-    async parse() {
-    }
-
 }
 
 export default JsonFile;

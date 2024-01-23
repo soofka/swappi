@@ -1,14 +1,11 @@
 import File from './File.js';
 
-export class JsFile extends File {
+export class HtmlFile extends File {
 
     constructor(absPath, relPath) {
         super(absPath, relPath);
     }
 
-    async parse() {
-    }
-
 }
 
-export default JsFile;
+export default HtmlFile;

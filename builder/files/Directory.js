@@ -34,11 +34,11 @@ export class Directory extends Dirent {
         }
     }
 
-    async executeAndSave(data) {
+    async executeAndSave(config) {
         await this.createDist();
         
         for (let dirent of this.#content) {
-            await dirent.executeAndSave(data);
+            await dirent.executeAndSave(config);
         }
     }
 

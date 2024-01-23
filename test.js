@@ -1,9 +1,8 @@
-function a(a, ...args) {
-    b(a, args);
-}
+import fs from 'fs/promises';
+import path from 'path';
 
-function b(b, args) {
-    console.log(b, ...args);
-}
-
-a('a', 'b', 'c', 'd');
+(async () => {
+    for (let dirent of await fs.readdir(path.resolve('app/dist'), { withFileTypes: true })) {
+        console.log(dirent);
+    }
+})();

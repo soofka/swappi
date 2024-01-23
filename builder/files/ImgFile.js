@@ -6,9 +6,6 @@ export class ImgFile extends File {
         super(absPath, relPath);
     }
 
-    async parse() {
-    }
-
 }
 
 export default ImgFile;

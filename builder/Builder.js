@@ -1,9 +1,17 @@
+import path from 'path';
 import defaultConfig from './config.js';
 import Logger from './Logger.js';
-import Directory from './files/Directory.js';
-import File from './files/File.js';
-import ModuleFile from './files/ModuleFile.js';
-import deepMerge from './helpers/deepMerge.js';
+import {
+    Directory,
+    File,
+    CssFile,
+    HtmlFile,
+    ImgFile,
+    JsFile,
+    JsonFile,
+    ModuleFile,
+} from './files/index.js';
+import { deepMerge, getDirentObject } from './helpers/index.js';
 
 export class Builder {
     #config = {};
@@ -57,7 +65,7 @@ export class Builder {
         await this.#files.src.templates.resetDist();
 
         this.#logger.log(3, 'Executing and saving templates');
-        await this.#files.src.templates.executeAndSave(this.#config.data);
+        await this.#files.src.templates.executeAndSave(this.#config);
         this.#logger.log(3, 'Executing and saving templates finished');
         
         this.#logger.log(2, 'Initializing templates finished');
@@ -86,7 +94,23 @@ export class Builder {
         this.#logger.log(2, 'Initializing public');
 
         this.#files.src.public = new Directory(
-            () => File,
+            (dirent) => {
+                const { ext } = getDirentObject(path.join(dirent.path, dirent.name));
+                
+                if (this.#config.constants.filesGroupMap.html.includes(ext)) {
+                    return HtmlFile;
+                } else if (this.#config.constants.filesGroupMap.css.includes(ext)) {
+                    return CssFile;
+                } else if (this.#config.constants.filesGroupMap.js.includes(ext)) {
+                    return JsFile;
+                } else if (this.#config.constants.filesGroupMap.json.includes(ext)) {
+                    return JsonFile;
+                } else if (this.#config.constants.filesGroupMap.img.includes(ext)) {
+                    return ImgFile;
+                } else {
+                    return File;
+                }
+            },
             this.#config.paths.public,
             [this.#config.paths.dist],
         );
@@ -104,7 +128,7 @@ export class Builder {
     async build() {
         this.#logger.log(1, 'Building');
 
-        await this.#files.src.public.executeAndSave();
+        await this.#files.src.public.executeAndSave(this.#config);
 
         this.#logger.log(1, 'Building finished');
     }

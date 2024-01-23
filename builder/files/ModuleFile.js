@@ -49,8 +49,8 @@ export class ModuleFile extends File {
         }
     }
 
-    async execute(dist, index, data) {
-        return this.#moduleFunctions[index](data);
+    async execute(dist, index, config) {
+        return this.#moduleFunctions[index](config.data);
     }
 
 }

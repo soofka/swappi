@@ -17,19 +17,19 @@ export class File extends Dirent {
         this.#contentHash = crypto.createHash('shake256', { outputLength: 8 }).update(this.#content).digest('hex');
     }
 
-    async executeAndSave(data) {
+    async executeAndSave(config) {
         for (let distIndex in this.dist) {
             const dist = this.dist[distIndex];
-            const content = await this.execute(dist, distIndex, data);
-            await this.save(dist, distIndex, content, data);
+            const content = await this.execute(dist, distIndex, config);
+            await this.save(dist, distIndex, content, config);
         }
     }
 
-    async execute(dist, index, data) {
+    async execute(dist, index, config) {
         return this.content;
     }
 
-    async save(dist, distIndex, content, data) {
+    async save(dist, distIndex, content, config) {
         await fs.writeFile(dist.abs, content);
     }
 

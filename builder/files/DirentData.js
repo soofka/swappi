@@ -1,4 +1,5 @@
 import path from 'path';
+import { getDirentObject } from '../helpers/index.js';
 
 export class DirentData {
 
@@ -9,7 +10,7 @@ export class DirentData {
 
     constructor(absPath, relPath = '') {
         if (absPath) {
-            const obj = path.parse(absPath);
+            const obj = getDirentObject(absPath);
             this.#dir = obj.dir;
             this.#name = obj.name;
             this.#ext = obj.ext;
