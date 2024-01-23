@@ -1,17 +1,7 @@
 import fs from 'fs/promises';
-import path from 'path';
 import defaultConfig from './config.js';
 import Logger from './Logger.js';
-import {
-    Directory,
-    File,
-    CssFile,
-    HtmlFile,
-    ImgFile,
-    JsFile,
-    JsonFile,
-    ModuleFile,
-} from './files/index.js';
+import { Directory, FileFactory } from './files/index.js';
 import { deepMerge, getDirentObject } from './helpers/index.js';
 
 export class Builder {
@@ -22,10 +12,7 @@ export class Builder {
             partials: {},
             templates: {},
         },
-        dist: {
-            old: {},
-            new: {},
-        },
+        dist: {},
     };
     #logger;
 
@@ -37,11 +24,12 @@ export class Builder {
 
     async init() {
         this.#logger.log(1, 'Initializing');
-        this.#logger.log(2, 'Config:', this.#config);
+        this.#logger.log(2, 'Config:', JSON.stringify(this.#config));
 
         await this.#initTemplates();
         await this.#initPartials();
         await this.#initPublic();
+        await this.#initDist();
 
         this.#logger.log(1, 'Initializing finished');
     }
@@ -50,7 +38,7 @@ export class Builder {
         this.#logger.log(2, 'Initializing templates');
 
         this.#files.src.templates = new Directory(
-            () => ModuleFile,
+            () => FileFactory.getModuleFile(),
             this.#config.paths.templates,
             [this.#config.paths.generated],
         );
@@ -75,7 +63,7 @@ export class Builder {
         this.#logger.log(2, 'Initializing partials');
 
         this.#files.src.partials = new Directory(
-            () => ModuleFile,
+            () => FileFactory.getModuleFile(),
             this.#config.paths.partials,
             [this.#config.paths.generated],
         );
@@ -94,23 +82,7 @@ export class Builder {
         this.#logger.log(2, 'Initializing public');
 
         this.#files.src.public = new Directory(
-            (dirent) => {
-                const { ext } = getDirentObject(path.join(dirent.path, dirent.name));
-                
-                if (this.#config.constants.filesGroupMap.html.includes(ext)) {
-                    return HtmlFile;
-                } else if (this.#config.constants.filesGroupMap.css.includes(ext)) {
-                    return CssFile;
-                } else if (this.#config.constants.filesGroupMap.js.includes(ext)) {
-                    return JsFile;
-                } else if (this.#config.constants.filesGroupMap.json.includes(ext)) {
-                    return JsonFile;
-                } else if (this.#config.constants.filesGroupMap.img.includes(ext)) {
-                    return ImgFile;
-                } else {
-                    return File;
-                }
-            },
+            (dirent) => FileFactory.getFile(this.#config.constants.filesGroupMap, dirent.path, dirent.name),
             this.#config.paths.public,
             [this.#config.paths.dist],
         );
@@ -124,6 +96,25 @@ export class Builder {
 
         this.#logger.log(2, 'Initializing public finished');
     }
+
+    async #initDist() {
+        this.#logger.log(2, 'Initializing dist');
+
+        this.#files.dist = new Directory(
+            (dirent) => FileFactory.getFile(this.#config.constants.filesGroupMap, dirent.path, dirent.name),
+            this.#config.paths.dist,
+        );
+
+        this.#logger.log(3, 'Loading dist');
+        await this.#files.dist.load();
+        this.#logger.log(3, 'Loading dist finished');
+        this.#logger.log(4, 'Dist:', JSON.stringify(this.#files.dist.serializeAll(true, true, false)));
+
+        // compare and mark those to be redone
+
+        this.#logger.log(2, 'Initializing dist finished');
+    }
+
 
     async build() {
         this.#logger.log(1, 'Building');

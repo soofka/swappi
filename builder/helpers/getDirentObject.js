@@ -1,7 +1,7 @@
 import path from 'path';
 
-export function getDirentObject(absPath) {
-    return path.parse(absPath);
+export function getDirentObject(...absPathElements) {
+    return path.parse(path.join(...absPathElements));
 }
 
 export default getDirentObject;
