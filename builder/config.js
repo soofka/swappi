@@ -11,7 +11,7 @@ export const config = {
     },
 
     options: {
-        verbosity: 3,
+        verbosity: 4,
         hash: true,
         force: false,
 

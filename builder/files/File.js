@@ -14,7 +14,7 @@ export class File extends Dirent {
 
     async load() {
         this.#content = await fs.readFile(this.src.abs, { encoding: 'utf8' });
-        this.#contentHash = crypto.createHash('sha256').update(this.#content).digest('hex');
+        this.#contentHash = crypto.createHash('shake256', { outputLength: 8 }).update(this.#content).digest('hex');
     }
 
     async executeAndSave(data) {

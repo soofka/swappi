@@ -35,20 +35,28 @@ export class Directory extends Dirent {
     }
 
     async executeAndSave(data) {
+        await this.createDist();
+        
         for (let dirent of this.#content) {
             await dirent.executeAndSave(data);
         }
     }
 
-    async removeFromDist() {
-
+    async createDist() {
+        for (let dist of this.dist) {
+            await createDir(dist.abs);
+        }
     }
 
     async resetDist() {
         for (let dist of this.dist) {
-            await fs.rm(dist.abs, { recursive: true, force: true });
-            await fs.mkdir(dist.abs, { recursive: true });
+            await removeDir(dist.abs);
+            await createDir(dist.abs);
         }
+    }
+
+    async removeFromDist() {
+
     }
 
     serializeAll(src = true, dist = true, fileContent = true) {
@@ -80,5 +88,8 @@ export class Directory extends Dirent {
     }
 
 }
+
+const createDir = async (absPath) => await fs.mkdir(absPath, { recursive: true });
+const removeDir = async (absPath) => await fs.rm(absPath, { recursive: true, force: true });
 
 export default Directory;
