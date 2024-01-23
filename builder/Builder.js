@@ -24,7 +24,7 @@ export class Builder {
         this.#files = deepMerge(this.#files, files);
 
         this.initTemplates();
-        this.initPartials();
+        // this.initPartials();
     }
 
     async initTemplates() {
@@ -35,8 +35,12 @@ export class Builder {
         );
 
         await this.#files.src.templates.load();
+        const res = this.#files.src.templates.serializeAll(true, true, false);
+        console.log('======================================')
+        console.log(JSON.stringify(res));
+        console.log('======================================')
         // compare and mark those to be redone
-        this.#files.src.generated = await this.#files.src.templates.executeAndSave(this.#config.data);
+        // this.#files.src.generated = await this.#files.src.templates.executeAndSave(this.#config.data);
     }
 
     async initPartials() {

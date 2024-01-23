@@ -4,7 +4,7 @@ import { isFunction, isObject } from '../helpers/index.js';
 
 export class ModuleFile extends File {
 
-    #module;
+    #moduleFunctions = [];
 
     constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
         super(srcAbsPath, distAbsPaths, relPath);
@@ -12,11 +12,9 @@ export class ModuleFile extends File {
 
     async load() {
         super.load();
-        const { default: d } = await import(path.join('file:///', this.src.abs));
-        this.#module = d;
 
+        const { default: module } = await import(path.join('file:///', this.src.abs));
         const nameArray = this.src.name.split('.');
-        nameArray.pop();
 
         if (nameArray.length >= 1) {
             let name;
@@ -29,24 +27,30 @@ export class ModuleFile extends File {
                 ext = `.${nameArray[nameArray.length - 1]}`;
             }
 
-            if (isFunction(this.#module)) {
-                this.dist[0].name = name;
-                this.dist[0].ext = ext;
-                this.dist[0].setModule(this.#module);
-            } else if (isObject(this.#module)) {
-                this.dist = Object.keys(this.#module).map((key) => {
-                    const rootDist = this.dist[0].clone();
-                    rootDist.name = `${name}${key}`;
-                    rootDist.ext = ext;
-                    rootDist.setModule(this.#module[key]);
-                    return rootDist;
-                });
+            if (isFunction(module)) {
+                for (let dist of this.dist) {
+                    this.#moduleFunctions.push(module);
+                    dist.name = name;
+                    dist.ext = ext;
+                }
+            } else if (isObject(module)) {
+                const newDist = [];
+                for (let dist of this.dist) {
+                    newDist.push(...Object.keys(module).map((key) => {
+                        this.#moduleFunctions.push(module[key]);
+                        const rootDist = dist.clone();
+                        rootDist.name = `${name}${key}`;
+                        rootDist.ext = ext;
+                        return rootDist;
+                    }));
+                }
+                this.dist = newDist;
             }
         }
     }
 
-    async execute(dist, data) {
-        dist.content = dist.module(data);
+    async execute(dist, index, data) {
+        return this.#moduleFunctions[index](data);
     }
 
 }

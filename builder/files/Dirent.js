@@ -2,8 +2,11 @@ import DirentData from './DirentData.js';
 
 export class Dirent {
 
-    #src;
-    #dist = [];
+    #src; get src() { return this.#src }
+    #dist = []; get dist() { return this.#dist } set dist(value) { this.#dist = value }
+
+    #content; get content() { return this.#content } set content(value) { this.#content = value }
+    #isDir; get isDir() { return this.#isDir } set isDir(value) { this.#isDir = value }
 
     constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
         this.#src = new DirentData(srcAbsPath, relPath);
@@ -17,16 +20,22 @@ export class Dirent {
         this.#dist.push(new DirentData(absPath, relPath));
     }
 
-    get src() {
-        return this.#src;
-    }
+    serialize(src = true, dist = true, content = true) {
+        const obj = {};
 
-    get dist() {
-        return this.#dist;
-    }
+        if (src) {
+            obj.src = this.#src.serialize();
+        }
 
-    set dist(dist) {
-        this.#dist = dist;
+        if (dist) {
+            obj.dist = this.#dist.map((dist) => dist.serialize());
+        }
+
+        if (content) {
+            obj.content = this.#content;
+        }
+
+        return obj;
     }
 
 }
