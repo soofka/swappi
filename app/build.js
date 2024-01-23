@@ -1,4 +1,6 @@
 import { config } from './config.js';
 import Builder from '../builder/Builder.js';
 
-new Builder(config);
+const builder = new Builder(config);
+await builder.init();
+await builder.build();
