@@ -1,6 +1,7 @@
 import defaultConfig from './config.js';
 import Logger from './Logger.js';
 import Directory from './files/Directory.js';
+import File from './files/File.js';
 import ModuleFile from './files/ModuleFile.js';
 import deepMerge from './helpers/deepMerge.js';
 
@@ -11,7 +12,7 @@ export class Builder {
             public: {},
             partials: {},
             templates: {},
-            generated: {},
+            generated: {}, // do i need this?
         },
         dist: {
             old: {},
@@ -31,6 +32,7 @@ export class Builder {
 
         await this.initTemplates();
         await this.initPartials();
+        await this.initPublic();
 
         this.#logger.log(1, 'Initializing finished');
     }
@@ -57,7 +59,7 @@ export class Builder {
         // compare and mark those to be redone
 
         this.#logger.log(3, 'Executing and saving templates');
-        this.#files.src.generated = await this.#files.src.templates.executeAndSave(this.#config.data);
+        await this.#files.src.templates.executeAndSave(this.#config.data);
         this.#logger.log(3, 'Executing and saving templates finished');
         
         this.#logger.log(2, 'Initializing templates finished');
@@ -79,6 +81,24 @@ export class Builder {
         // compare and mark those to be redone
 
         this.#logger.log(2, 'Initializing partials finished');
+    }
+
+    async initPublic() {
+        this.#logger.log(2, 'Initializing public');
+
+        this.#files.src.public = new Directory(
+            () => File,
+            this.#config.paths.public,
+            [this.#config.paths.dist],
+        );
+
+        this.#logger.log(3, 'Loading public');
+        await this.#files.src.public.load();
+        this.#logger.log(3, 'Loading public finished:', JSON.stringify(this.#files.src.public.serializeAll(true, true, false)));
+
+        // compare and mark those to be redone
+
+        this.#logger.log(2, 'Initializing public finished');
     }
 
 }

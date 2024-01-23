@@ -1,5 +1,4 @@
 import path from 'path';
-import crypto from 'crypto';
 
 export class DirentData {
 
@@ -35,21 +34,6 @@ export class DirentData {
             rel: this.#rel,
         }
     }
-
-    // get content() {
-    //     return this.#content;
-    // }
-
-    // set content(content) {
-    //     this.#content = content;
-    //     this.#hash = Array.isArray(this.#content)
-    //         ? ''
-    //         : crypto.createHash('sha256').update(this.#content).digest('hex');
-    // }
-
-    // get hash() {
-    //     return this.#hash;
-    // }
 
     get abs() { return path.join(this.#dir, this.full) }
     get full() { return `${this.#name}${this.#ext}` }

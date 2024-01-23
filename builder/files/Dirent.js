@@ -4,8 +4,6 @@ export class Dirent {
 
     #src; get src() { return this.#src }
     #dist = []; get dist() { return this.#dist } set dist(value) { this.#dist = value }
-
-    #content; get content() { return this.#content } set content(value) { this.#content = value }
     #isDir; get isDir() { return this.#isDir } set isDir(value) { this.#isDir = value }
 
     constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
@@ -20,7 +18,7 @@ export class Dirent {
         this.#dist.push(new DirentData(absPath, relPath));
     }
 
-    serialize(src = true, dist = true, content = true) {
+    serialize(src = true, dist = true) {
         const obj = {};
 
         if (src) {
@@ -29,10 +27,6 @@ export class Dirent {
 
         if (dist) {
             obj.dist = this.#dist.map((dist) => dist.serialize());
-        }
-
-        if (content) {
-            obj.content = this.#content;
         }
 
         return obj;
