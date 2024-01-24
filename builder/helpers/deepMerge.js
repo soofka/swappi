@@ -11,7 +11,7 @@ export function deepMerge(target, source) {
 
         target[key] = isObject(targetValue) && isObject(sourceValue)
             ? deepMerge(Object.assign({}, targetValue), sourceValue)
-            : target[key] = sourceValue;
+            : sourceValue;
     }
 
     return target;

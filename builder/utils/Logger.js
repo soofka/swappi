@@ -1,4 +1,6 @@
-export class Logger {
+import { decorateWithSingleton } from './decorateWithSingleton.js';
+
+class Logger {
 
     #verbosity;
 
@@ -26,4 +28,6 @@ export class Logger {
 
 }
 
-export default Logger;
+const { init: initLogger, get: getLogger } = decorateWithSingleton(Logger);
+export { initLogger, getLogger };
+export default getLogger;

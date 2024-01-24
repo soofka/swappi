@@ -1,8 +1,13 @@
 import fs from 'fs/promises';
 import defaultConfig from './config.js';
-import Logger from './Logger.js';
-import { Directory, FileFactory } from './files/index.js';
-import { deepMerge, getDirentObject } from './helpers/index.js';
+import { Directory } from './files/index.js';
+import { deepMerge } from './helpers/index.js';
+import {
+    initFileFactory,
+    getFileFactory,
+    initLogger,
+    getLogger,
+} from './utils/index.js';
 
 export class Builder {
     #config = {};
@@ -12,122 +17,130 @@ export class Builder {
             partials: {},
             templates: {},
         },
-        dist: {},
+        dist: {
+            old: {},
+            new: {},
+        },
     };
-    #logger;
 
     constructor(config, files = {}) {
         this.#config = deepMerge(defaultConfig, config);
         this.#files = deepMerge(this.#files, files);
-        this.#logger = new Logger(this.#config.options.verbosity);
+
+        initFileFactory(this.#config.constants.filesGroupMap);
+        initLogger(this.#config.options.verbosity);
     }
 
     async init() {
-        this.#logger.log(1, 'Initializing');
-        this.#logger.log(2, 'Config:', JSON.stringify(this.#config));
+        getLogger().log(1, 'Initializing');
+        getLogger().log(2, 'Config:', JSON.stringify(this.#config));
 
         await this.#initTemplates();
         await this.#initPartials();
         await this.#initPublic();
-        await this.#initDist();
+        await this.#initOldDist();
+        await this.#initNewDist();
 
-        this.#logger.log(1, 'Initializing finished');
+        getLogger().log(1, 'Initializing finished');
     }
 
     async #initTemplates() {
-        this.#logger.log(2, 'Initializing templates');
+        getLogger().log(2, 'Initializing templates');
 
         this.#files.src.templates = new Directory(
-            () => FileFactory.getModuleFile(),
+            () => getFileFactory().getModuleFile(),
             this.#config.paths.templates,
             [this.#config.paths.generated],
         );
 
-        this.#logger.log(3, 'Loading templates');
+        getLogger().log(3, 'Loading templates');
         await this.#files.src.templates.load();
-        this.#logger.log(3, 'Loading templates finished');
-        this.#logger.log(4, 'Templates:', JSON.stringify(this.#files.src.templates.serializeAll(true, true, false)));
+        getLogger().log(3, 'Loading templates finished');
+        getLogger().log(4, 'Templates:', JSON.stringify(this.#files.src.templates.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
         await this.#files.src.templates.resetDist();
 
-        this.#logger.log(3, 'Executing and saving templates');
+        getLogger().log(3, 'Executing and saving templates');
         await this.#files.src.templates.executeAndSave(this.#config);
-        this.#logger.log(3, 'Executing and saving templates finished');
+        getLogger().log(3, 'Executing and saving templates finished');
         
-        this.#logger.log(2, 'Initializing templates finished');
+        getLogger().log(2, 'Initializing templates finished');
     }
 
     async #initPartials() {
-        this.#logger.log(2, 'Initializing partials');
+        getLogger().log(2, 'Initializing partials');
 
         this.#files.src.partials = new Directory(
-            () => FileFactory.getModuleFile(),
+            () => getFileFactory().getModuleFile(),
             this.#config.paths.partials,
             [this.#config.paths.generated],
         );
 
-        this.#logger.log(3, 'Loading partials');
+        getLogger().log(3, 'Loading partials');
         await this.#files.src.partials.load();
-        this.#logger.log(3, 'Loading partials finished:');
-        this.#logger.log(4, 'Partials:', JSON.stringify(this.#files.src.partials.serializeAll(true, true, false)));
+        getLogger().log(3, 'Loading partials finished:');
+        getLogger().log(4, 'Partials:', JSON.stringify(this.#files.src.partials.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
-        this.#logger.log(2, 'Initializing partials finished');
+        getLogger().log(2, 'Initializing partials finished');
     }
 
     async #initPublic() {
-        this.#logger.log(2, 'Initializing public');
+        getLogger().log(2, 'Initializing public');
 
         this.#files.src.public = new Directory(
-            (dirent) => FileFactory.getFile(this.#config.constants.filesGroupMap, dirent.path, dirent.name),
+            (dirent) => getFileFactory().getFile(dirent.path, dirent.name),
             this.#config.paths.public,
             [this.#config.paths.dist],
         );
 
-        this.#logger.log(3, 'Loading public');
+        getLogger().log(3, 'Loading public');
         await this.#files.src.public.load();
-        this.#logger.log(3, 'Loading public finished');
-        this.#logger.log(4, 'Public:', JSON.stringify(this.#files.src.public.serializeAll(true, true, false)));
+        getLogger().log(3, 'Loading public finished');
+        getLogger().log(4, 'Public:', JSON.stringify(this.#files.src.public.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
-        this.#logger.log(2, 'Initializing public finished');
+        getLogger().log(2, 'Initializing public finished');
     }
 
-    async #initDist() {
-        this.#logger.log(2, 'Initializing dist');
+    async #initOldDist() {
+        getLogger().log(2, 'Initializing old dist');
 
-        this.#files.dist = new Directory(
-            (dirent) => FileFactory.getFile(this.#config.constants.filesGroupMap, dirent.path, dirent.name),
+        this.#files.dist.old = new Directory(
+            (dirent) => getFileFactory().getFile(dirent.path, dirent.name),
             this.#config.paths.dist,
         );
 
-        this.#logger.log(3, 'Loading dist');
-        await this.#files.dist.load();
-        this.#logger.log(3, 'Loading dist finished');
-        this.#logger.log(4, 'Dist:', JSON.stringify(this.#files.dist.serializeAll(true, true, false)));
+        getLogger().log(3, 'Loading old dist');
+        await this.#files.dist.old.load();
+        getLogger().log(3, 'Loading old dist finished');
+        getLogger().log(4, 'Old dist:', JSON.stringify(this.#files.dist.old.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
-        this.#logger.log(2, 'Initializing dist finished');
+        getLogger().log(2, 'Initializing old dist finished');
     }
 
+    async #initNewDist() {
+
+    }
 
     async build() {
-        this.#logger.log(1, 'Building');
+        getLogger().log(1, 'Building');
 
-        this.#logger.log(3, 'Executing and saving public');
+        getLogger().log(3, 'Executing and saving public');
         await this.#files.src.public.executeAndSave(this.#config);
-        this.#logger.log(3, 'Executing and saving public finished');
+        getLogger().log(3, 'Executing and saving public finished');
 
-        this.#logger.log(3, 'Saving build report');
+        getLogger().log(3, 'Saving build report');
         await this.#saveBuildReport();
-        this.#logger.log(3, 'Saving build report finished');
+        getLogger().log(3, 'Saving build report finished');
 
-        this.#logger.log(1, 'Building finished');
+        getLogger().log(1, 'Building finished');
     }
 
     async #saveBuildReport() {
