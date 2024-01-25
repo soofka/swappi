@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import defaultConfig from './config.js';
 import { Directory } from './files/index.js';
-import { deepMerge } from './helpers/index.js';
+import { deepMerge, isDeepEqual } from './helpers/index.js';
 import {
     initConfigProvider,
     getConfig,
@@ -22,6 +22,7 @@ export class Builder {
         dist: {},
         report: {},
     };
+    #newConfig = true;
 
     constructor(config) {
         initConfigProvider(deepMerge(defaultConfig, config));
@@ -45,16 +46,29 @@ export class Builder {
     async #initReport() {
         getLogger().log(2, 'Initializing previous build report');
 
-        const report = JSON.parse(await fs.readFile(getConfig().paths.report, { encoding: 'utf8' }));
-        console.log('wut', report)
-        for (let key of Object.keys(report)) {
-            console.log('gonna parse', key, report[key]);
-            this.#files.report[key] = new Directory().deserializeAll(report[key]);
-            console.log('parsed', key, this.#files.report[key].direntList);
+        try {
+            getLogger().log(3, 'Loading previous build report');
+
+            const report = JSON.parse(await fs.readFile(getConfig().paths.report, { encoding: 'utf8' }));
+
+            if (isDeepEqual(getConfig(), report.config)) {
+                this.#newConfig = false;
+            }
+
+            for (let key of Object.keys(report.files)) {
+                this.#files.report[key] = new Directory().deserializeAll(report.files[key]);
+            }
+
+            getLogger().log(3, 'Loading previous build report finished');
+            getLogger().log(4, 'Previous bulid report:', JSON.stringify(this.#files.report.public.serializeAll(true, true, false)));
+        } catch(e) {
+            if (!e.code === 'ENOENT') {
+                throw e;
+            }
+            getLogger().log(2, `Previous build report not found (${getConfig().paths.report})`);
         }
 
         getLogger().log(2, 'Initializing previous bulid report finished');
-        getLogger().log(3, 'Previous bulid report:', JSON.stringify(this.#files.report.public.serializeAll(true, true, false)));
     }
 
     async #initDist() {
@@ -153,9 +167,12 @@ export class Builder {
     }
 
     async #saveBuildReport() {
-        let report = {};
+        let report = {
+            config: getConfig(),
+            files: {},
+        };
         for (let key of Object.keys(this.#files.src)) {
-            report[key] = this.#files.src[key].serializeAll(true, true, false);
+            report.files[key] = this.#files.src[key].serializeAll(true, true, false);
         }
         await fs.writeFile(getConfig().paths.report, JSON.stringify(report));
     }
