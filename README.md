@@ -20,8 +20,8 @@
 
 ## builder
 ### todo
-* utils -> providers + configprovider
 * old dist + report vs src
+* logging to directory/file class?
 
 * browser support transpilation
 * honor config options

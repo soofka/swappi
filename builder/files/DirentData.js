@@ -27,6 +27,13 @@ export class DirentData {
         return clone;
     }
 
+    isEqual(direntData) {
+        return this.#dir === direntData.dir
+            && this.#name === direntData.name
+            && this.#ext === direntData.ext
+            && this.#rel === direntData.rel;
+    }
+
     serialize() {
         return {
             dir: this.#dir,

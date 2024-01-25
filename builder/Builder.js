@@ -1,7 +1,10 @@
 import fs from 'fs/promises';
 import defaultConfig from './config.js';
 import { Directory } from './files/index.js';
-import { deepMerge, isDeepEqual } from './helpers/index.js';
+import {
+    deepMerge,
+    isDeepEqual,
+} from './helpers/index.js';
 import {
     initConfigProvider,
     getConfig,
@@ -15,12 +18,14 @@ export class Builder {
     
     #files = {
         src: {
-            public: {},
-            partials: {},
-            templates: {},
+            old: {},
+            new: {
+                public: {},
+                partials: {},
+                templates: {},
+            }
         },
         dist: {},
-        report: {},
     };
     #newConfig = true;
 
@@ -46,27 +51,34 @@ export class Builder {
     async #initReport() {
         getLogger().log(2, 'Initializing previous build report');
 
+        let report;
+        getLogger().log(3, 'Loading previous build report');
+
         try {
-            getLogger().log(3, 'Loading previous build report');
-
-            const report = JSON.parse(await fs.readFile(getConfig().paths.report, { encoding: 'utf8' }));
-
-            if (isDeepEqual(getConfig(), report.config)) {
-                this.#newConfig = false;
-            }
-
-            for (let key of Object.keys(report.files)) {
-                this.#files.report[key] = new Directory().deserializeAll(report.files[key]);
-            }
-
-            getLogger().log(3, 'Loading previous build report finished');
-            getLogger().log(4, 'Previous bulid report:', JSON.stringify(this.#files.report.public.serializeAll(true, true, false)));
+            report = JSON.parse(await fs.readFile(getConfig().paths.report, { encoding: 'utf8' }));
         } catch(e) {
             if (!e.code === 'ENOENT') {
                 throw e;
             }
-            getLogger().log(2, `Previous build report not found (${getConfig().paths.report})`);
+            getLogger().log(2, `Previous build report not found (${getConfig().paths.report})`, e);
+            return;
         }
+
+        if (isDeepEqual(getConfig(), report.config)) {
+            this.#newConfig = false;
+        }
+
+        for (let key of Object.keys(report.files)) {
+            this.#files.src.old[key] = new Directory(
+                (dirent) => getFileProvider().getFile(dirent.src.dir, dirent.src.name, dirent.src.ext),
+            ).deserializeAll(report.files[key]);
+
+            getLogger().log(4, `Loading ${key} directory from previous build finished`);
+            getLogger().log(5, `${key} directory from previous build:`, JSON.stringify(this.#files.src.old[key].serializeAll(true, true, false)));
+        }
+
+        getLogger().log(3, 'Loading previous build report finished');
+        getLogger().log(4, 'Previous bulid report:', JSON.stringify(report));
 
         getLogger().log(2, 'Initializing previous bulid report finished');
     }
@@ -92,23 +104,22 @@ export class Builder {
     async #initTemplates() {
         getLogger().log(2, 'Initializing templates');
 
-        this.#files.src.templates = new Directory(
+        this.#files.src.new.templates = new Directory(
             () => getFileProvider().getModuleFile(),
             getConfig().paths.templates,
             [getConfig().paths.generated],
         );
 
         getLogger().log(3, 'Loading templates');
-        await this.#files.src.templates.load();
+        await this.#files.src.new.templates.load();
         getLogger().log(3, 'Loading templates finished');
-        getLogger().log(4, 'Templates:', JSON.stringify(this.#files.src.templates.serializeAll(true, true, false)));
+        getLogger().log(4, 'Templates:', JSON.stringify(this.#files.src.new.templates.serializeAll(true, true, false)));
 
-        // compare and mark those to be redone
-
-        await this.#files.src.templates.resetDist();
+        await this.#files.src.new.templates.resetDist();
 
         getLogger().log(3, 'Executing and saving templates');
-        await this.#files.src.templates.executeAndSave();
+        // compare and mark those to be redone
+        await this.#files.src.new.templates.executeAndSave(this.#files.src.old.templates);
         getLogger().log(3, 'Executing and saving templates finished');
         
         getLogger().log(2, 'Initializing templates finished');
@@ -117,16 +128,16 @@ export class Builder {
     async #initPartials() {
         getLogger().log(2, 'Initializing partials');
 
-        this.#files.src.partials = new Directory(
+        this.#files.src.new.partials = new Directory(
             () => getFileProvider().getModuleFile(),
             getConfig().paths.partials,
             [getConfig().paths.generated],
         );
 
         getLogger().log(3, 'Loading partials');
-        await this.#files.src.partials.load();
+        await this.#files.src.new.partials.load();
         getLogger().log(3, 'Loading partials finished:');
-        getLogger().log(4, 'Partials:', JSON.stringify(this.#files.src.partials.serializeAll(true, true, false)));
+        getLogger().log(4, 'Partials:', JSON.stringify(this.#files.src.new.partials.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
@@ -136,16 +147,16 @@ export class Builder {
     async #initPublic() {
         getLogger().log(2, 'Initializing public');
 
-        this.#files.src.public = new Directory(
+        this.#files.src.new.public = new Directory(
             (dirent) => getFileProvider().getFile(dirent.path, dirent.name),
             getConfig().paths.public,
             [getConfig().paths.dist],
         );
 
         getLogger().log(3, 'Loading public');
-        await this.#files.src.public.load();
+        await this.#files.src.new.public.load();
         getLogger().log(3, 'Loading public finished');
-        getLogger().log(4, 'Public:', JSON.stringify(this.#files.src.public.serializeAll(true, true, false)));
+        getLogger().log(4, 'Public:', JSON.stringify(this.#files.src.new.public.serializeAll(true, true, false)));
 
         // compare and mark those to be redone
 
@@ -156,7 +167,7 @@ export class Builder {
         getLogger().log(1, 'Building');
 
         getLogger().log(3, 'Executing and saving public');
-        await this.#files.src.public.executeAndSave();
+        await this.#files.src.new.public.executeAndSave(this.#files.src.old.public);
         getLogger().log(3, 'Executing and saving public finished');
 
         getLogger().log(3, 'Saving build report');
@@ -171,8 +182,8 @@ export class Builder {
             config: getConfig(),
             files: {},
         };
-        for (let key of Object.keys(this.#files.src)) {
-            report.files[key] = this.#files.src[key].serializeAll(true, true, false);
+        for (let key of Object.keys(this.#files.src.old)) {
+            report.files[key] = this.#files.src.old[key].serializeAll(true, true, false);
         }
         await fs.writeFile(getConfig().paths.report, JSON.stringify(report));
     }

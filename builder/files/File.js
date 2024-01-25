@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import crypto from 'crypto';
 import Dirent from './Dirent.js';
+import { isInArray } from '../helpers/index.js';
 import { getConfig } from '../utils/index.js';
 
 export class File extends Dirent {
@@ -21,7 +22,8 @@ export class File extends Dirent {
             ).update(this.#content).digest('hex');
     }
 
-    async executeAndSave() {
+    async executeAndSave(comparandsList, parentModified) {
+        this.modified = parentModified || (comparandsList && !isInArray(comparandsList, (item) => this.isEqual(item)));
         for (let distIndex in this.dist) {
             const dist = this.dist[distIndex];
             const content = await this.execute(dist, distIndex);
@@ -35,6 +37,13 @@ export class File extends Dirent {
 
     async save(dist, distIndex, content) {
         await fs.writeFile(dist.abs, content);
+    }
+
+    async isEqual(file) {
+        if (super.isEqual(file)) {
+            return this.#contentHash === file.contentHash;
+        }
+        return false;
     }
 
     serialize(src = true, dist = true, content = true) {

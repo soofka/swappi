@@ -1,11 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import Dirent from './Dirent.js';
-import File from './File.js';
 
 export class Directory extends Dirent {
 
-    #direntList = [];
+    #direntList = []; get direntList() { return this.#direntList }
     #getFileClass;
 
     constructor(getFileClass, srcAbsPath, distAbsPaths, relPath = '') {
@@ -35,11 +34,20 @@ export class Directory extends Dirent {
         }
     }
 
-    async executeAndSave() {
+    async executeAndSave(comparandDirectory, parentModified = false) {
         await this.createDist();
+        this.modified = parentModified || (comparandDirectory && this.isEqual(comparandDirectory));
         
         for (let dirent of this.#direntList) {
-            await dirent.executeAndSave();
+            if (dirent.isDir) {
+                const newComparand = comparandDirectory
+                    && Array.isArray(comparandDirectory)
+                    && comparandDirectory.direntList.find((item) => dirent.isEqual(item));
+                await dirent.executeAndSave(newComparand, parentModified);
+            } else {
+                const newComparand = comparandDirectory && comparandDirectory.dirList;
+                await dirent.executeAndSave(newComparand, parentModified);
+            }
         }
     }
 
@@ -58,6 +66,13 @@ export class Directory extends Dirent {
 
     async removeFromDist() {
 
+    }
+
+    async isEqual(directory) {
+        if (super.isEqual(directory)) {
+            return this.#direntList.length === directory.direntList.length;
+        }
+        return false;
     }
 
     serializeAll(src = true, dist = true, fileContent = true) {
@@ -80,11 +95,12 @@ export class Directory extends Dirent {
         this.deserialize({ src, dist });
 
         for (let index in direntList) {
-            const direntData = direntList[index];
-            if (direntData.hasOwnProperty('direntList')) {
-                this.#direntList.push(new Directory().deserializeAll(direntData));
+            const dirent = direntList[index];
+            if (dirent.hasOwnProperty('direntList')) {
+                this.#direntList.push(new Directory(this.#getFileClass).deserializeAll(dirent));
             } else {
-                this.#direntList.push(new File().deserialize(direntData));
+                const fileClass = this.#getFileClass(dirent);
+                this.#direntList.push(new fileClass().deserialize(dirent));
             }
         }
 
