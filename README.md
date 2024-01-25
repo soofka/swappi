@@ -20,7 +20,9 @@
 
 ## builder
 ### todo
-* refresh only modified files?
+* utils -> providers + configprovider
+* old dist + report vs src
+
 * browser support transpilation
 * honor config options
 * figure out image width vs pixel density

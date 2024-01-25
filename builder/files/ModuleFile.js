@@ -1,6 +1,7 @@
 import path from 'path';
 import File from './File.js';
 import { isFunction, isObject } from '../helpers/index.js';
+import { getConfig } from '../utils/index.js';
 
 export class ModuleFile extends File {
 
@@ -49,8 +50,8 @@ export class ModuleFile extends File {
         }
     }
 
-    async execute(dist, index, config) {
-        return this.#moduleFunctions[index](config.data);
+    async execute(dist, index) {
+        return this.#moduleFunctions[index](getConfig().data);
     }
 
 }

@@ -2,9 +2,7 @@ export function decorateWithSingleton(className) {
     let instance;
     const init = (...args) => instance = new className(...args);
     const get = (...args) => {
-        if (!instance) {
-            instance = new className(...args);
-        }
+        if (!instance) init(...args);
         return instance;
     }
     return { init, get };

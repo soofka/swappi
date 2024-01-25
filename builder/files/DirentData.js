@@ -36,6 +36,14 @@ export class DirentData {
         }
     }
 
+    deserialize({ dir, name, ext, rel}) {
+        this.#dir = dir;
+        this.#name = name;
+        this.#ext = ext;
+        this.#rel = rel;
+        return this;
+    }
+
     get abs() { return path.join(this.#dir, this.full) }
     get full() { return `${this.#name}${this.#ext}` }
 

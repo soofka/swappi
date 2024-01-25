@@ -32,6 +32,12 @@ export class Dirent {
         return obj;
     }
 
+    deserialize({ src, dist }) {
+        this.#src = new DirentData().deserialize(src);
+        this.#dist = dist.map((distItem) => new DirentData().deserialize(distItem));
+        return this;
+    }
+
 }
 
 export default Dirent;

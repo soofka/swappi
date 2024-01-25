@@ -46,7 +46,8 @@ export const config = {
 
     constants: {
         other: 'other',
-        hashAlgorithm: 'sha256',
+        hashAlgorithm: 'shake256',
+        hashAlgorithmOptions: { outputLength: 8 },
         hashSeparator: '+',
         htmlPartialAttribute: 'data-swapp-partial',
         cssPartialDeclaration: '-swapp-partial',

@@ -10,7 +10,7 @@ import {
 import { getDirentObject } from '../helpers/index.js';
 import { decorateWithSingleton } from './decorateWithSingleton.js';
 
-class FileFactory {
+class FileProvider {
 
     #filesGroupMap;
 
@@ -42,6 +42,6 @@ class FileFactory {
 
 }
 
-const { init: initFileFactory, get: getFileFactory } = decorateWithSingleton(FileFactory);
-export { initFileFactory, getFileFactory };
-export default getFileFactory;
+const { init: initFileProvider, get: getFileProvider } = decorateWithSingleton(FileProvider);
+export { initFileProvider, getFileProvider };
+export default getFileProvider;

@@ -1,5 +1,6 @@
 import { minify } from 'terser';
 import File from './File.js';
+import { getConfig } from '../utils/index.js';
 
 export class JsFile extends File {
 
@@ -7,8 +8,8 @@ export class JsFile extends File {
         super(absPath, relPath);
     }
 
-    async execute(dist, index, config) {
-        const contentMinified = await minify(this.content, config.options.optimize.js);
+    async execute(dist, index) {
+        const contentMinified = await minify(this.content, getConfig().options.optimize.js);
         return contentMinified.code;
     }
 

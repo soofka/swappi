@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import crypto from 'crypto';
 import Dirent from './Dirent.js';
+import { getConfig } from '../utils/index.js';
 
 export class File extends Dirent {
 
@@ -14,22 +15,25 @@ export class File extends Dirent {
 
     async load() {
         this.#content = await fs.readFile(this.src.abs, { encoding: 'utf8' });
-        this.#contentHash = crypto.createHash('shake256', { outputLength: 8 }).update(this.#content).digest('hex');
+        this.#contentHash = crypto.createHash(
+                getConfig().constants.hashAlgorithm,
+                getConfig().constants.hashAlgorithmOptions
+            ).update(this.#content).digest('hex');
     }
 
-    async executeAndSave(config) {
+    async executeAndSave() {
         for (let distIndex in this.dist) {
             const dist = this.dist[distIndex];
-            const content = await this.execute(dist, distIndex, config);
-            await this.save(dist, distIndex, content, config);
+            const content = await this.execute(dist, distIndex);
+            await this.save(dist, distIndex, content);
         }
     }
 
-    async execute(dist, index, config) {
+    async execute(dist, index) {
         return this.content;
     }
 
-    async save(dist, distIndex, content, config) {
+    async save(dist, distIndex, content) {
         await fs.writeFile(dist.abs, content);
     }
 
@@ -41,6 +45,13 @@ export class File extends Dirent {
         }
 
         return obj;
+    }
+
+    deserialize({ src, dist, content, contentHash }) {
+        super.deserialize({ src, dist });
+        this.#content = content;
+        this.#contentHash = contentHash;
+        return this;
     }
 
 }

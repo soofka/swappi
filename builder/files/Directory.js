@@ -1,10 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 import Dirent from './Dirent.js';
+import File from './File.js';
 
 export class Directory extends Dirent {
 
-    #content = []; get content() { return this.#content }
+    #direntList = [];
     #getFileClass;
 
     constructor(getFileClass, srcAbsPath, distAbsPaths, relPath = '') {
@@ -29,16 +30,16 @@ export class Directory extends Dirent {
 
             if (direntObject) {
                 await direntObject.load();
-                this.#content.push(direntObject);
+                this.#direntList.push(direntObject);
             }
         }
     }
 
-    async executeAndSave(config) {
+    async executeAndSave() {
         await this.createDist();
         
-        for (let dirent of this.#content) {
-            await dirent.executeAndSave(config);
+        for (let dirent of this.#direntList) {
+            await dirent.executeAndSave();
         }
     }
 
@@ -61,31 +62,46 @@ export class Directory extends Dirent {
 
     serializeAll(src = true, dist = true, fileContent = true) {
         const root = this.serialize(src, dist);
-        root.content = [];
+        root.direntList = [];
         
-        for (let index in this.#content) {
-            let dirent = this.#content[index];
+        for (let index in this.#direntList) {
+            const dirent = this.#direntList[index];
             if (dirent.isDir) {
-                root.content.push(dirent.serializeAll(src, dist, fileContent));
+                root.direntList.push(dirent.serializeAll(src, dist, fileContent));
             } else {
-                root.content.push(dirent.serialize(src, dist, fileContent));
+                root.direntList.push(dirent.serialize(src, dist, fileContent));
             }
         }
 
         return root;
     }
 
-    get allDirents() {
-        let allDirents = [];
-        for (let dirent of this.#content) {
-            if (dirent.isDir) {
-                allDirents.push(...dirent.allDirents);
+    deserializeAll({ src, dist, direntList }) {
+        this.deserialize({ src, dist });
+
+        for (let index in direntList) {
+            const direntData = direntList[index];
+            if (direntData.hasOwnProperty('direntList')) {
+                this.#direntList.push(new Directory().deserializeAll(direntData));
             } else {
-                allDirents.push(dirent);
+                this.#direntList.push(new File().deserialize(direntData));
             }
         }
-        return allDirents;
+
+        return this;
     }
+
+    // get allDirents() {
+    //     let allDirents = [];
+    //     for (let dirent of this.#direntList) {
+    //         if (dirent.isDir) {
+    //             allDirents.push(...dirent.allDirents);
+    //         } else {
+    //             allDirents.push(dirent);
+    //         }
+    //     }
+    //     return allDirents;
+    // }
 
 }
 
