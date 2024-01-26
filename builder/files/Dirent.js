@@ -31,6 +31,20 @@ export class Dirent {
         return true;
     }
 
+    process(oldSrc, oldDist, comparisonMethod, parentModified) {
+        this.#modified = true;
+
+        if (!parentModified && oldSrc && comparisonMethod(oldSrc) && oldDist) {
+            for (let dirent of oldDist.allDirents) {
+                if (comparisonMethod(dirent)) {
+                    dirent.toBeRemoved = false;
+                    this.#modified = false;
+                    break;
+                }
+            }
+        };
+    }
+
     serialize(src = true, dist = true) {
         const obj = {};
 

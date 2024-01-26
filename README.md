@@ -22,6 +22,7 @@
 ### todo
 * old dist + report vs src
 * logging to directory/file class?
+* more private methods
 
 * browser support transpilation
 * honor config options

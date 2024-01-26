@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import Dirent from './Dirent.js';
+import { isInArray } from '../helpers/index.js';
 
 export class Directory extends Dirent {
 
@@ -34,19 +35,17 @@ export class Directory extends Dirent {
         }
     }
 
-    async executeAndSave(comparandDirectory, parentModified = false) {
+    async process(oldSrc, oldDist, parentModified = false) {
+        super.process(oldSrc, oldDist, this.isEqual, parentModified);
         await this.createDist();
-        this.modified = parentModified || (comparandDirectory && this.isEqual(comparandDirectory));
         
         for (let dirent of this.#direntList) {
             if (dirent.isDir) {
-                const newComparand = comparandDirectory
-                    && Array.isArray(comparandDirectory)
-                    && comparandDirectory.direntList.find((item) => dirent.isEqual(item));
-                await dirent.executeAndSave(newComparand, parentModified);
+                const newOldSrc = oldSrc && Array.isArray(oldSrc.direntList) && oldSrc.direntList.find((item) => dirent.isEqual(item));
+                await dirent.process(newOldSrc, oldDist, this.modified);
             } else {
-                const newComparand = comparandDirectory && comparandDirectory.dirList;
-                await dirent.executeAndSave(newComparand, parentModified);
+                const newOldSrc = oldSrc && oldSrc.dirList;
+                await dirent.process(newOldSrc, oldDist, this.modified);
             }
         }
     }

@@ -18,14 +18,14 @@ export class Builder {
     
     #files = {
         src: {
-            old: {},
-            new: {
+            old: {}, // old state of src dir (from report)
+            new: { // current state of src dir (from file system)
                 public: {},
                 partials: {},
                 templates: {},
             }
         },
-        dist: {},
+        dist: {}, // current state of dist dir (from file system)
     };
     #newConfig = true;
 
@@ -117,10 +117,10 @@ export class Builder {
 
         await this.#files.src.new.templates.resetDist();
 
-        getLogger().log(3, 'Executing and saving templates');
+        getLogger().log(3, 'Processing templates');
         // compare and mark those to be redone
-        await this.#files.src.new.templates.executeAndSave(this.#files.src.old.templates);
-        getLogger().log(3, 'Executing and saving templates finished');
+        await this.#files.src.new.templates.process(this.#files.src.old.templates);
+        getLogger().log(3, 'Processing templates finished');
         
         getLogger().log(2, 'Initializing templates finished');
     }
@@ -166,9 +166,9 @@ export class Builder {
     async build() {
         getLogger().log(1, 'Building');
 
-        getLogger().log(3, 'Executing and saving public');
-        await this.#files.src.new.public.executeAndSave(this.#files.src.old.public);
-        getLogger().log(3, 'Executing and saving public finished');
+        getLogger().log(3, 'Processing public');
+        await this.#files.src.new.public.process(this.#files.src.old.public, this.#files.dist);
+        getLogger().log(3, 'Processing public finished');
 
         getLogger().log(3, 'Saving build report');
         await this.#saveBuildReport();

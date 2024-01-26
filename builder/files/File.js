@@ -22,12 +22,15 @@ export class File extends Dirent {
             ).update(this.#content).digest('hex');
     }
 
-    async executeAndSave(comparandsList, parentModified) {
-        this.modified = parentModified || (comparandsList && !isInArray(comparandsList, (item) => this.isEqual(item)));
-        for (let distIndex in this.dist) {
-            const dist = this.dist[distIndex];
-            const content = await this.execute(dist, distIndex);
-            await this.save(dist, distIndex, content);
+    async process(oldSrc, oldDist, parentModified) {
+        super.process(oldSrc, oldDist, (comparands) => isInArray(comparands, (item) => this.isEqual(item)), parentModified);
+
+        if (this.modified) {
+            for (let distIndex in this.dist) {
+                const dist = this.dist[distIndex];
+                const content = await this.execute(dist, distIndex);
+                await this.save(dist, distIndex, content);
+            }
         }
     }
 
