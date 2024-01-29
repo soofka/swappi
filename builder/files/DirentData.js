@@ -3,56 +3,61 @@ import { getDirentObject } from '../helpers/index.js';
 
 export class DirentData {
 
-    #dir; get dir() { return this.#dir } set dir(value) { this.#dir = value }
+    #absDir; get absDir() { return this.#absDir } set absDir(value) { this.#absDir = value }
+    #relDir; get relDir() { return this.#relDir } set relDir(value) { this.#relDir = value }
     #name; get name() { return this.#name } set name(value) { this.#name = value }
     #ext; get ext() { return this.#ext } set ext(value) { this.#ext = value }
-    #rel; get rel() { return this.#rel } set rel(value) { this.#rel = value }
 
     constructor(absPath, relPath = '') {
         if (absPath) {
             const obj = getDirentObject(absPath);
-            this.#dir = obj.dir;
+            this.#absDir = obj.dir;
             this.#name = obj.name;
             this.#ext = obj.ext;
         }
-        this.#rel = relPath;
+        this.#relDir = relPath;
     }
     
     clone() {
         const clone = new DirentData();
-        clone.dir = this.#dir;
+        clone.absDir = this.#absDir;
+        clone.relDir = this.#relDir;
         clone.name = this.#name;
         clone.ext = this.#ext;
-        clone.rel = this.#rel;
         return clone;
     }
 
+    createName(suffixes = [], separator = '.') {
+        return `${this.#name}${suffixes.join(separator)}${this.#ext}`
+    }
+
     isEqual(direntData) {
-        return this.#dir === direntData.dir
+        return this.#absDir === direntData.absDir        
+            && this.#relDir === direntData.relDir
             && this.#name === direntData.name
-            && this.#ext === direntData.ext
-            && this.#rel === direntData.rel;
+            && this.#ext === direntData.ext;
     }
 
     serialize() {
         return {
-            dir: this.#dir,
+            absDir: this.#absDir,
+            relDir: this.#relDir,
             name: this.#name,
             ext: this.#ext,
-            rel: this.#rel,
         }
     }
 
-    deserialize({ dir, name, ext, rel}) {
-        this.#dir = dir;
+    deserialize({ absDir, relDir, name, ext}) {
+        this.#absDir = absDir;
+        this.#relDir = relDir;
         this.#name = name;
         this.#ext = ext;
-        this.#rel = rel;
         return this;
     }
 
-    get abs() { return path.join(this.#dir, this.full) }
     get full() { return `${this.#name}${this.#ext}` }
+    get abs() { return path.join(this.#absDir, this.full) }
+    get rel() { return path.join(this.#relDir, this.full) }
 
 }
 

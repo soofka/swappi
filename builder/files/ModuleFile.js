@@ -1,21 +1,22 @@
 import path from 'path';
 import File from './File.js';
 import { isFunction, isObject } from '../helpers/index.js';
-import { getConfig } from '../utils/index.js';
+import { getConfig, getLogger } from '../utils/index.js';
 
 export class ModuleFile extends File {
 
     #moduleFunctions = [];
 
-    constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
-        super(srcAbsPath, distAbsPaths, relPath);
+    constructor(absPath, relPath = '') {
+        super(absPath, relPath);
     }
 
-    async load() {
-        super.load();
+    async prepare(distPath) {
+        getLogger().log(7, `Preparing module file ${this.src.rel} [distPath=${distPath}]`);
+        super.prepare(distPath);
 
-        const { default: module } = await import(path.join('file:///', this.src.abs));
-        const nameArray = this.src.name.split('.');
+        const { default: module } = await import(path.join('file:///', this.abs));
+        const nameArray = this.name.split('.');
 
         if (nameArray.length >= 1) {
             let name;
@@ -29,28 +30,27 @@ export class ModuleFile extends File {
             }
 
             if (isFunction(module)) {
-                for (let dist of this.dist) {
-                    this.#moduleFunctions.push(module);
-                    dist.name = name;
-                    dist.ext = ext;
-                }
+                this.#moduleFunctions.push(module);
+                this.dist[0].name = name;
+                this.dist[0].ext = ext;
             } else if (isObject(module)) {
-                const newDist = [];
-                for (let dist of this.dist) {
-                    newDist.push(...Object.keys(module).map((key) => {
-                        this.#moduleFunctions.push(module[key]);
-                        const rootDist = dist.clone();
-                        rootDist.name = `${name}${key}`;
-                        rootDist.ext = ext;
-                        return rootDist;
-                    }));
-                }
+                const newDist = Object.keys(module).map((key) => {
+                    this.#moduleFunctions.push(module[key]);
+                    const distDirentData = this.dist[0].clone();
+                    distDirentData.name = `${name}${key}`;
+                    distDirentData.ext = ext;
+                    return distDirentData;
+                });
                 this.dist = newDist;
             }
         }
+
+        getLogger().log(7, `Module file ${this.src.rel} prepared (dist length: ${this.dist.length})`);
+        return this;
     }
 
     async execute(dist, index) {
+        // is it safe to do it in order instead of relying on keys?
         return this.#moduleFunctions[index](getConfig().data);
     }
 

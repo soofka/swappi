@@ -1,41 +1,58 @@
 import fs from 'fs/promises';
 import path from 'path';
 import Dirent from './Dirent.js';
-import { isInArray } from '../helpers/index.js';
+import { loadDir } from '../helpers/index.js';
+import { getLogger } from '../utils/index.js';
 
 export class Directory extends Dirent {
 
     #direntList = []; get direntList() { return this.#direntList }
     #getFileClass;
 
-    constructor(getFileClass, srcAbsPath, distAbsPaths, relPath = '') {
-        super(srcAbsPath, distAbsPaths, relPath);
+    constructor(getFileClass, absPath, relPath = '') {
+        super(absPath, relPath);
         this.#getFileClass = getFileClass;
         this.isDir = true;
     }
 
     async load() {
-        for (let dirent of await fs.readdir(this.src.abs, { withFileTypes: true })) {
-            const srcPath = path.join(this.src.abs, dirent.name);
-            const distPaths = this.dist.map((dist) => path.join(dist.abs, dirent.name));
+        getLogger().log(6, `Loading directory ${this.src.rel}`);
 
-            let direntObject;
+        for (let nodeDirent of await loadDir(this.src.abs)) {
+            const srcPath = path.join(this.src.abs, nodeDirent.name);
+            let dirent;
 
-            if (dirent.isFile()) {
-                const fileClass = this.#getFileClass(dirent);
-                direntObject = new fileClass(srcPath, distPaths, this.src.rel);
-            } else if (dirent.isDirectory()) {
-                direntObject = new Directory(this.#getFileClass, srcPath, distPaths, dirent.name);
+            if (nodeDirent.isFile()) {
+                const fileClass = this.#getFileClass(nodeDirent);
+                dirent = new fileClass(srcPath, this.src.relDir);
+            } else if (nodeDirent.isDirectory()) {
+                dirent = new Directory(this.#getFileClass, srcPath, dirent.name);
             }
 
-            if (direntObject) {
-                await direntObject.load();
-                this.#direntList.push(direntObject);
+            if (dirent) {
+                await dirent.load();
+                this.#direntList.push(dirent);
             }
         }
+
+        getLogger().log(6, `Directory ${this.src.rel} loaded`);
+        return this;
+    }
+
+    prepare(distPath) {
+        getLogger().log(6, `Preparing directory ${this.src.rel} [distPath=${distPath}]`);
+
+        for (let dirent of this.#direntList) {
+            dirent.prepare(distPath);
+        }
+
+        getLogger().log(6, `Directory ${this.src.rel} prepared`);
+        return this;
     }
 
     async process(oldSrc, oldDist, parentModified = false) {
+        getLogger().log(6, `Processing directory (abs: ${this.abs})`);
+
         super.process(oldSrc, oldDist, this.isEqual, parentModified);
         await this.createDist();
         
@@ -48,6 +65,8 @@ export class Directory extends Dirent {
                 await dirent.process(newOldSrc, oldDist, this.modified);
             }
         }
+
+        getLogger().log(6, `Directory processed (abs: ${this.abs})`);
     }
 
     async createDist() {

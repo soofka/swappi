@@ -1,25 +1,45 @@
 import fs from 'fs/promises';
+import path from 'path';
 import crypto from 'crypto';
 import Dirent from './Dirent.js';
-import { isInArray } from '../helpers/index.js';
-import { getConfig } from '../utils/index.js';
+import { isInArray, loadFile } from '../helpers/index.js';
+import { getConfig, getLogger } from '../utils/index.js';
 
 export class File extends Dirent {
 
+    #dist = []; get dist() { return this.#dist }
     #content = ''; get content() { return this.#content }
     #contentHash = ''; get contentHash() { return this.#contentHash }
 
-    constructor(srcAbsPath, distAbsPaths = [], relPath = '') {
-        super(srcAbsPath, distAbsPaths, relPath);
+    constructor(srcAbsPath, relPath = '') {
+        super(srcAbsPath, relPath);
         this.isDir = false;
     }
 
     async load() {
-        this.#content = await fs.readFile(this.src.abs, { encoding: 'utf8' });
+        getLogger().log(7, `Loading file ${this.src.rel}`);
+
+        this.#content = await loadFile(this.abs);
         this.#contentHash = crypto.createHash(
                 getConfig().constants.hashAlgorithm,
-                getConfig().constants.hashAlgorithmOptions
+                getConfig().constants.hashAlgorithmOptions,
             ).update(this.#content).digest('hex');
+
+        getLogger().log(7, `File ${this.src.rel} loaded`);
+        return this;        
+    }
+
+    prepare(distPath) {
+        getLogger().log(7, `Preparing file ${this.src.rel} [distPath=${distPath}]`);
+
+        const distDirentData = this.src.clone();
+        if (distPath) {
+            distDirentData.dir = path.join(distPath, distDirentData.rel);
+        }
+        this.#dist.push(distDirentData);
+
+        getLogger().log(7, `File ${this.src.rel} prepared (dist length: ${this.#dist.length})`);
+        return this;
     }
 
     async process(oldSrc, oldDist, parentModified) {
@@ -40,6 +60,11 @@ export class File extends Dirent {
 
     async save(dist, distIndex, content) {
         await fs.writeFile(dist.abs, content);
+    }
+
+    createName() {
+        let name = this.src.full;
+
     }
 
     async isEqual(file) {

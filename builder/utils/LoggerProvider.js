@@ -3,6 +3,7 @@ import { decorateWithSingleton } from './decorateWithSingleton.js';
 class LoggerProvider {
 
     #verbosity;
+    #prefix = '-';
 
     constructor(verbosity) {
         this.#verbosity = verbosity;
@@ -22,6 +23,7 @@ class LoggerProvider {
 
     #log(verbosity, method, messageArgs) {
         if (verbosity <= this.#verbosity) {
+            messageArgs[0] = `${this.#prefix.repeat(verbosity)}${messageArgs[0]}`;
             console[method](...messageArgs);
         }
     }
