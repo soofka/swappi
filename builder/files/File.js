@@ -35,7 +35,7 @@ export class File extends Dirent {
 
         const distDirentData = this.src.clone();
         if (distPath) {
-            distDirentData.dir = path.join(distPath, distDirentData.rel);
+            distDirentData.absDir = path.join(distPath, distDirentData.relDir);
         }
         this.#dist.push(distDirentData);
 

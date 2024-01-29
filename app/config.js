@@ -15,7 +15,7 @@ export const config = {
         },
         templates: {
             src: path.join(appPath, 'src', 'templates'),
-            dist: path.join(appPath, 'src', 'templatesOutput'),
+            dist: path.join(appPath, 'src', 'public', 'generated'),
         },
     },
 

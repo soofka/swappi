@@ -80,7 +80,7 @@ export class Directory extends Dirent {
             } else if (!dirent.modified) {
                 newDirentList.push(dirent);
             } else {
-                await deleteFile(dirent.abs);
+                await deleteFile(dirent.src.abs);
             }
         }
         this.#direntList = newDirentList;

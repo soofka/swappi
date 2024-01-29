@@ -12,7 +12,7 @@ export const config = {
         },
         templates: {
             src: path.resolve(path.join('src','templates')),
-            dist: path.resolve(path.join('src','templatesOutput')),
+            dist: path.resolve(path.join('src', 'public', 'templatesOutput')),
         },
         report: path.resolve('report.json'),
     },

@@ -90,7 +90,7 @@ export class Builder {
         );
         await this.#files.templates.dist.old.load();
 
-        this.#files.templates.src = await new Directory(
+        this.#files.templates.src = new Directory(
             () => getFileProvider().getModuleFile(),
             getConfig().paths.templates.src,
         );
@@ -99,7 +99,7 @@ export class Builder {
 
         this.#deduplicateTemplates();
 
-        this.#files.templates.dist.old.reset();
+        await this.#files.templates.dist.old.reset();
         this.#files.templates.dist.new = await this.#files.templates.src.process();
         
         getLogger().log(2, 'Initializing templates finished');
