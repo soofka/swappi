@@ -1,13 +1,13 @@
-import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import Dirent from './Dirent.js';
-import { isInArray, loadFile } from '../helpers/index.js';
+import { isInArray, loadFile, saveFile } from '../helpers/index.js';
 import { getConfig, getLogger } from '../utils/index.js';
 
 export class File extends Dirent {
 
-    #dist = []; get dist() { return this.#dist }
+    #dist = []; get dist() { return this.#dist } set dist(value) { this.#dist = value }
+    #modified; get modified() { return this.#modified } set modified(value) { this.#modified = value }
     #content = ''; get content() { return this.#content }
     #contentHash = ''; get contentHash() { return this.#contentHash }
 
@@ -19,7 +19,8 @@ export class File extends Dirent {
     async load() {
         getLogger().log(7, `Loading file ${this.src.rel}`);
 
-        this.#content = await loadFile(this.abs);
+        this.#modified = true;
+        this.#content = await loadFile(this.src.abs);
         this.#contentHash = crypto.createHash(
                 getConfig().constants.hashAlgorithm,
                 getConfig().constants.hashAlgorithmOptions,
@@ -29,7 +30,7 @@ export class File extends Dirent {
         return this;        
     }
 
-    prepare(distPath) {
+    async prepare(distPath) {
         getLogger().log(7, `Preparing file ${this.src.rel} [distPath=${distPath}]`);
 
         const distDirentData = this.src.clone();
@@ -42,8 +43,8 @@ export class File extends Dirent {
         return this;
     }
 
-    async process(oldSrc, oldDist, parentModified) {
-        super.process(oldSrc, oldDist, (comparands) => isInArray(comparands, (item) => this.isEqual(item)), parentModified);
+    async process() {
+        getLogger().log(7, `Processing file ${this.src.rel} (${this.modified ? '' : 'not '}modified)`);
 
         if (this.modified) {
             for (let distIndex in this.dist) {
@@ -52,6 +53,9 @@ export class File extends Dirent {
                 await this.save(dist, distIndex, content);
             }
         }
+
+        getLogger().log(7, `File ${this.src.rel} processed`);
+        return this;
     }
 
     async execute(dist, index) {
@@ -59,23 +63,29 @@ export class File extends Dirent {
     }
 
     async save(dist, distIndex, content) {
-        await fs.writeFile(dist.abs, content);
+        await saveFile(dist.abs, content);
     }
 
-    createName() {
-        let name = this.src.full;
-
-    }
-
-    async isEqual(file) {
+    async isEqual(file, withDist = true) {
         if (super.isEqual(file)) {
+            if (withDist) {
+                for (let dist of file.dist) {
+                    if (!isInArray(this.#dist, dist)) {
+                        return false;
+                    }
+                }
+            }
             return this.#contentHash === file.contentHash;
         }
         return false;
     }
 
     serialize(src = true, dist = true, content = true) {
-        const obj = { ...super.serialize(src, dist), contentHash: this.#contentHash };
+        const obj = { ...super.serialize(src), contentHash: this.#contentHash };
+
+        if (dist) {
+            obj.dist = this.#dist.map((dist) => dist.serialize());
+        }
 
         if (content) {
             obj.content = this.#content;
@@ -85,7 +95,13 @@ export class File extends Dirent {
     }
 
     deserialize({ src, dist, content, contentHash }) {
-        super.deserialize({ src, dist });
+        super.deserialize({ src });
+
+        this.#dist = [];
+        for (let item of dist) {
+            this.#dist.push(new DirentData().deserialize(item));
+        }
+
         this.#content = content;
         this.#contentHash = contentHash;
         return this;
@@ -94,9 +110,3 @@ export class File extends Dirent {
 }
 
 export default File;
-
-const obj = {"src":{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src","name":"partials","ext":"","rel":""},"dist":[{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\public","name":"generated","ext":"","rel":""}],"content":[
-    {"src":{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\partials","name":"background-image.css","ext":".js","rel":""},"dist":[{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\public\\generated","name":"background-image","ext":".css","rel":""}],"contentHash":"8ac85d496e60be0076e6c0fcfe4262b716ac67e71aebdd6501cf6cf150e9fc4b"},
-    {"src":{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\partials","name":"head.html","ext":".js","rel":""},"dist":[{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\public\\generated","name":"head","ext":".html","rel":""}],"contentHash":"460e901b5e2cf72695ead148f10bb76cdb5086c7044ab44c172e539a8d4d80bb"},
-    {"src":{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\partials","name":"img.html","ext":".js","rel":""},"dist":[{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\public\\generated","name":"img","ext":".html","rel":""}],"contentHash":"2885e6eee9dd17f5de8f54ecdc94e8dd3b1435ac8902cd73454de368a940ac0b"},
-    {"src":{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\partials","name":"label.html","ext":".js","rel":""},"dist":[{"dir":"C:\\Users\\panso\\Documents\\Code\\swn.ski\\app\\src\\public\\generated","name":"label","ext":".html","rel":""}],"contentHash":"c2b73aab7d7109f007af237ff2494820ee4909d0c05d5236bbe81079b98929c3"}]}

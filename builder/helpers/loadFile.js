@@ -5,7 +5,7 @@ export async function loadFile(absPath, options = { encoding: 'utf8' }) {
     try {
         file = await fs.readFile(absPath, options);
     } catch(e) {
-        if (!e.code === 'ENOENT') {
+        if (e.code !== 'ENOENT') {
             throw e;
         }
     }

@@ -1,12 +1,14 @@
-import fs from 'fs/promises';
 import defaultConfig from './config.js';
 import { Directory } from './files/index.js';
 import {
     deepMerge,
+    findInArray,
     isDeepEqual,
+    isInArray,
     isObject,
     loadFile,
     parseJson,
+    saveFile,
 } from './helpers/index.js';
 import {
     initConfigProvider,
@@ -23,8 +25,8 @@ export class Builder {
         public: { src: {}, dist: { old: {}, new: {} }},
         partials: { src: {}, dist: { old: {}, new: {} }},
         templates: { src: {}, dist: { old: {}, new: {} }},
-        report: {},
     };
+    #report = false;
     #newConfig = true;
 
     constructor(config) {
@@ -39,8 +41,8 @@ export class Builder {
 
         await this.#initReport();
         await this.#initTemplates();
-        await this.#initPartials();
-        await this.#initPublic();
+        // await this.#initPartials();
+        // await this.#initPublic();
 
         getLogger().log(1, 'Build initialized');
     }
@@ -59,8 +61,9 @@ export class Builder {
                 this.#newConfig = !isDeepEqual(getConfig(), reportJson.config);
                 getLogger().log(4, `Config has ${this.#newConfig ? '' : 'NOT '}changed`);
         
+                this.#report = {};
                 for (let key of Object.keys(report.files)) {
-                    this.#files.report[key] = new Directory(
+                    this.#report[key] = new Directory(
                         (direntObject) => getFileProvider()
                             .getFile(direntObject.absDir, direntObject.name, direntObject.ext),
                     ).deserializeAll(report.files[key]);
@@ -69,65 +72,68 @@ export class Builder {
                 getLogger().log(3, 'Loading previous build report finished');
                 getLogger().log(4, 'Previous bulid report:', report);
             } else {
-                getLogger().log(3, `Invalid previous build report content (content: ${reportJson})`);
+                getLogger().warn(3, `Invalid previous build report content (content: ${reportJson})`);
             }
         } else {
-            getLogger().log(3, `Previous build report not found (path: ${getConfig().paths.report})`);
+            getLogger().warn(3, `Previous build report not found (path: ${getConfig().paths.report})`);
         }
         
         getLogger().log(2, 'Previous bulid report initialized');
     }
 
-    async #initDist() {
-        getLogger().log(2, 'Initializing dist');
-
-        this.#files.dist = new Directory(
-            (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
-            getConfig().paths.dist,
-        );
-
-        getLogger().log(3, 'Loading dist');
-        await this.#files.dist.load();
-        getLogger().log(3, 'Loading dist finished');
-        getLogger().log(4, 'Dist:', JSON.stringify(this.#files.dist.serializeAll(true, true, false)));
-
-        // compare and mark those to be redone
-
-        getLogger().log(2, 'Initializing dist finished');
-    }
-
     async #initTemplates() {
         getLogger().log(2, `Initializing templates (path: ${JSON.stringify(getConfig().paths.templates)})`);
+
+        this.#files.templates.dist.old = new Directory(
+            (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
+            getConfig().paths.templates.dist,
+        );
+        await this.#files.templates.dist.old.load();
 
         this.#files.templates.src = await new Directory(
             () => getFileProvider().getModuleFile(),
             getConfig().paths.templates.src,
-        ).load().prepare(getConfig().paths.templates.dist);
+        );
+        await this.#files.templates.src.load();
+        await this.#files.templates.src.prepare(getConfig().paths.templates.dist);
 
-        this.#files.templates.dist.old = await new Directory(
-            (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
-            getConfig().paths.templates.dist,
-        ).load();
+        this.#deduplicateTemplates();
 
-        this.#files.templates.dist.new = await deduplicateTemplates( // <==== next step
-            this.#files.templates.src,
-            this.#files.templates.dist.old,
-        ).process();
-
-
-        // getLogger().log(3, `Loading templates src (abs: ${this.#files.templates.src.abs})`);
-        // await this.#files.src.new.templates.load();
-        // getLogger().log(3, 'Loading templates finished');
-        // getLogger().log(4, 'Templates:', JSON.stringify(this.#files.src.new.templates.serializeAll(true, true, false)));
-
-        // await this.#files.src.new.templates.resetDist();
-
-        // getLogger().log(3, 'Processing templates');
-        // // compare and mark those to be redone
-        // await this.#files.src.new.templates.process(this.#files.src.old.templates);
-        // getLogger().log(3, 'Processing templates finished');
+        this.#files.templates.dist.old.reset();
+        this.#files.templates.dist.new = await this.#files.templates.src.process();
         
         getLogger().log(2, 'Initializing templates finished');
+
+    }
+
+    #deduplicateTemplates() {
+        getLogger().log(3, `Deduplicating templates`);
+
+        for (let template of this.#files.templates.src.allDirents) {
+            if (this.#report && isInArray(this.#report.files.templates.src.allDirents, (element) => element.isEqual(template))) {
+                let templateFiles = [];
+
+                for (let dist of template.dist) {
+                    const templateFile = findInArray(this.#files.templates.dist.old.allDirents, (element) => element.src.equals(dist));
+                    if (templateFile) {
+                        templateFiles.push(templateFile);
+                    } else {
+                        templateFiles = [];
+                        break;
+                    }
+                }
+
+                if (templateFiles.length > 0) {
+                    template.modified = false;
+                    
+                    for (let templateFile of templateFiles) {
+                        templateFile.modified = false;
+                    }
+                }
+            }
+        }
+        
+        getLogger().log(3, `Templates deduplicated`);
     }
 
     async #initPartials() {
@@ -171,13 +177,13 @@ export class Builder {
     async build() {
         getLogger().log(1, 'Building');
 
-        getLogger().log(3, 'Processing public');
-        await this.#files.src.new.public.process(this.#files.src.old.public, this.#files.dist);
-        getLogger().log(3, 'Processing public finished');
+        // getLogger().log(3, 'Processing public');
+        // await this.#files.src.new.public.process(this.#files.src.old.public, this.#files.dist);
+        // getLogger().log(3, 'Processing public finished');
 
-        getLogger().log(3, 'Saving build report');
-        await this.#saveBuildReport();
-        getLogger().log(3, 'Saving build report finished');
+        // getLogger().log(3, 'Saving build report');
+        // await this.#saveBuildReport();
+        // getLogger().log(3, 'Saving build report finished');
 
         getLogger().log(1, 'Building finished');
     }
@@ -190,7 +196,7 @@ export class Builder {
         for (let key of Object.keys(this.#files.src.old)) {
             report.files[key] = this.#files.src.old[key].serializeAll(true, true, false);
         }
-        await fs.writeFile(getConfig().paths.report, JSON.stringify(report));
+        await saveFile(getConfig().paths.report, JSON.stringify(report));
     }
 
 }

@@ -23,8 +23,7 @@ class LoggerProvider {
 
     #log(verbosity, method, messageArgs) {
         if (verbosity <= this.#verbosity) {
-            messageArgs[0] = `${this.#prefix.repeat(verbosity)}${messageArgs[0]}`;
-            console[method](...messageArgs);
+            console[method](`${method.toUpperCase()}\t`, this.#prefix.repeat(verbosity), ...messageArgs);
         }
     }
 

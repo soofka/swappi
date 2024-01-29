@@ -1,6 +1,6 @@
 import path from 'path';
 import File from './File.js';
-import { isFunction, isObject } from '../helpers/index.js';
+import { isFunction, isObject, loadModule } from '../helpers/index.js';
 import { getConfig, getLogger } from '../utils/index.js';
 
 export class ModuleFile extends File {
@@ -15,8 +15,8 @@ export class ModuleFile extends File {
         getLogger().log(7, `Preparing module file ${this.src.rel} [distPath=${distPath}]`);
         super.prepare(distPath);
 
-        const { default: module } = await import(path.join('file:///', this.abs));
-        const nameArray = this.name.split('.');
+        const module = await loadModule(this.src.abs);
+        const nameArray = this.src.name.split('.');
 
         if (nameArray.length >= 1) {
             let name;
