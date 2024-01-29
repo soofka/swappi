@@ -5,11 +5,18 @@ const colors = ['#f4f7fc', '#dfe7f2', '#8fa4c3', '#586c91', '#283347'];
 
 export const config = {
     paths: {
-        dist: path.join(appPath, 'dist'),
-        public: path.join(appPath, 'src', 'public'),
-        partials: path.join(appPath, 'src', 'partials'),
-        templates: path.join(appPath, 'src', 'templates'),
-        generated: path.join(appPath, 'src', 'public', 'generated'),
+        public: {
+            src: path.join(appPath, 'src', 'public'),
+            dist: path.join(appPath, 'dist'),
+        },
+        partials: {
+            src: path.join(appPath, 'src', 'partials'),
+            dist: path.join(appPath, 'dist', 'partials'),
+        },
+        templates: {
+            src: path.join(appPath, 'src', 'templates'),
+            dist: path.join(appPath, 'src', 'templatesOutput'),
+        },
     },
 
     data: {

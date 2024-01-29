@@ -4,6 +4,9 @@ import { Directory } from './files/index.js';
 import {
     deepMerge,
     isDeepEqual,
+    isObject,
+    loadFile,
+    parseJson,
 } from './helpers/index.js';
 import {
     initConfigProvider,
@@ -17,15 +20,19 @@ import {
 export class Builder {
     
     #files = {
-        src: {
-            old: {}, // old state of src dir (from report)
-            new: { // current state of src dir (from file system)
-                public: {},
-                partials: {},
-                templates: {},
-            }
+        public: {
+            src: {},
+            dist: {},
         },
-        dist: {}, // current state of dist dir (from file system)
+        partials: {
+            src: {},
+            dist: {},
+        },
+        templates: {
+            src: {},
+            dist: {},
+        },
+        report: {},
     };
     #newConfig = true;
 
@@ -50,31 +57,29 @@ export class Builder {
 
     async #initReport() {
         getLogger().log(2, 'Initializing previous build report');
-
-        let report;
         getLogger().log(3, 'Loading previous build report');
 
-        try {
-            report = JSON.parse(await fs.readFile(getConfig().paths.report, { encoding: 'utf8' }));
-        } catch(e) {
-            if (!e.code === 'ENOENT') {
-                throw e;
-            }
-            getLogger().log(2, `Previous build report not found (${getConfig().paths.report})`, e);
+        const report = await loadFile(getConfig().paths.report);
+        if (!report) {
+            getLogger().log(3, `Previous build report not found (${getConfig().paths.report})`);
             return;
         }
 
-        if (isDeepEqual(getConfig(), report.config)) {
-            this.#newConfig = false;
+        const reportJson = parseJson(report);
+        if (!reportJson || !isObject(reportJson) || !report.hasOwnProperty('config') || !isObject(reportJson.config) || !report.hasOwnProperty('files') || !isObject(reportJson).files) {
+            getLogger().log(3, `Invalid previous build report content (${reportJson})`);
+            return;
         }
 
+        this.#newConfig = !isDeepEqual(getConfig(), reportJson.config);
+        getLogger().log(3, `Config has ${this.#newConfig ? '' : 'NOT '}changed`);
+
         for (let key of Object.keys(report.files)) {
-            this.#files.src.old[key] = new Directory(
-                (dirent) => getFileProvider().getFile(dirent.src.dir, dirent.src.name, dirent.src.ext),
-            ).deserializeAll(report.files[key]);
+            const directory = new Directory((dirent) => getFileProvider().getFile(dirent.src.dir, dirent.src.name, dirent.src.ext));
+            this.#files.report[key] = directory.deserializeAll(report.files[key]);
 
             getLogger().log(4, `Loading ${key} directory from previous build finished`);
-            getLogger().log(5, `${key} directory from previous build:`, JSON.stringify(this.#files.src.old[key].serializeAll(true, true, false)));
+            getLogger().log(5, `${key} directory from previous build:`, directory);
         }
 
         getLogger().log(3, 'Loading previous build report finished');

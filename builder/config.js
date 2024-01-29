@@ -2,16 +2,23 @@ import path from 'path';
 
 export const config = {
     paths: {
-        dist: path.resolve('dist'),
-        public: path.resolve(path.join('src','public')),
-        partials: path.resolve(path.join('src','partials')),
-        templates: path.resolve(path.join('src','templates')),
-        generated: path.resolve(path.join('src','generated')),
-        report: 'report.json',
+        public: {
+            src: path.resolve(path.join('src','public')),
+            dist: path.resolve('dist'),
+        },
+        partials: {
+            src: path.resolve(path.join('src','partials')),
+            dist: path.resolve('dist'),
+        },
+        templates: {
+            src: path.resolve(path.join('src','templates')),
+            dist: path.resolve(path.join('src','templatesOutput')),
+        },
+        report: path.resolve('report.json'),
     },
 
     options: {
-        verbosity: 4,
+        verbosity: 5,
         hash: true,
         force: false,
 

@@ -4,6 +4,8 @@ import isDeepEqual from './isDeepEqual.js';
 import isFunction from './isFunction.js';
 import isInArray from './isInArray.js';
 import isObject from './isObject.js';
+import loadFile from './loadFile.js';
+import parseJson from './parseJson.js';
 
 export {
     deepMerge,
@@ -12,4 +14,6 @@ export {
     isFunction,
     isInArray,
     isObject,
+    loadFile,
+    parseJson,
 }
