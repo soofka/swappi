@@ -1,5 +1,5 @@
 // use files?
-const head = (element, attributes, config, files) => '';
+const head = (htmlElement, attributes, config, files) => '';
 // DATA????
 // `
 //     <head>

@@ -4,18 +4,18 @@ import { getConfig, getLogger } from '../utils/index.js';
 
 export class ModuleFile extends File {
 
-    #moduleFunctions = [];
+    #module; get module() { return this.#module }
 
     constructor(absPath, relPath = '') {
         super(absPath, relPath);
     }
 
-    async prepare(isConfigModified, distPath, reportDirectory, distDirectory) {
-        getLogger().log(7, `Preparing module file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, distDirectory=${distDirectory}]`);
-        super.prepare(isConfigModified, distPath, reportDirectory);
+    async prepare(isConfigModified, distPath, reportDirectory = undefined, additionalDirectories = undefined) {
+        getLogger().log(7, `Preparing module file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`);
+        super.prepare(isConfigModified, distPath, reportDirectory, additionalDirectories);
 
         const nameArray = this.src.name.split('.');
-        if (nameArray.length >= 1) {
+        if (nameArray.length > 0) {
             let name;
             let ext = '';
 
@@ -27,14 +27,12 @@ export class ModuleFile extends File {
             }
 
             // make it load from memory
-            const module = await loadModule(this.src.abs);
-            if (isFunction(module)) {
-                this.#moduleFunctions.push(module);
+            this.#module = await loadModule(this.src.abs);
+            if (isFunction(this.#module)) {
                 this.dist[0].name = name;
                 this.dist[0].ext = ext;
-            } else if (isObject(module)) {
-                const newDist = Object.keys(module).map((key) => {
-                    this.#moduleFunctions.push(module[key]);
+            } else if (isObject(this.#module)) {
+                const newDist = Object.keys(this.#module).map((key) => {
                     const distDirentData = this.dist[0].clone();
                     distDirentData.name = `${name}${key}`;
                     distDirentData.ext = ext;
@@ -43,10 +41,10 @@ export class ModuleFile extends File {
                 this.dist = newDist;
             }
 
-            if (!this.modified) {
+            if (!this.modified && isObject(additionalDirectories) && additionalDirectories.hasOwnProperty('oldDist')) {
                 let distFiles = [];
                 for (let dist of this.dist) {
-                    const distFile = findInArray(distDirectory.allFiles, (element) => element.src.isEqual(dist));
+                    const distFile = findInArray(additionalDirectories.oldDist.allFiles, (element) => element.src.isEqual(dist));
                     if (distFile) {
                         distFiles.push(distFile);
                     } else {
@@ -70,8 +68,15 @@ export class ModuleFile extends File {
     }
 
     async execute(dist, index) {
-        // is it safe to do it in order instead of relying on keys?
-        return this.#moduleFunctions[index](getConfig().data);
+        if (isFunction(this.#module)) {
+            return this.#module(getConfig().data);
+        } else if (isObject(this.#module)) {
+            for (let key of Object.keys(this.#module)) {
+                if (dist.name.endsWith(key)) {
+                    return this.#module[key](getConfig().data);
+                }
+            }
+        }
     }
 
 }

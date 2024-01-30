@@ -20,9 +20,9 @@
 
 ## builder
 ### todo
-* old dist + report vs src
-* logging to directory/file class?
-* more private methods
+* prepare: analyze if partials changed and mark file appropriately
+* process: input partials
+* prepare and process images appropriately
 
 * browser support transpilation
 * honor config options

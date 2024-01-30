@@ -5,7 +5,7 @@
   "description": "swn.ski",
   "license": "MIT",
   "scripts": {
-    "build": "echo \"BUDOWANKO\" && node app/build.js",
+    "build": "node app/build.js",
     "start": "node app/start.js",
     "test": "echo \"no tests yet\""
   },

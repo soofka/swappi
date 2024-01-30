@@ -1,4 +1,4 @@
-const img = (element, attributes, config, files) => {
+const img = (htmlElement, attributes, config, files) => {
     // CONFIG???
     return '';
     // let picture = '<picture';

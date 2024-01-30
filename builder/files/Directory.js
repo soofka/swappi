@@ -48,11 +48,11 @@ export class Directory extends Dirent {
         return this;
     }
 
-    async prepare(isConfigModified, distPath, reportDirectory, oldDistDirectory) {
-        getLogger().log(6, `Preparing directory ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`);
+    async prepare(isConfigModified, distPath, reportDirectory = undefined, additionalDirectories = undefined) {
+        getLogger().log(6, `Preparing directory ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory} additionalDirectories=${additionalDirectories}]`);
 
         for (let dirent of this.#direntList) {
-            await dirent.prepare(isConfigModified, distPath, reportDirectory, oldDistDirectory);
+            await dirent.prepare(isConfigModified, distPath, reportDirectory, additionalDirectories);
         }
 
         getLogger().log(6, `Directory ${this.src.rel} prepared`);
@@ -133,6 +133,10 @@ export class Directory extends Dirent {
             }
         }
         return allFiles;
+    }
+
+    get allDists() {
+        return [].concat(...this.allFiles().map((file) => file.dist));
     }
 
 }

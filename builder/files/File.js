@@ -29,8 +29,8 @@ export class File extends Dirent {
         return this;        
     }
 
-    async prepare(isConfigModified, distPath, reportDirectory) {
-        getLogger().log(7, `Preparing file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}]`);
+    async prepare(isConfigModified, distPath, reportDirectory = undefined, additionalDirectories = undefined) {
+        getLogger().log(7, `Preparing file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`);
 
         const distDirentData = this.src.clone();
         if (distPath) {

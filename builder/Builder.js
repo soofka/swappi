@@ -110,8 +110,8 @@ export class Builder {
         await this.#files.templates.src.prepare(
             this.#isConfigModified,
             getConfig().paths.templates.dist,
-            this.#files.report && this.#files.report.templates,
-            this.#files.templates.dist,
+            this.#files.report.templates,
+            { oldDist: this.#files.templates.dist },
         );
         
         getLogger().log(2, 'Initializing templates finished');
@@ -135,8 +135,8 @@ export class Builder {
         await this.#files.partials.src.prepare(
             this.#isConfigModified,
             getConfig().paths.partials.dist,
-            this.#files.report && this.#files.report.partials,
-            this.#files.partials.dist,
+            this.#files.report.partials,
+            { oldDist: this.#files.partials.dist },
         );
 
         getLogger().log(2, 'Initializing partials finished');
@@ -160,8 +160,11 @@ export class Builder {
         await this.#files.public.src.prepare(
             this.#isConfigModified,
             getConfig().paths.public.dist,
-            this.#files.report && this.#files.report.public,
-            this.#files.public.dist,
+            this.#files.report.public,
+            {
+                oldDist: this.#files.public.dist,
+                partials: this.#files.partials.src,
+            },
         );
 
         getLogger().log(2, 'Initializing public finished');
