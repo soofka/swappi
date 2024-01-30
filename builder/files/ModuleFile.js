@@ -1,5 +1,5 @@
 import File from './File.js';
-import { isFunction, isObject, loadModule } from '../helpers/index.js';
+import { findInArray, isFunction, isObject, loadModule } from '../helpers/index.js';
 import { getConfig, getLogger } from '../utils/index.js';
 
 export class ModuleFile extends File {
@@ -10,8 +10,8 @@ export class ModuleFile extends File {
         super(absPath, relPath);
     }
 
-    async prepare(distPath, reportDirectory, oldDistDirectory) {
-        getLogger().log(7, `Preparing module file ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`);
+    async prepare(distPath, reportDirectory, distDirectory) {
+        getLogger().log(7, `Preparing module file ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}, distDirectory=${distDirectory}]`);
         super.prepare(distPath, reportDirectory);
 
         const nameArray = this.src.name.split('.');
@@ -43,21 +43,21 @@ export class ModuleFile extends File {
                 this.dist = newDist;
             }
 
-            let oldDistFiles = [];
+            let distFiles = [];
             for (let dist of this.dist) {
-                const oldDistFile = findInArray(oldDistDirectory, (element) => element.src.equals(dist));
-                if (oldDistFile) {
-                    oldDistFiles.push(oldDistFile);
+                const distFile = findInArray(distDirectory.allFiles, (element) => element.src.isEqual(dist));
+                if (distFile) {
+                    distFiles.push(distFile);
                 } else {
-                    oldDistFiles = [];
+                    distFiles = [];
                     break;
                 }
             }
-            if (oldDistFiles.length > 0) {
+            if (distFiles.length > 0) {
                 this.modified = false;
                 
-                for (let oldDistFile of oldDistFiles) {
-                    oldDistFile.modified = false;
+                for (let distFile of distFiles) {
+                    distFile.modified = false;
                 }
             }
         }
@@ -68,7 +68,7 @@ export class ModuleFile extends File {
 
     async execute(dist, index) {
         // is it safe to do it in order instead of relying on keys?
-        return moduleFunctions[index](getConfig().data);
+        return this.#moduleFunctions[index](getConfig().data);
     }
 
 }

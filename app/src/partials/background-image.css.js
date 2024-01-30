@@ -1,4 +1,6 @@
 const backgroundImage = (cssDeclaration, config, files) => {
+    return '';
+    // to be done
     const originalFileBase = cssDeclaration.value.split(':')[1];
     const originalFileName = originalFileBase.substring(0, originalFileBase.lastIndexOf('.'));
     

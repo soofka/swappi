@@ -1,5 +1,5 @@
 import path from 'path';
-import { Dirent } from './index.js';
+import Dirent from './Dirent.js';
 import { createDir, deleteFile, loadDir } from '../helpers/index.js';
 import { getLogger } from '../utils/index.js';
 
@@ -27,7 +27,7 @@ export class Directory extends Dirent {
                     const fileClass = this.#getFileClass(nodeDirent);
                     dirent = new fileClass(srcPath, this.src.relDir);
                 } else if (nodeDirent.isDirectory()) {
-                    dirent = new Directory(this.#getFileClass, srcPath, dirent.name);
+                    dirent = new Directory(this.#getFileClass, srcPath, nodeDirent.name);
                 }
 
                 if (dirent) {
@@ -65,7 +65,7 @@ export class Directory extends Dirent {
         const newDirentList = [];
         for (let dirent of this.#direntList) {
             if (dirent.isDir) {
-                newDirentList.push(await dirent.clear());
+                newDirentList.push(await dirent.reset());
             } else if (!dirent.modified) {
                 newDirentList.push(dirent);
             } else {

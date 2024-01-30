@@ -135,7 +135,7 @@ export class Builder {
         await this.#files.public.dist.old.load();
 
         this.#files.public.src = new Directory(
-            () => getFileProvider().getModuleFile(),
+            (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
             getConfig().paths.public.src,
         );
         await this.#files.public.src.load();

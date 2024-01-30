@@ -8,7 +8,7 @@ import {
     ModuleFile,
 } from '../files/index.js';
 import { getDirentObject } from '../helpers/index.js';
-import { decorateWithSingleton } from './decorateWithSingleton.js';
+import decorateWithSingleton from './decorateWithSingleton.js';
 
 class FileProvider {
 

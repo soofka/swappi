@@ -1,4 +1,4 @@
-import { decorateWithSingleton } from './decorateWithSingleton.js';
+import decorateWithSingleton from './decorateWithSingleton.js';
 
 class ConfigProvider {
 
