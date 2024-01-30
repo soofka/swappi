@@ -1,3 +1,4 @@
 app/dist
-app/src/public/generated
+app/src/public/partials
+app/src/public/templates
 node_modules

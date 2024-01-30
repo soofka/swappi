@@ -1,5 +1,5 @@
 import path from 'path';
-import Dirent from './Dirent.js';
+import { Dirent } from './index.js';
 import { createDir, deleteFile, loadDir } from '../helpers/index.js';
 import { getLogger } from '../utils/index.js';
 
@@ -48,25 +48,14 @@ export class Directory extends Dirent {
         return this;
     }
 
-    async prepare(distPath) {
-        getLogger().log(6, `Preparing directory ${this.src.rel} [distPath=${distPath}]`);
+    async prepare(distPath, reportDirectory, oldDistDirectory) {
+        getLogger().log(6, `Preparing directory ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`);
 
         for (let dirent of this.#direntList) {
-            await dirent.prepare(distPath);
+            await dirent.prepare(distPath, reportDirectory, oldDistDirectory);
         }
 
         getLogger().log(6, `Directory ${this.src.rel} prepared`);
-        return this;
-    }
-
-    async process() {
-        getLogger().log(6, `Processing directory ${this.src.rel}`);
-
-        for (let dirent of this.#direntList) {
-            await dirent.process();
-        }
-
-        getLogger().log(6, `Directory ${this.src.rel} processed`);
         return this;
     }
 
@@ -86,6 +75,17 @@ export class Directory extends Dirent {
         this.#direntList = newDirentList;
 
         getLogger().log(6, `Directory ${this.src.rel} reseted`);
+        return this;
+    }
+
+    async process() {
+        getLogger().log(6, `Processing directory ${this.src.rel}`);
+
+        for (let dirent of this.#direntList) {
+            await dirent.process();
+        }
+
+        getLogger().log(6, `Directory ${this.src.rel} processed`);
         return this;
     }
 
@@ -123,16 +123,16 @@ export class Directory extends Dirent {
         return this;
     }
 
-    get allDirents() {
-        let allDirents = [];
+    get allFiles() {
+        let allFiles = [];
         for (let dirent of this.#direntList) {
             if (dirent.isDir) {
-                allDirents.push(...dirent.allDirents);
+                allFiles.push(...dirent.allFiles);
             } else {
-                allDirents.push(dirent);
+                allFiles.push(dirent);
             }
         }
-        return allDirents;
+        return allFiles;
     }
 
 }

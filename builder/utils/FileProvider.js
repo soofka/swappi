@@ -40,6 +40,10 @@ class FileProvider {
         return ModuleFile;
     }
 
+    getBaseFile() {
+        return File;
+    }
+
 }
 
 const { init: initFileProvider, get: getFileProvider } = decorateWithSingleton(FileProvider);

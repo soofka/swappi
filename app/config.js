@@ -11,11 +11,11 @@ export const config = {
         },
         partials: {
             src: path.join(appPath, 'src', 'partials'),
-            dist: path.join(appPath, 'dist', 'partials'),
+            dist: path.join(appPath, 'src', 'public', 'partials'),
         },
         templates: {
             src: path.join(appPath, 'src', 'templates'),
-            dist: path.join(appPath, 'src', 'public', 'generated'),
+            dist: path.join(appPath, 'src', 'public', 'templates'),
         },
     },
 

@@ -8,11 +8,11 @@ export const config = {
         },
         partials: {
             src: path.resolve(path.join('src','partials')),
-            dist: path.resolve('dist'),
+            dist: path.resolve('src', 'public', 'partials'),
         },
         templates: {
             src: path.resolve(path.join('src','templates')),
-            dist: path.resolve(path.join('src', 'public', 'templatesOutput')),
+            dist: path.resolve(path.join('src', 'public', 'templates')),
         },
         report: path.resolve('report.json'),
     },

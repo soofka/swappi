@@ -30,8 +30,8 @@ export class File extends Dirent {
         return this;        
     }
 
-    async prepare(distPath) {
-        getLogger().log(7, `Preparing file ${this.src.rel} [distPath=${distPath}]`);
+    async prepare(distPath, reportDirectory) {
+        getLogger().log(7, `Preparing file ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}]`);
 
         const distDirentData = this.src.clone();
         if (distPath) {
@@ -39,7 +39,9 @@ export class File extends Dirent {
         }
         this.#dist.push(distDirentData);
 
-        getLogger().log(7, `File ${this.src.rel} prepared (dist length: ${this.#dist.length})`);
+        this.modified = !(reportDirectory && isInArray(reportDirectory.allFiles, (element) => element.isEqual(this)));
+
+        getLogger().log(7, `File ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.#dist.length})`);
         return this;
     }
 
