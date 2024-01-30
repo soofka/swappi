@@ -48,11 +48,11 @@ export class Directory extends Dirent {
         return this;
     }
 
-    async prepare(distPath, reportDirectory, oldDistDirectory) {
-        getLogger().log(6, `Preparing directory ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`);
+    async prepare(isConfigModified, distPath, reportDirectory, oldDistDirectory) {
+        getLogger().log(6, `Preparing directory ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`);
 
         for (let dirent of this.#direntList) {
-            await dirent.prepare(distPath, reportDirectory, oldDistDirectory);
+            await dirent.prepare(isConfigModified, distPath, reportDirectory, oldDistDirectory);
         }
 
         getLogger().log(6, `Directory ${this.src.rel} prepared`);
@@ -96,7 +96,7 @@ export class Directory extends Dirent {
         return false;
     }
 
-    serialize(src = true, dist = true, content = true) {
+    serialize(src = true, dist = true, content = false) {
         const root = super.serialize(src);
 
         root.direntList = [];

@@ -19,7 +19,6 @@ export class File extends Dirent {
     async load() {
         getLogger().log(7, `Loading file ${this.src.rel}`);
 
-        this.#modified = true;
         this.#content = await loadFile(this.src.abs);
         this.#contentHash = crypto.createHash(
                 getConfig().constants.hashAlgorithm,
@@ -30,16 +29,15 @@ export class File extends Dirent {
         return this;        
     }
 
-    async prepare(distPath, reportDirectory) {
-        getLogger().log(7, `Preparing file ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}]`);
+    async prepare(isConfigModified, distPath, reportDirectory) {
+        getLogger().log(7, `Preparing file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}]`);
 
         const distDirentData = this.src.clone();
         if (distPath) {
             distDirentData.absDir = path.join(distPath, distDirentData.relDir);
         }
         this.#dist.push(distDirentData);
-
-        this.modified = !(reportDirectory && isInArray(reportDirectory.allFiles, (element) => element.isEqual(this)));
+        this.modified = isConfigModified || !reportDirectory || !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this));
 
         getLogger().log(7, `File ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.#dist.length})`);
         return this;
@@ -82,7 +80,7 @@ export class File extends Dirent {
         return false;
     }
 
-    serialize(src = true, dist = true, content = true) {
+    serialize(src = true, dist = true, content = false) {
         const obj = { ...super.serialize(src), contentHash: this.#contentHash };
 
         if (dist) {

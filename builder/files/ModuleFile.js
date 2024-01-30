@@ -10,9 +10,9 @@ export class ModuleFile extends File {
         super(absPath, relPath);
     }
 
-    async prepare(distPath, reportDirectory, distDirectory) {
-        getLogger().log(7, `Preparing module file ${this.src.rel} [distPath=${distPath}, reportDirectory=${reportDirectory}, distDirectory=${distDirectory}]`);
-        super.prepare(distPath, reportDirectory);
+    async prepare(isConfigModified, distPath, reportDirectory, distDirectory) {
+        getLogger().log(7, `Preparing module file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, distDirectory=${distDirectory}]`);
+        super.prepare(isConfigModified, distPath, reportDirectory);
 
         const nameArray = this.src.name.split('.');
         if (nameArray.length >= 1) {
@@ -43,21 +43,24 @@ export class ModuleFile extends File {
                 this.dist = newDist;
             }
 
-            let distFiles = [];
-            for (let dist of this.dist) {
-                const distFile = findInArray(distDirectory.allFiles, (element) => element.src.isEqual(dist));
-                if (distFile) {
-                    distFiles.push(distFile);
-                } else {
-                    distFiles = [];
-                    break;
+            if (!this.modified) {
+                let distFiles = [];
+                for (let dist of this.dist) {
+                    const distFile = findInArray(distDirectory.allFiles, (element) => element.src.isEqual(dist));
+                    if (distFile) {
+                        distFiles.push(distFile);
+                    } else {
+                        distFiles = [];
+                        break;
+                    }
                 }
-            }
-            if (distFiles.length > 0) {
-                this.modified = false;
-                
-                for (let distFile of distFiles) {
-                    distFile.modified = false;
+                if (distFiles.length > 0) {
+                    this.modified = false;
+                    for (let distFile of distFiles) {
+                        distFile.modified = false;
+                    }
+                } else {
+                    this.modified = true;
                 }
             }
         }

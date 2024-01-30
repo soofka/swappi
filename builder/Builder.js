@@ -20,12 +20,16 @@ import {
 export class Builder {
     
     #files = {
-        public: { src: {}, dist: { old: {}, new: {} }},
-        partials: { src: {}, dist: { old: {}, new: {} }},
-        templates: { src: {}, dist: { old: {}, new: {} }},
+        public: { src: {}, dist: {} },
+        partials: { src: {}, dist: {} },
+        templates: { src: {}, dist: {} },
+        report: {
+            public: undefined,
+            partials: undefined,
+            templates: undefined,
+        },
     };
-    #report = false;
-    #newConfig = true;
+    #isConfigModified = true;
 
     constructor(config) {
         initConfigProvider(deepMerge(defaultConfig, config));
@@ -56,14 +60,25 @@ export class Builder {
                 && report.hasOwnProperty('config') && isObject(reportJson.config)
                 && report.hasOwnProperty('files') && isObject(reportJson.files)
             ) {
-                this.#newConfig = !isDeepEqual(getConfig(), reportJson.config);
-                getLogger().log(4, `Config has ${this.#newConfig ? '' : 'not '}changed`);
+                this.#isConfigModified = !isDeepEqual(getConfig(), reportJson.config);
+                getLogger().log(4, `Config has ${this.#isConfigModified ? '' : 'not '}changed`);
         
-                this.#report = {};
-                for (let key of Object.keys(report.files)) {
-                    this.#report[key] = new Directory(
+                if (report.files.hasOwnProperty('templates')) {
+                    this.#files.report.templates = new Directory(
                         (direntObject) => getFileProvider().getFile(direntObject.absDir, direntObject.name, direntObject.ext),
-                    ).deserializeAll(report.files[key]);
+                    ).deserializeAll(report.files.templates);
+                }
+        
+                if (report.files.hasOwnProperty('partials')) {
+                    this.#files.report.partials = new Directory(
+                        (direntObject) => getFileProvider().getFile(direntObject.absDir, direntObject.name, direntObject.ext),
+                    ).deserializeAll(report.files.partials);
+                }
+        
+                if (report.files.hasOwnProperty('public')) {
+                    this.#files.report.public = new Directory(
+                        (direntObject) => getFileProvider().getFile(direntObject.absDir, direntObject.name, direntObject.ext),
+                    ).deserializeAll(report.files.public);
                 }
         
                 getLogger().log(3, 'Loading previous build report finished');
@@ -81,11 +96,11 @@ export class Builder {
     async #initTemplates() {
         getLogger().log(2, `Initializing templates (path: ${JSON.stringify(getConfig().paths.templates)})`);
 
-        this.#files.templates.dist.old = new Directory(
+        this.#files.templates.dist = new Directory(
             (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
             getConfig().paths.templates.dist,
         );
-        await this.#files.templates.dist.old.load();
+        await this.#files.templates.dist.load();
 
         this.#files.templates.src = new Directory(
             () => getFileProvider().getModuleFile(),
@@ -93,23 +108,24 @@ export class Builder {
         );
         await this.#files.templates.src.load();
         await this.#files.templates.src.prepare(
+            this.#isConfigModified,
             getConfig().paths.templates.dist,
-            this.#report && this.#report.files.templates,
-            this.#files.templates.dist.old,
+            this.#files.report && this.#files.report.templates,
+            this.#files.templates.dist,
         );
         
         getLogger().log(2, 'Initializing templates finished');
-
+        getLogger().log(4, 'Templates:', JSON.stringify(this.#files.templates.src.serialize()));
     }
 
     async #initPartials() {
         getLogger().log(2, `Initializing partials (path: ${JSON.stringify(getConfig().paths.partials)})`);
 
-        this.#files.partials.dist.old = new Directory(
+        this.#files.partials.dist = new Directory(
             (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
             getConfig().paths.partials.dist,
         );
-        await this.#files.partials.dist.old.load();
+        await this.#files.partials.dist.load();
 
         this.#files.partials.src = new Directory(
             () => getFileProvider().getModuleFile(),
@@ -117,22 +133,24 @@ export class Builder {
         );
         await this.#files.partials.src.load();
         await this.#files.partials.src.prepare(
+            this.#isConfigModified,
             getConfig().paths.partials.dist,
-            this.#report && this.#report.files.partials,
-            this.#files.partials.dist.old,
+            this.#files.report && this.#files.report.partials,
+            this.#files.partials.dist,
         );
 
         getLogger().log(2, 'Initializing partials finished');
+        getLogger().log(4, 'Partials:', JSON.stringify(this.#files.partials.src.serialize()));
     }
 
     async #initPublic() {
         getLogger().log(2, `Initializing public (path: ${JSON.stringify(getConfig().paths.public)})`);
 
-        this.#files.public.dist.old = new Directory(
+        this.#files.public.dist = new Directory(
             (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
             getConfig().paths.public.dist,
         );
-        await this.#files.public.dist.old.load();
+        await this.#files.public.dist.load();
 
         this.#files.public.src = new Directory(
             (nodeDirent) => getFileProvider().getFile(nodeDirent.path, nodeDirent.name),
@@ -140,12 +158,14 @@ export class Builder {
         );
         await this.#files.public.src.load();
         await this.#files.public.src.prepare(
+            this.#isConfigModified,
             getConfig().paths.public.dist,
-            this.#report && this.#report.files.public,
-            this.#files.public.dist.old,
+            this.#files.report && this.#files.report.public,
+            this.#files.public.dist,
         );
 
         getLogger().log(2, 'Initializing public finished');
+        getLogger().log(4, 'Public:', JSON.stringify(this.#files.public.src.serialize()));
     }
 
     async build() {
@@ -162,8 +182,8 @@ export class Builder {
     async #buildTemplates() {
         getLogger().log(2, 'Building templates');
 
-        await this.#files.templates.dist.old.reset();
-        this.#files.templates.dist.new = await this.#files.templates.src.process();
+        await this.#files.templates.dist.reset();
+        await this.#files.templates.src.process();
 
         getLogger().log(2, 'Building templates finished');
     }
@@ -171,8 +191,8 @@ export class Builder {
     async #buildPartials() {
         getLogger().log(2, 'Building partials');
 
-        await this.#files.partials.dist.old.reset();
-        this.#files.partials.dist.new = await this.#files.partials.src.process();
+        await this.#files.partials.dist.reset();
+         await this.#files.partials.src.process();
 
         getLogger().log(2, 'Building partials finished');
     }
@@ -180,8 +200,8 @@ export class Builder {
     async #buildPublic() {
         getLogger().log(2, 'Building public');
 
-        await this.#files.public.dist.old.reset();
-        this.#files.public.dist.new = await this.#files.public.src.process();
+        await this.#files.public.dist.reset();
+        await this.#files.public.src.process();
 
         getLogger().log(2, 'Building public finished');
     }
@@ -192,9 +212,9 @@ export class Builder {
         await saveFile(getConfig().paths.report, JSON.stringify({
             config: getConfig(),
             files: {
-                templates: this.#files.templates.src.serialize(true, true, false),
-                partials: this.#files.partials.src.serialize(true, true, false),
-                public: this.#files.public.src.serialize(true, true, false),
+                templates: this.#files.templates.src.serialize(),
+                partials: this.#files.partials.src.serialize(),
+                public: this.#files.public.src.serialize(),
             },
         }));
 
