@@ -20,8 +20,8 @@
 
 ## builder
 ### todo
-* prepare: analyze if partials changed and mark file appropriately
-* process: input partials
+* fix css bug
+* add partials to json files
 * prepare and process images appropriately
 
 * browser support transpilation

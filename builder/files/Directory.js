@@ -74,7 +74,7 @@ export class Directory extends Dirent {
         }
         this.#direntList = newDirentList;
 
-        getLogger().log(6, `Directory ${this.src.rel} reseted`);
+        getLogger().log(6, `Directory ${this.src.rel} reset`);
         return this;
     }
 
