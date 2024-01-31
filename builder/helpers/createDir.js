@@ -1,8 +1,7 @@
 import fs from "fs/promises";
 
 export async function createDir(absPath, options = { recursive: true }) {
-  const dir = await fs.mkdir(absPath, options);
-  return dir;
+  return await fs.mkdir(absPath, options);
 }
 
 export default createDir;

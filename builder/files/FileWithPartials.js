@@ -39,7 +39,7 @@ export class FileWithPartials extends File {
     return this;
   }
 
-  executePartials(replaceFunction, rootDirectory) {
+  async executePartials(replaceFunction, rootDirectory) {
     for (let key of Object.keys(this.#partials).filter(
       (key) => this.#partials[key].file,
     )) {
@@ -61,7 +61,7 @@ export class FileWithPartials extends File {
         }
 
         if (elementContent) {
-          tryCatch(
+          await tryCatch(
             () => replaceFunction(element, elementContent),
             (e) =>
               getLogger().warn(

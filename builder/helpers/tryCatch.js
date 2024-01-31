@@ -1,19 +1,18 @@
-export function tryCatch(
+export async function tryCatch(
   tryFunction,
   catchFunction,
   throwCondition = () => false,
 ) {
   let result;
-
   try {
-    result = tryFunction();
+    result = await tryFunction();
   } catch (e) {
     if (throwCondition(e)) {
       throw e;
     }
 
     if (catchFunction) {
-      catchFunction(e);
+      result = await catchFunction(e);
     }
   }
 

@@ -15,7 +15,7 @@ export function saveFile(absPath, content) {
         `(${e.name}: ${e.message})`,
       );
       await createDir(getDirentObject(absPath).dir);
-      await saveFileFunction();
+      return await saveFileFunction();
     },
     (e) => e.code !== "ENOENT",
   );

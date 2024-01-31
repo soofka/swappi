@@ -9,11 +9,19 @@ import {
 import { getLogger } from "../utils/index.js";
 
 export class Directory extends Dirent {
+  #getFile;
   #direntList = [];
   get direntList() {
     return this.#direntList;
   }
-  #getFile;
+  #fileStats = {
+    loaded: 0,
+    prepared: 0,
+    processed: 0,
+  };
+  get fileStats() {
+    return this.#fileStats;
+  }
 
   constructor(getFile, absPath, relPath) {
     super(absPath, relPath);
@@ -40,6 +48,10 @@ export class Directory extends Dirent {
         if (dirent) {
           await dirent.load();
           this.#direntList.push(dirent);
+
+          if (!dirent.isDir) {
+            this.#fileStats.loaded++;
+          }
         }
       }
     } else {
@@ -56,7 +68,7 @@ export class Directory extends Dirent {
 
     getLogger().log(
       6,
-      `Directory ${this.src.rel} loaded (direntList length: ${this.#direntList.length})`,
+      `Directory ${this.src.rel} loaded (${this.#fileStats.loaded} files)`,
     );
     return this;
   }
@@ -79,9 +91,16 @@ export class Directory extends Dirent {
         reportDirectory,
         additionalDirectories,
       );
+
+      if (!dirent.isDir) {
+        this.#fileStats.prepared++;
+      }
     }
 
-    getLogger().log(6, `Directory ${this.src.rel} prepared`);
+    getLogger().log(
+      6,
+      `Directory ${this.src.rel} prepared (${this.#fileStats.prepared} files)`,
+    );
     return this;
   }
 
@@ -108,10 +127,18 @@ export class Directory extends Dirent {
     getLogger().log(6, `Processing directory ${this.src.rel}`);
 
     for (let dirent of this.#direntList) {
-      await dirent.process(rootDirectory || this);
+      if (dirent.isDir) {
+        await dirent.process(rootDirectory || this);
+      } else if (dirent.shouldBeProcessed()) {
+        await dirent.process(rootDirectory || this);
+        this.#fileStats.processed++;
+      }
     }
 
-    getLogger().log(6, `Directory ${this.src.rel} processed`);
+    getLogger().log(
+      6,
+      `Directory ${this.src.rel} processed (${this.#fileStats.processed} files)`,
+    );
     return this;
   }
 

@@ -2,7 +2,13 @@ import path from "path";
 import crypto from "crypto";
 import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
-import { isInArray, loadFile, saveFile } from "../helpers/index.js";
+import {
+  findInArray,
+  isInArray,
+  isInObject,
+  loadFile,
+  saveFile,
+} from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class File extends Dirent {
@@ -66,9 +72,12 @@ export class File extends Dirent {
       distDirentData.absDir = path.join(distPath, distDirentData.relDir);
     }
     this.#dist.push(distDirentData);
-    this.modified =
-      isConfigModified ||
-      !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this));
+    this.checkForModifications(
+      isConfigModified,
+      reportDirectory,
+      isInObject(additionalDirectories, "oldDist") &&
+        additionalDirectories.oldDist,
+    );
 
     getLogger().log(
       7,
@@ -78,19 +87,15 @@ export class File extends Dirent {
   }
 
   async process(rootDirectory) {
-    if (this.shouldBeProcessed()) {
-      getLogger().log(7, `Processing file ${this.src.rel}`);
+    getLogger().log(7, `Processing file ${this.src.rel}`);
 
-      for (let distIndex in this.dist) {
-        const dist = this.dist[distIndex];
-        const content = await this.execute(dist, distIndex, rootDirectory);
-        await this.save(dist, distIndex, content);
-      }
-
-      getLogger().log(7, `File ${this.src.rel} processed`);
-    } else {
-      getLogger().log(7, `File ${this.src.rel} is not to be processed`);
+    for (let distIndex in this.dist) {
+      const dist = this.dist[distIndex];
+      const content = await this.execute(dist, distIndex, rootDirectory);
+      await this.save(dist, distIndex, content);
     }
+
+    getLogger().log(7, `File ${this.src.rel} processed`);
     return this;
   }
 
@@ -100,6 +105,44 @@ export class File extends Dirent {
 
   async save(dist, distIndex, content) {
     await saveFile(dist.abs, content);
+  }
+
+  checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
+    if (isConfigModified) {
+      this.modified = true;
+      return;
+    }
+    if (
+      reportDirectory &&
+      !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this))
+    ) {
+      this.modified = true;
+      return;
+    }
+    if (oldDistDirectory) {
+      let distFiles = [];
+      for (let dist of this.dist) {
+        const distFile = findInArray(oldDistDirectory.allFiles, (element) =>
+          element.src.isEqual(dist),
+        );
+        if (distFile) {
+          distFiles.push(distFile);
+        } else {
+          distFiles = [];
+          break;
+        }
+      }
+      if (distFiles.length > 0) {
+        this.modified = false;
+        for (let distFile of distFiles) {
+          distFile.modified = false;
+        }
+        return;
+      } else {
+        this.modified = true;
+        return;
+      }
+    }
   }
 
   shouldBeProcessed() {

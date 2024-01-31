@@ -1,9 +1,7 @@
 import File from "./File.js";
 import {
-  findInArray,
   isFunction,
   isObject,
-  isInArray,
   isInObject,
   loadModule,
 } from "../helpers/index.js";
@@ -59,35 +57,12 @@ export class ModuleFile extends File {
         this.dist = newDist;
       }
 
-      if (
-        !isConfigModified &&
-        isInArray(reportDirectory.allFiles, (element) =>
-          element.isEqual(this),
-        ) &&
-        isInObject(additionalDirectories, "oldDist")
-      ) {
-        let distFiles = [];
-        for (let dist of this.dist) {
-          const distFile = findInArray(
-            additionalDirectories.oldDist.allFiles,
-            (element) => element.src.isEqual(dist),
-          );
-          if (distFile) {
-            distFiles.push(distFile);
-          } else {
-            distFiles = [];
-            break;
-          }
-        }
-        if (distFiles.length > 0) {
-          this.modified = false;
-          for (let distFile of distFiles) {
-            distFile.modified = false;
-          }
-        } else {
-          this.modified = true;
-        }
-      }
+      this.checkForModifications(
+        isConfigModified,
+        reportDirectory,
+        isInObject(additionalDirectories, "oldDist") &&
+          additionalDirectories.oldDist,
+      );
     }
 
     getLogger().log(

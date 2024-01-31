@@ -58,7 +58,7 @@ export class Builder {
     getLogger().log(3, "Loading previous build report");
     const reportJson = await loadFile(getConfig().paths.report);
     if (reportJson) {
-      const report = parseJson(reportJson);
+      const report = await parseJson(reportJson);
       if (
         report &&
         isInObject(report, "config") &&
@@ -213,7 +213,7 @@ export class Builder {
     await this.#buildTemplates();
     await this.#buildPartials();
     await this.#buildPublic();
-    await this.#saveReport();
+    await this.#buildReport();
 
     getLogger().log(1, "Building finished");
   }
@@ -245,7 +245,7 @@ export class Builder {
     getLogger().log(2, "Building public finished");
   }
 
-  async #saveReport() {
+  async #buildReport() {
     getLogger().log(3, "Saving current build report");
 
     await saveFile(
@@ -261,6 +261,10 @@ export class Builder {
     );
 
     getLogger().log(3, "Saving current build report finished");
+
+    getLogger().log(1, "Templates:", this.#files.templates.src.fileStats);
+    getLogger().log(1, "Partials:", this.#files.partials.src.fileStats);
+    getLogger().log(1, "Public:", this.#files.public.src.fileStats);
   }
 }
 
