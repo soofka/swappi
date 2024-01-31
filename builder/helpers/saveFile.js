@@ -9,7 +9,7 @@ export async function saveFile(absPath, content) {
     return tryCatch(
         saveFileFunction,
         async (e) => {
-            getLogger().warn(8, `Failed to save file ${absPath}, attempting to create missing directories and save again`, e);
+            getLogger().warn(8, `Failed to save file ${absPath}, attempting to create missing directories and save again`, `(${e.name}: ${e.message})`),
             await createDir(getDirentObject(absPath).dir);
             await saveFileFunction();
         },

@@ -24,35 +24,13 @@ export const config = {
 
         optimize: {
             js: {},
-            img: {
-                widths: [256, 320, 640, 1280, 1920, 2560],
-                types: ['webp', 'avif', 'jpeg'],
-            },
-            html: {
-                removeComments: false,
-                removeCommentsFromCDATA: true,
-                removeCDATASectionsFromCDATA: true,
-                collapseWhitespace: true,
-                collapseBooleanAttributes: true,
-                removeAttributeQuotes: true,
-                removeRedundantAttributes: true,
-                useShortDoctype: true,
-                removeEmptyAttributes: true,
-                removeEmptyElements: false,
-                removeOptionalTags: false,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                minifyJS: true,
-                minifyCSS: true,
-            },
-            css: {
-                compatibility: '*',
-            },
+            img: {},
+            html: {},
+            css: {},
         },
     },
 
     constants: {
-        other: 'other',
         hashAlgorithm: 'shake256',
         hashAlgorithmOptions: { outputLength: 8 },
         hashSeparator: '+',

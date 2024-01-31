@@ -1,31 +1,28 @@
-const img = (htmlElement, attributes, config, files) => {
-    // CONFIG???
-    return '';
-    // let picture = '<picture';
-    // for (let key of Object.keys(attributes)) {
-    //     if (key !== 'name' && key !== 'src') {
-    //         picture += ` ${key}="${attributes[key]}"`;
-    //     }
-    // }
-    // picture += '>';
+import { findInArray, getDirentObject } from '../../../builder/helpers/index.js'; //fix this
 
-    // for (let type of config.options.optimize.img.types) {
-    //     picture += '<source srcet="';
-    //     for (let widthIndex in config.options.optimize.img.widths) {
-    //         const width = config.options.optimize.img.widths[widthIndex];
-    //         const fileName = `${attributes.src.substring(0, attributes.src.lastIndexOf('.'))}-${width}.${type}`;
-    //         const imgFile = files.img.find((file) => file.base === fileName);
-    //         if (imgFile) {
-    //             picture += `${imgFile.base} ${width}w`;
-    //             if (widthIndex < config.options.optimize.img.widths.length - 1) {
-    //                 picture += ', ';
-    //             }
-    //         }
-    //     }
-    //     picture += `" type="image/${type}">`
-    // }
+const img = (htmlElement, data, rootDirectory) => {
+    let picture = '<picture';
+    for (let key of Object.keys(htmlElement.attribs)) {
+        if (key !== 'name' && key !== 'src') {
+            picture += ` ${key}="${htmlElement.attribs[key]}"`;
+        }
+    }
+    picture += '>';
 
-    // return picture + '</picture>';
+    const valueArray = [];
+    const { name, ext } = getDirentObject(htmlElement.attribs.src);
+    const imgFile = findInArray(rootDirectory.allFiles, (element) => element.src.name === name && element.src.ext === ext);
+
+    if (imgFile) {
+        for (let dist of file.dist) {
+            // figure out values for w
+            // figure out types???
+            valueArray.push(`${dist.full} 400w`);
+        }
+        picture += `<source srcet="${valueArray.join(',')}" type="image/dupa">`;
+    }
+
+    return picture + '</picture>';
 }
 
 export default img;

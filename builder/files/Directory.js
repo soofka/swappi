@@ -78,11 +78,11 @@ export class Directory extends Dirent {
         return this;
     }
 
-    async process() {
+    async process(rootDirectory) {
         getLogger().log(6, `Processing directory ${this.src.rel}`);
 
         for (let dirent of this.#direntList) {
-            await dirent.process();
+            await dirent.process(rootDirectory || this);
         }
 
         getLogger().log(6, `Directory ${this.src.rel} processed`);

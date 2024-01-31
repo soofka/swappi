@@ -42,7 +42,7 @@ export class FileWithPartials extends File {
         return this;
     }
 
-    async executePartials(replaceFunction, stringifyFunction) {
+    async executePartials(replaceFunction, stringifyFunction, files) {
         let content = this.content;
 
         for (let key of Object.keys(this.#partials)) {
@@ -50,18 +50,18 @@ export class FileWithPartials extends File {
                 let elementContent;
 
                 if (isFunction(this.#partials[key].file.module)) {
-                    elementContent = this.#partials[key].file.module(element, getConfig().data); // FILES???
+                    elementContent = this.#partials[key].file.module(element, getConfig().data, files);
                 } else if (
                     isObject(this.#partials[key].file.module)
                     && this.#partials[key].file.module.hasOwnProperty('render')
                 ) {
-                    elementContent = this.#partials[key].file.module.render(element, getConfig().data);
+                    elementContent = this.#partials[key].file.module.render(element, getConfig().data, files);
                 }
                 
                 if (elementContent) {
                     content = await tryCatch(
                         () => replaceFunction(element, elementContent),
-                        (e) => getLogger().warn(8, `Failed to substitute partial in file ${this.src.rel} (key: ${key}, element: ${element}, elementContent: ${elementContent})`, e),
+                        (e) => getLogger().warn(8, `Failed to substitute partial in file ${this.src.rel} (key: ${key}, element: ${element}, elementContent: ${elementContent})`, `(${e.name}: ${e.message})`),
                         (e) => e.name !== 'TypeError',
                     );
                 }
@@ -70,7 +70,7 @@ export class FileWithPartials extends File {
         
         content = await tryCatch(
             () => stringifyFunction(content),
-            (e) => getLogger().warn(8, `Failed to stringify file ${this.src.rel} content after substituting partials`, e),
+            (e) => getLogger().warn(8, `Failed to stringify file ${this.src.rel} content after substituting partials`, `(${e.name}: ${e.message})`),
             (e) => e.name !== 'TypeError',
         );
         

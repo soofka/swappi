@@ -43,13 +43,13 @@ export class File extends Dirent {
         return this;
     }
 
-    async process() {
+    async process(rootDirectory) {
         getLogger().log(7, `Processing file ${this.src.rel} (${this.modified ? '' : 'not '}modified)`);
 
         if (this.modified) {
             for (let distIndex in this.dist) {
                 const dist = this.dist[distIndex];
-                const content = await this.execute(dist, distIndex);
+                const content = await this.execute(dist, distIndex, rootDirectory);
                 await this.save(dist, distIndex, content);
             }
         }

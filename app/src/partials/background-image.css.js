@@ -1,26 +1,21 @@
-const backgroundImage = (cssDeclaration, config, files) => {
-    return '';
-    // to be done
-    const originalFileBase = cssDeclaration.value.split(':')[1];
-    const originalFileName = originalFileBase.substring(0, originalFileBase.lastIndexOf('.'));
-    
-    let value = 'image-set(';
-    for (let type of config.options.optimize.img.types) {
-        for (let widthIndex in config.options.optimize.img.widths) {
-            const width = config.options.optimize.img.widths[widthIndex];
-            const newFileName = `${originalFileName}-${width}.${type}`;
-            const imgFile = files.img.find((file) => file.base === newFileName);
-            if (imgFile) {
-                value += `url("${newFileName}") type("image/${type}") ${(parseInt(widthIndex) + 1)}x`
-                if (widthIndex < config.options.optimize.img.widths.length - 1) {
-                    value += ', ';
-                }
-            }
+import { findInArray, getDirentObject } from '../../../builder/helpers/index.js'; //fix this
+
+const backgroundImage = (cssDeclaration, data, rootDirectory) => {
+    const valueArray = [];
+    console.log('HUH', cssDeclaration);
+    const { name, ext } = getDirentObject(cssDeclaration.value.split(':')[1]);
+    const imgFile = findInArray(rootDirectory.allFiles, (element) => element.src.name === name && element.src.ext === ext);
+
+    if (imgFile) {
+        for (let distIndex in file.dist) {
+            const dist = file.dist[distIndex];
+            // figure out values for x
+            valueArray.push(`url("${dist.full}") type("image/${dist.ext.substring(1)}") ${(parseInt(distIndex) + 1)}x`);
         }
     }
 
     cssDeclaration.property = 'background-image';
-    cssDeclaration.value = value + ')';
+    cssDeclaration.value = `image-set(${valueArray.join(',')})`;
     return cssDeclaration;
 };
 

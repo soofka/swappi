@@ -29,13 +29,14 @@ export class HtmlFile extends FileWithPartials {
         return this;
     }
 
-    async execute(dist, index) {
+    async execute(dist, index, rootDirectory) {
         let content = this.content;
 
         if (this.#htmlParser) {
             content = await this.executePartials(
                 (element, content) => this.#htmlParser(element).replaceWith(content),
                 () => this.#htmlParser.html(),
+                rootDirectory,
             );
         }
 

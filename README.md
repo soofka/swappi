@@ -20,9 +20,12 @@
 
 ## builder
 ### todo
-* fix css bug
 * add partials to json files
 * prepare and process images appropriately
+* pass data to partials and make them work again
+* print build report in console
+* analyze if this actually works
+* write unit tests
 
 * browser support transpilation
 * honor config options
