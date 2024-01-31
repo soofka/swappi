@@ -5,11 +5,11 @@ import {
 
 const img = (htmlElement, data, rootDirectory) => {
   let picture = "<picture";
-  for (let key of Object.keys(htmlElement.attribs)) {
-    if (key !== "name" && key !== "src") {
-      picture += ` ${key}="${htmlElement.attr(key)}"`;
-    }
-  }
+  // for (let key of Object.keys(htmlElement.attribs)) {
+  //   if (key !== "name" && key !== "src") {
+  //     picture += ` ${key}="${htmlElement.attr(key)}"`;
+  //   }
+  // }
   picture += ">";
 
   const valueArray = [];
@@ -20,7 +20,7 @@ const img = (htmlElement, data, rootDirectory) => {
   );
 
   if (imgFile) {
-    for (let dist of file.dist) {
+    for (let dist of imgFile.dist) {
       // figure out values for w
       // figure out types???
       valueArray.push(`${dist.full} 400w`);

@@ -40,12 +40,14 @@ export class FileWithPartials extends File {
   }
 
   async executePartials(replaceFunction, rootDirectory) {
-    // let content = this.content;
+    // console.log("executing partials", this.#partials);
 
     for (let key of Object.keys(this.#partials).filter(
-      (partial) => partial.file,
+      (key) => this.#partials[key].file,
     )) {
+      // console.log("partial", key);
       for (let element of this.#partials[key].elements) {
+        // console.log("element", element);
         let elementContent;
 
         if (isFunction(this.#partials[key].file.module)) {
@@ -66,7 +68,7 @@ export class FileWithPartials extends File {
         }
 
         if (elementContent) {
-          content = await tryCatch(
+          await tryCatch(
             () => replaceFunction(element, elementContent),
             (e) =>
               getLogger().warn(

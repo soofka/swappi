@@ -1,6 +1,6 @@
 const label = (htmlElement, data, rootDirectory) => {
   let tempLabel = data.labels.en;
-  let value = htmlElement.attribs["label-id"];
+  let value = htmlElement.attr("label-id");
   const keys = value.split(".");
 
   for (let i = 0; i < keys.length; i++) {
