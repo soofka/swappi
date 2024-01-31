@@ -1,11 +1,5 @@
-import File from './File.js';
+import File from "./File.js";
 
-export class JsonFile extends File {
-
-    constructor(absPath, relPath) {
-        super(absPath, relPath);
-    }
-
-}
+export class JsonFile extends File {}
 
 export default JsonFile;

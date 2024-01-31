@@ -1,47 +1,73 @@
-import * as cheerio from 'cheerio';
-import { minify } from 'html-minifier';
-import FileWithPartials from './FileWithPartials.js';
-import { isObject } from '../helpers/index.js';
-import { getConfig, getLogger } from '../utils/index.js';
+import * as cheerio from "cheerio";
+import { minify } from "html-minifier";
+import FileWithPartials from "./FileWithPartials.js";
+import { isObject } from "../helpers/index.js";
+import { getConfig, getLogger } from "../utils/index.js";
 
 export class HtmlFile extends FileWithPartials {
+  #htmlParser;
 
-    #htmlParser;
+  async prepare(
+    isConfigModified,
+    distPath,
+    reportDirectory = undefined,
+    additionalDirectories = undefined,
+  ) {
+    getLogger().log(
+      7,
+      `Preparing html file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+    );
+    super.prepare(
+      isConfigModified,
+      distPath,
+      reportDirectory,
+      additionalDirectories,
+    );
 
-    constructor(absPath, relPath) {
-        super(absPath, relPath);
-    }
+    if (
+      isObject(additionalDirectories) &&
+      additionalDirectories.hasOwnProperty("partials")
+    ) {
+      this.#htmlParser = cheerio.load(this.content);
+      const partials = {};
 
-    async prepare(isConfigModified, distPath, reportDirectory = undefined, additionalDirectories = undefined) {
-        getLogger().log(7, `Preparing html file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`);
-        super.prepare(isConfigModified, distPath, reportDirectory, additionalDirectories);
-
-        if (isObject(additionalDirectories) && additionalDirectories.hasOwnProperty('partials')) {
-            this.#htmlParser = cheerio.load(this.content);
-            await this.preparePartials(
-                additionalDirectories.partials,
-                this.#htmlParser(`[${getConfig().constants.htmlPartialAttribute}]`),
-                (partialElement) => partialElement.attribs[getConfig().constants.htmlPartialAttribute],
-            );
+      for (let element of this.#htmlParser(
+        `[${getConfig().constants.htmlPartialAttribute}]`,
+      )) {
+        const elementParsed = this.#htmlParser(element);
+        const name = elementParsed.attr(
+          getConfig().constants.htmlPartialAttribute,
+        );
+        if (partials.hasOwnProperty(name)) {
+          partials[name].elements.push(elementParsed);
+        } else {
+          partials[name] = { elements: [elementParsed] };
         }
+      }
 
-        getLogger().log(7, `Html file ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.dist.length})`);
-        return this;
+      await this.preparePartials(additionalDirectories.partials, partials);
     }
 
-    async execute(dist, index, rootDirectory) {
-        let content = this.content;
+    getLogger().log(
+      7,
+      `Html file ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.dist.length})`,
+    );
+    return this;
+  }
 
-        if (this.#htmlParser) {
-            content = await this.executePartials(
-                (element, content) => this.#htmlParser(element).replaceWith(content),
-                () => this.#htmlParser.html(),
-                rootDirectory,
-            );
-        }
+  async execute(dist, index, rootDirectory) {
+    let content = this.content;
 
-        return minify(content, getConfig().options.optimize.html);
+    if (this.#htmlParser) {
+      await this.executePartials(
+        (element, content) => this.#htmlParser(element).replaceWith(content),
+        rootDirectory,
+      );
+      content = this.#htmlParser.html();
     }
+
+    return minify(content, getConfig().options.optimize.html);
+  }
 }
 
 export default HtmlFile;

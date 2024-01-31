@@ -1,5 +1,5 @@
 export function isFunction(variable) {
-    return variable && typeof variable === 'function';
+  return variable && typeof variable === "function";
 }
 
 export default isFunction;
