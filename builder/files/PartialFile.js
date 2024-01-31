@@ -28,11 +28,13 @@ export class PartialFile extends ModuleFile {
       isFunction(this.module.render)
     ) {
       this.#executable = true;
+    } else {
+      this.checkForModifications(isConfigModified, reportDirectory);
     }
 
     getLogger().log(
       7,
-      `Partial file ${this.src.rel} prepared (executable: ${this.#executable})`,
+      `Partial file ${this.src.rel} prepared (modified: ${this.modified}, executable: ${this.#executable})`,
     );
     return this;
   }

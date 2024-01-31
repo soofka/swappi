@@ -81,7 +81,7 @@ export class File extends Dirent {
 
     getLogger().log(
       7,
-      `File ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.#dist.length})`,
+      `File ${this.src.rel} prepared (modified: ${this.#modified}, dist length: ${this.#dist.length})`,
     );
     return this;
   }
@@ -109,14 +109,14 @@ export class File extends Dirent {
 
   checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
     if (isConfigModified) {
-      this.modified = true;
+      this.#modified = true;
       return;
     }
     if (
       reportDirectory &&
       !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this))
     ) {
-      this.modified = true;
+      this.#modified = true;
       return;
     }
     if (oldDistDirectory) {
@@ -133,16 +133,15 @@ export class File extends Dirent {
         }
       }
       if (distFiles.length > 0) {
-        this.modified = false;
         for (let distFile of distFiles) {
-          distFile.modified = false;
+          distFile.#modified = false;
         }
-        return;
       } else {
-        this.modified = true;
+        this.#modified = true;
         return;
       }
     }
+    this.#modified = false;
   }
 
   shouldBeProcessed() {
