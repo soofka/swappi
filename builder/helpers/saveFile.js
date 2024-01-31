@@ -4,7 +4,7 @@ import getDirentObject from "./getDirentObject.js";
 import tryCatch from "./tryCatch.js";
 import { getLogger } from "../utils/index.js";
 
-export async function saveFile(absPath, content) {
+export function saveFile(absPath, content) {
   const saveFileFunction = async () => await fs.writeFile(absPath, content);
   return tryCatch(
     saveFileFunction,
@@ -13,8 +13,8 @@ export async function saveFile(absPath, content) {
         8,
         `Failed to save file ${absPath}, attempting to create missing directories and save again`,
         `(${e.name}: ${e.message})`,
-      ),
-        await createDir(getDirentObject(absPath).dir);
+      );
+      await createDir(getDirentObject(absPath).dir);
       await saveFileFunction();
     },
     (e) => e.code !== "ENOENT",

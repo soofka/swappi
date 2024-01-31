@@ -1,7 +1,7 @@
 import tryCatch from "./tryCatch.js";
 import { getLogger } from "../utils/index.js";
 
-export async function parseJson(json) {
+export function parseJson(json) {
   return tryCatch(
     () => JSON.parse(json),
     (e) =>

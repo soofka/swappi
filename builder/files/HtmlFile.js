@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { minify } from "html-minifier";
 import FileWithPartials from "./FileWithPartials.js";
-import { isObject } from "../helpers/index.js";
+import { isInObject } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class HtmlFile extends FileWithPartials {
@@ -17,17 +17,14 @@ export class HtmlFile extends FileWithPartials {
       7,
       `Preparing html file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    super.prepare(
+    await super.prepare(
       isConfigModified,
       distPath,
       reportDirectory,
       additionalDirectories,
     );
 
-    if (
-      isObject(additionalDirectories) &&
-      additionalDirectories.hasOwnProperty("partials")
-    ) {
+    if (isInObject(additionalDirectories, "partials")) {
       this.#htmlParser = cheerio.load(this.content);
       const partials = {};
 
@@ -38,14 +35,14 @@ export class HtmlFile extends FileWithPartials {
         const name = elementParsed.attr(
           getConfig().constants.htmlPartialAttribute,
         );
-        if (partials.hasOwnProperty(name)) {
+        if (isInObject(partials, name)) {
           partials[name].elements.push(elementParsed);
         } else {
           partials[name] = { elements: [elementParsed] };
         }
       }
 
-      await this.preparePartials(additionalDirectories.partials, partials);
+      this.preparePartials(additionalDirectories.partials, partials);
     }
 
     getLogger().log(
@@ -59,7 +56,7 @@ export class HtmlFile extends FileWithPartials {
     let content = this.content;
 
     if (this.#htmlParser) {
-      await this.executePartials(
+      this.executePartials(
         (element, content) => this.#htmlParser(element).replaceWith(content),
         rootDirectory,
       );

@@ -3,6 +3,8 @@ import {
   findInArray,
   isFunction,
   isObject,
+  isInArray,
+  isInObject,
   loadModule,
 } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
@@ -23,7 +25,7 @@ export class ModuleFile extends File {
       7,
       `Preparing module file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    super.prepare(
+    await super.prepare(
       isConfigModified,
       distPath,
       reportDirectory,
@@ -58,9 +60,11 @@ export class ModuleFile extends File {
       }
 
       if (
-        !this.modified &&
-        isObject(additionalDirectories) &&
-        additionalDirectories.hasOwnProperty("oldDist")
+        !isConfigModified &&
+        isInArray(reportDirectory.allFiles, (element) =>
+          element.isEqual(this),
+        ) &&
+        isInObject(additionalDirectories, "oldDist")
       ) {
         let distFiles = [];
         for (let dist of this.dist) {

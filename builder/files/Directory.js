@@ -1,6 +1,11 @@
 import path from "path";
 import Dirent from "./Dirent.js";
-import { createDir, deleteFile, loadDir } from "../helpers/index.js";
+import {
+  createDir,
+  deleteFile,
+  isInObject,
+  loadDir,
+} from "../helpers/index.js";
 import { getLogger } from "../utils/index.js";
 
 export class Directory extends Dirent {
@@ -110,7 +115,7 @@ export class Directory extends Dirent {
     return this;
   }
 
-  async isEqual(directory) {
+  isEqual(directory) {
     if (super.isEqual(directory)) {
       return this.#direntList.length === directory.direntList.length;
     }
@@ -133,7 +138,7 @@ export class Directory extends Dirent {
 
     for (let index in direntList) {
       const dirent = direntList[index];
-      if (dirent.hasOwnProperty("direntList")) {
+      if (isInObject(dirent, "direntList")) {
         this.#direntList.push(new Directory(this.#getFile).deserialize(dirent));
       } else {
         this.#direntList.push(this.#getFile(dirent).deserialize(dirent));

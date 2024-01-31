@@ -3,7 +3,7 @@ import {
   findInArray,
   isFunction,
   isInArray,
-  isObject,
+  isInObject,
   tryCatch,
 } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
@@ -11,7 +11,7 @@ import { getConfig, getLogger } from "../utils/index.js";
 export class FileWithPartials extends File {
   #partials = {};
 
-  async preparePartials(partialsDirectory, partials) {
+  preparePartials(partialsDirectory, partials) {
     getLogger().log(
       7,
       `Preparing partials for file ${this.src.rel} [partialsDirectory=${partialsDirectory}, partials=${partials}]`,
@@ -39,15 +39,11 @@ export class FileWithPartials extends File {
     return this;
   }
 
-  async executePartials(replaceFunction, rootDirectory) {
-    // console.log("executing partials", this.#partials);
-
+  executePartials(replaceFunction, rootDirectory) {
     for (let key of Object.keys(this.#partials).filter(
       (key) => this.#partials[key].file,
     )) {
-      // console.log("partial", key);
       for (let element of this.#partials[key].elements) {
-        // console.log("element", element);
         let elementContent;
 
         if (isFunction(this.#partials[key].file.module)) {
@@ -56,10 +52,7 @@ export class FileWithPartials extends File {
             getConfig().data,
             rootDirectory,
           );
-        } else if (
-          isObject(this.#partials[key].file.module) &&
-          this.#partials[key].file.module.hasOwnProperty("render")
-        ) {
+        } else if (isInObject(this.#partials[key].file.module, "render")) {
           elementContent = this.#partials[key].file.module.render(
             element,
             getConfig().data,
@@ -68,7 +61,7 @@ export class FileWithPartials extends File {
         }
 
         if (elementContent) {
-          await tryCatch(
+          tryCatch(
             () => replaceFunction(element, elementContent),
             (e) =>
               getLogger().warn(
@@ -81,19 +74,6 @@ export class FileWithPartials extends File {
         }
       }
     }
-
-    // content = await tryCatch(
-    //   () => stringifyFunction(content),
-    //   (e) =>
-    //     getLogger().warn(
-    //       8,
-    //       `Failed to stringify file ${this.src.rel} content after substituting partials`,
-    //       `(${e.name}: ${e.message})`,
-    //     ),
-    //   (e) => e.name !== "TypeError",
-    // );
-
-    // return content || this.content;
   }
 }
 

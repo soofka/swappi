@@ -1,7 +1,7 @@
 import css from "css";
 import CleanCSS from "clean-css";
 import FileWithPartials from "./FileWithPartials.js";
-import { isObject } from "../helpers/index.js";
+import { isInObject } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class CssFile extends FileWithPartials {
@@ -17,17 +17,14 @@ export class CssFile extends FileWithPartials {
       7,
       `Preparing css file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    super.prepare(
+    await super.prepare(
       isConfigModified,
       distPath,
       reportDirectory,
       additionalDirectories,
     );
 
-    if (
-      isObject(additionalDirectories) &&
-      additionalDirectories.hasOwnProperty("partials")
-    ) {
+    if (isInObject(additionalDirectories, "partials")) {
       this.#cssParser = css.parse(this.content);
       const partials = {};
 
@@ -41,7 +38,7 @@ export class CssFile extends FileWithPartials {
               getConfig().constants.cssPartialDeclaration,
         )) {
           const name = declaration.value.substring(1).split(":")[0];
-          if (partials.hasOwnProperty(name)) {
+          if (isInObject(partials, name)) {
             partials[name].elements.push(declaration);
           } else {
             partials[name] = { elements: [declaration] };
@@ -49,7 +46,7 @@ export class CssFile extends FileWithPartials {
         }
       }
 
-      await this.preparePartials(additionalDirectories.partials, partials);
+      this.preparePartials(additionalDirectories.partials, partials);
     }
 
     getLogger().log(
@@ -63,7 +60,7 @@ export class CssFile extends FileWithPartials {
     let content = this.content;
 
     if (this.#cssParser) {
-      await this.executePartials(
+      this.executePartials(
         (element, content) => (element = content),
         rootDirectory,
       );

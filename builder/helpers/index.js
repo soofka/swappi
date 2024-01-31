@@ -6,6 +6,7 @@ import getDirentObject from "./getDirentObject.js";
 import isDeepEqual from "./isDeepEqual.js";
 import isFunction from "./isFunction.js";
 import isInArray from "./isInArray.js";
+import isInObject from "./isInObject.js";
 import isObject from "./isObject.js";
 import loadDir from "./loadDir.js";
 import loadFile from "./loadFile.js";
@@ -23,6 +24,7 @@ export {
   isDeepEqual,
   isFunction,
   isInArray,
+  isInObject,
   isObject,
   loadDir,
   loadFile,

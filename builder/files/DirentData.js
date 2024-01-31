@@ -55,10 +55,6 @@ export class DirentData {
     return clone;
   }
 
-  // createName(suffixes = [], separator = '.') {
-  //     return `${this.#name}${suffixes.join(separator)}${this.#ext}`
-  // }
-
   isEqual(direntData) {
     return (
       this.#absDir === direntData.absDir &&

@@ -1,6 +1,7 @@
 import path from "path";
 import crypto from "crypto";
 import Dirent from "./Dirent.js";
+import DirentData from "./DirentData.js";
 import { isInArray, loadFile, saveFile } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
@@ -67,7 +68,6 @@ export class File extends Dirent {
     this.#dist.push(distDirentData);
     this.modified =
       isConfigModified ||
-      !reportDirectory ||
       !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this));
 
     getLogger().log(
@@ -106,11 +106,11 @@ export class File extends Dirent {
     return this.#modified;
   }
 
-  async isEqual(file, withDist = true) {
+  isEqual(file, withDist = true) {
     if (super.isEqual(file)) {
       if (withDist) {
         for (let dist of file.dist) {
-          if (!isInArray(this.#dist, dist)) {
+          if (!isInArray(this.#dist, (element) => element.isEqual(dist))) {
             return false;
           }
         }

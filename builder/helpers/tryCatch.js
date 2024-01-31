@@ -1,4 +1,4 @@
-export async function tryCatch(
+export function tryCatch(
   tryFunction,
   catchFunction,
   throwCondition = () => false,
@@ -6,14 +6,14 @@ export async function tryCatch(
   let result;
 
   try {
-    result = await tryFunction();
+    result = tryFunction();
   } catch (e) {
     if (throwCondition(e)) {
       throw e;
     }
 
     if (catchFunction) {
-      await catchFunction(e);
+      catchFunction(e);
     }
   }
 

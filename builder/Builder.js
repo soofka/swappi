@@ -3,6 +3,7 @@ import { Directory } from "./files/index.js";
 import {
   deepMerge,
   isDeepEqual,
+  isInObject,
   isObject,
   loadFile,
   parseJson,
@@ -38,7 +39,7 @@ export class Builder {
 
   async init() {
     getLogger().log(1, "Initializing build");
-    getLogger().log(3, "Config:", JSON.stringify(getConfig()));
+    getLogger().log(4, "Config:", JSON.stringify(getConfig()));
 
     await this.#initReport();
     await this.#initTemplates();
@@ -55,43 +56,42 @@ export class Builder {
     );
 
     getLogger().log(3, "Loading previous build report");
-    const report = await loadFile(getConfig().paths.report);
-    if (report) {
-      const reportJson = parseJson(report);
+    const reportJson = await loadFile(getConfig().paths.report);
+    if (reportJson) {
+      const report = parseJson(reportJson);
       if (
-        reportJson &&
-        isObject(reportJson) &&
-        report.hasOwnProperty("config") &&
-        isObject(reportJson.config) &&
-        report.hasOwnProperty("files") &&
-        isObject(reportJson.files)
+        report &&
+        isInObject(report, "config") &&
+        isObject(report.config) &&
+        isInObject(report, "files") &&
+        isObject(report.files)
       ) {
-        this.#isConfigModified = !isDeepEqual(getConfig(), reportJson.config);
+        this.#isConfigModified = !isDeepEqual(getConfig(), report.config);
         getLogger().log(
           4,
           `Config has ${this.#isConfigModified ? "" : "not "}changed`,
         );
 
-        if (report.files.hasOwnProperty("templates")) {
-          this.#files.report.templates = new Directory((direntData) =>
-            getFileProvider().getFileFromDirentData(direntData),
-          ).deserializeAll(report.files.templates);
+        if (isInObject(report.files, "templates")) {
+          this.#files.report.templates = new Directory((dirent) =>
+            getFileProvider().getTemplateFile(),
+          ).deserialize(report.files.templates);
         }
 
-        if (report.files.hasOwnProperty("partials")) {
-          this.#files.report.partials = new Directory((direntData) =>
-            getFileProvider().getFileFromDirentData(direntData),
-          ).deserializeAll(report.files.partials);
+        if (isInObject(report.files, "partials")) {
+          this.#files.report.partials = new Directory((dirent) =>
+            getFileProvider().getPartialFile(),
+          ).deserialize(report.files.partials);
         }
 
-        if (report.files.hasOwnProperty("public")) {
-          this.#files.report.public = new Directory((direntData) =>
-            getFileProvider().getFileFromDirentData(direntData),
-          ).deserializeAll(report.files.public);
+        if (isInObject(report.files, "public")) {
+          this.#files.report.public = new Directory((dirent) =>
+            getFileProvider().getFileFromDirentData(dirent.src),
+          ).deserialize(report.files.public);
         }
 
         getLogger().log(3, "Loading previous build report finished");
-        getLogger().log(4, "Previous bulid report:", report);
+        getLogger().log(4, "Previous bulid report:", reportJson);
       } else {
         getLogger().warn(
           3,
