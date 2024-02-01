@@ -181,7 +181,6 @@ export class File extends Dirent {
       executing.push(this.execute(dist, distIndex, rootDirectory));
     }
     const content = await Promise.all(executing);
-    console.log("POST PROCESS", content);
     const saving = [];
     for (let distIndex in this.dist) {
       const dist = this.dist[distIndex];

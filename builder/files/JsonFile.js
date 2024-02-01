@@ -40,7 +40,6 @@ export class JsonFile extends FileWithPartials {
 
   async execute(dist, index, rootDirectory) {
     const content = await this.#executeDeep(this.#contentJson, rootDirectory);
-    console.log("POST JSON EXECUTE", content);
     return JSON.stringify(content);
   }
 
