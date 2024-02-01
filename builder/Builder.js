@@ -213,11 +213,10 @@ export class Builder {
     const startTime = performance.now();
     getLogger().log(1, "Building");
 
-    await Promise.all([
-      this.#buildTemplates(),
-      this.#buildPartials(),
-      this.#buildPublic(),
-    ]);
+    // await Promise.all([this.#buildTemplates(), this.#buildPartials()]);
+    await this.#buildTemplates();
+    await this.#buildPartials();
+    await this.#buildPublic();
     await this.#buildReport();
 
     const endTime = performance.now();

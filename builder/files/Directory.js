@@ -89,7 +89,6 @@ export class Directory extends Dirent {
       );
 
       if (!dirent.isDir) {
-        console.log(">>>ADDING FILE", dirent.src.rel);
         fileCount++;
       }
     }

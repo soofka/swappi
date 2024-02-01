@@ -40,6 +40,7 @@ export class JsonFile extends FileWithPartials {
 
   async execute(dist, index, rootDirectory) {
     const content = await this.#executeDeep(this.#contentJson, rootDirectory);
+    console.log("POST JSON EXECUTE", content);
     return JSON.stringify(content);
   }
 
@@ -48,7 +49,6 @@ export class JsonFile extends FileWithPartials {
     for (let key of Object.keys(obj)) {
       const value = obj[key];
       if (key === getConfig().constants.jsonPartialField) {
-        newObj[key] = value;
         for (let partial of Object.keys(this.partials)) {
           if (partial === value) {
             newObj[key] = this.executePartial(
@@ -61,6 +61,8 @@ export class JsonFile extends FileWithPartials {
         }
       } else if (isObject(value)) {
         newObj[key] = await this.#executeDeep(value);
+      } else {
+        newObj[key] = value;
       }
     }
     return newObj;

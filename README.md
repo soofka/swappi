@@ -27,20 +27,20 @@
 ### todo
 
 - hashes!!!
-- remove from public after processing
 - prepare and process images appropriately
 - write unit tests
 - static partials
 - support for ts files
+- work dirs can be removed
+- client script
 
 - browser support transpilation
 - honor config options
 - figure out image width vs pixel density
 - service worker
-- --run --build --test --generate
+- --watch --build --test --generate + node api
 
 ### bugs
 
 - partials, templates generation
-- work dirs can be removed
 - /templates dir is probably not created properly on first run
