@@ -1,4 +1,5 @@
 import createDir from "./createDir.js";
+import deepClone from "./deepClone.js";
 import deepMerge from "./deepMerge.js";
 import deleteFile from "./deleteFile.js";
 import findInArray from "./findInArray.js";
@@ -17,6 +18,7 @@ import tryCatch from "./tryCatch.js";
 
 export {
   createDir,
+  deepClone,
   deepMerge,
   deleteFile,
   findInArray,

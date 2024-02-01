@@ -46,7 +46,7 @@ export const config = {
     hashSeparator: "+",
     htmlPartialAttribute: "data-swapp-partial",
     cssPartialDeclaration: "-swapp-partial",
-    jsonPartialField: "_partial",
+    jsonPartialField: "_swapp_partial",
     filesGroupMap: {
       html: [".html"],
       css: [".css"],
@@ -55,6 +55,8 @@ export const config = {
       img: [".avif", ".webp", ".gif", ".png", ".jpg", ".jpeg", ".svg"],
     },
   },
+
+  data: {},
 };
 
 export default config;

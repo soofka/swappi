@@ -30,6 +30,8 @@
 - prepare and process images appropriately
 - analyze if this actually works
 - write unit tests
+- static partials
+- support for ts files
 
 - browser support transpilation
 - honor config options
