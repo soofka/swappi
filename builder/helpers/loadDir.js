@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import createDir from "./createDir.js";
-import getDirentObject from "./getDirentObject.js";
 import tryCatch from "./tryCatch.js";
 import { getLogger } from "../utils/index.js";
 

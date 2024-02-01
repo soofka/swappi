@@ -90,9 +90,10 @@ export class Builder {
         }
 
         if (isInObject(report.files, "public")) {
-          this.#files.report.public = new Directory((dirent) =>
-            getFileProvider().getFileFromDirentData(dirent.src),
-          ).deserialize(report.files.public);
+          this.#files.report.public = new Directory((dirent) => {
+            console.log("zonk123", dirent);
+            return getFileProvider().getFileFromDirentData(dirent.src);
+          }).deserialize(report.files.public);
         }
 
         getLogger().log(3, "Loading previous build report finished");

@@ -13,6 +13,10 @@ export class ModuleFile extends File {
     return this.#module;
   }
 
+  constructor(absPath, relPath, hashable = false) {
+    super(absPath, relPath, hashable);
+  }
+
   async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
@@ -64,7 +68,9 @@ export class ModuleFile extends File {
       return this.#module(getConfig().data);
     } else if (isObject(this.#module)) {
       for (let key of Object.keys(this.#module)) {
-        if (dist.name.endsWith(key)) {
+        if (
+          dist.name.split(getConfig().constants.hashSeparator)[0].endsWith(key)
+        ) {
           return this.#module[key](getConfig().data);
         }
       }

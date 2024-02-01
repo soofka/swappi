@@ -38,13 +38,9 @@ export class File extends Dirent {
   get content() {
     return this.#content;
   }
-  #contentHash = "";
-  get contentHash() {
-    return this.#contentHash;
-  }
 
-  constructor(srcAbsPath, relPath) {
-    super(srcAbsPath, relPath);
+  constructor(srcAbsPath, relPath, hashable = true) {
+    super(srcAbsPath, relPath, hashable);
     this.isDir = false;
   }
 
@@ -52,7 +48,7 @@ export class File extends Dirent {
     getLogger().log(7, `Loading file ${this.src.rel}`);
 
     this.#content = await loadFile(this.src.abs);
-    this.#contentHash = crypto
+    this.src.hash = crypto
       .createHash(
         getConfig().constants.hashAlgorithm,
         getConfig().constants.hashAlgorithmOptions,
@@ -101,12 +97,10 @@ export class File extends Dirent {
     );
 
     const distDirentData = this.src.clone();
-    if (distPath) {
-      distDirentData.absDir =
-        distDirentData.relDir === path.sep
-          ? distPath
-          : path.join(distPath, distDirentData.relDir);
-    }
+    distDirentData.absDir =
+      distDirentData.relDir === path.sep
+        ? distPath
+        : path.join(distPath, distDirentData.relDir);
     this.#dist.push(distDirentData);
 
     getLogger().log(
@@ -209,15 +203,13 @@ export class File extends Dirent {
           }
         }
       }
-      return this.#contentHash && file.contentHash
-        ? this.#contentHash === file.contentHash
-        : true;
+      return true;
     }
     return false;
   }
 
   serialize(src = true, dist = true, content = false) {
-    const obj = { ...super.serialize(src), contentHash: this.#contentHash };
+    const obj = super.serialize(src);
 
     if (dist) {
       obj.dist = this.#dist.map((dist) => dist.serialize());
@@ -230,7 +222,7 @@ export class File extends Dirent {
     return obj;
   }
 
-  deserialize({ src, dist, content, contentHash }) {
+  deserialize({ src = {}, dist = [], content }) {
     super.deserialize({ src });
 
     this.#dist = [];
@@ -239,7 +231,6 @@ export class File extends Dirent {
     }
 
     this.#content = content;
-    this.#contentHash = contentHash;
     return this;
   }
 }

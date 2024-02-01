@@ -26,7 +26,6 @@
 
 ### todo
 
-- hashes!!!
 - prepare and process images appropriately
 - write unit tests
 - static partials
@@ -42,5 +41,4 @@
 
 ### bugs
 
-- partials, templates generation
 - /templates dir is probably not created properly on first run

@@ -13,8 +13,8 @@ export class Dirent {
     this.#isDir = value;
   }
 
-  constructor(absPath, relPath) {
-    this.#src = new DirentData(absPath, relPath);
+  constructor(absPath, relPath, hashable) {
+    this.#src = new DirentData(absPath, relPath, hashable);
   }
 
   isEqual(dirent) {
@@ -31,7 +31,7 @@ export class Dirent {
     return obj;
   }
 
-  deserialize({ src }) {
+  deserialize({ src = {} }) {
     this.#src = new DirentData().deserialize(src);
     return this;
   }

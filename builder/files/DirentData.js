@@ -1,5 +1,6 @@
 import path from "path";
 import { getDirentObject } from "../helpers/index.js";
+import { getConfig } from "../utils/index.js";
 
 export class DirentData {
   #absDir;
@@ -23,6 +24,14 @@ export class DirentData {
   set name(value) {
     this.#name = value;
   }
+  #hash;
+  get hash() {
+    return this.#hash;
+  }
+  set hash(value) {
+    this.#hash = value;
+  }
+  #hashable;
   #ext;
   get ext() {
     return this.#ext;
@@ -31,18 +40,24 @@ export class DirentData {
     this.#ext = value;
   }
 
-  constructor(absPath, relPath = "") {
-    this.init(absPath, relPath);
+  constructor(absPath, relPath = "", hashable = true) {
+    this.init(absPath, relPath, hashable);
   }
 
-  init(absPath, relPath = "") {
+  init(absPath, relPath, hashable) {
     if (absPath) {
       const obj = getDirentObject(absPath);
       this.#absDir = obj.dir;
       this.#name = obj.name;
+      this.#hash = obj.hash;
       this.#ext = obj.ext;
     }
-    this.#relDir = relPath;
+    if (relPath !== undefined) {
+      this.#relDir = relPath;
+    }
+    if (hashable !== undefined) {
+      this.#hashable = hashable;
+    }
     return this;
   }
 
@@ -51,6 +66,7 @@ export class DirentData {
     clone.absDir = this.#absDir;
     clone.relDir = this.#relDir;
     clone.name = this.#name;
+    clone.hash = this.#hash;
     clone.ext = this.#ext;
     return clone;
   }
@@ -60,29 +76,44 @@ export class DirentData {
       this.#absDir === direntData.absDir &&
       this.#relDir === direntData.relDir &&
       this.#name === direntData.name &&
+      (this.#hash !== "" && direntData.hash !== ""
+        ? this.#hash === direntData.hash
+        : true) &&
       this.#ext === direntData.ext
     );
   }
 
   serialize() {
-    return {
-      absDir: this.#absDir,
-      relDir: this.#relDir,
-      name: this.#name,
-      ext: this.#ext,
-    };
+    const obj = {};
+    if (this.#absDir && this.#absDir !== "") {
+      obj.absDir = this.#absDir;
+    }
+    if (this.#relDir && this.#relDir !== "") {
+      obj.relDir = this.#relDir;
+    }
+    if (this.#name && this.#name !== "") {
+      obj.name = this.#name;
+    }
+    if (this.#hash && this.#hash !== "") {
+      obj.hash = this.#hash;
+    }
+    if (this.#ext && this.#ext !== "") {
+      obj.ext = this.#ext;
+    }
+    return obj;
   }
 
-  deserialize({ absDir, relDir, name, ext }) {
+  deserialize({ absDir = "", relDir = "", name = "", hash = "", ext = "" }) {
     this.#absDir = absDir;
     this.#relDir = relDir;
     this.#name = name;
+    this.#hash = hash;
     this.#ext = ext;
     return this;
   }
 
   get full() {
-    return `${this.#name}${this.#ext}`;
+    return `${this.#name}${this.#hashable ? (this.#hash === "" ? "" : `${getConfig().constants.hashSeparator}${this.#hash}`) : ""}${this.#ext}`;
   }
   get abs() {
     return path.join(this.#absDir, this.full);

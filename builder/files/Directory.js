@@ -1,11 +1,6 @@
 import path from "path";
 import Dirent from "./Dirent.js";
-import {
-  createDir,
-  deleteFile,
-  isInObject,
-  loadDir,
-} from "../helpers/index.js";
+import { deleteFile, isInObject, loadDir } from "../helpers/index.js";
 import { getLogger } from "../utils/index.js";
 
 export class Directory extends Dirent {
@@ -23,8 +18,8 @@ export class Directory extends Dirent {
     return this.#stats;
   }
 
-  constructor(getFile, absPath, relPath) {
-    super(absPath, relPath);
+  constructor(getFile, absPath, relPath, hashable = false) {
+    super(absPath, relPath, hashable);
     this.#getFile = getFile;
     this.isDir = true;
   }
@@ -164,19 +159,22 @@ export class Directory extends Dirent {
   serialize(src = true, dist = true, content = false) {
     const root = super.serialize(src);
 
-    root.direntList = [];
-    for (let dirent of this.#direntList) {
-      root.direntList.push(dirent.serialize(src, dist, content));
+    if (this.#direntList.length > 0) {
+      root.direntList = [];
+      for (let dirent of this.#direntList) {
+        root.direntList.push(dirent.serialize(src, dist, content));
+      }
     }
 
     return root;
   }
 
-  deserialize({ src, direntList }) {
+  deserialize({ src = {}, direntList = [] }) {
     super.deserialize({ src });
 
     for (let index in direntList) {
       const dirent = direntList[index];
+      console.log("zonk", dirent);
       if (isInObject(dirent, "direntList")) {
         this.#direntList.push(new Directory(this.#getFile).deserialize(dirent));
       } else {
