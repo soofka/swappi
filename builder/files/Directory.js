@@ -14,13 +14,13 @@ export class Directory extends Dirent {
   get direntList() {
     return this.#direntList;
   }
-  #fileStats = {
+  #stats = {
     loaded: 0,
     prepared: 0,
     processed: 0,
   };
-  get fileStats() {
-    return this.#fileStats;
+  get stats() {
+    return this.#stats;
   }
 
   constructor(getFile, absPath, relPath) {
@@ -36,13 +36,14 @@ export class Directory extends Dirent {
     if (dir) {
       for (let nodeDirent of dir) {
         const srcPath = path.join(this.src.abs, nodeDirent.name);
-        let dirent;
+        const relPath = this.src.relDir === "" ? path.sep : this.src.rel;
 
+        let dirent;
         if (nodeDirent.isFile()) {
           dirent = this.#getFile(nodeDirent);
-          dirent.src.init(srcPath, this.src.relDir);
+          dirent.src.init(srcPath, relPath);
         } else if (nodeDirent.isDirectory()) {
-          dirent = new Directory(this.#getFile, srcPath, nodeDirent.name);
+          dirent = new Directory(this.#getFile, srcPath, relPath);
         }
 
         if (dirent) {
@@ -50,7 +51,7 @@ export class Directory extends Dirent {
           this.#direntList.push(dirent);
 
           if (!dirent.isDir) {
-            this.#fileStats.loaded++;
+            this.#stats.loaded++;
           }
         }
       }
@@ -68,7 +69,7 @@ export class Directory extends Dirent {
 
     getLogger().log(
       6,
-      `Directory ${this.src.rel} loaded (${this.#fileStats.loaded} files)`,
+      `Directory ${this.src.rel} loaded (${this.#stats.loaded} files)`,
     );
     return this;
   }
@@ -93,13 +94,13 @@ export class Directory extends Dirent {
       );
 
       if (!dirent.isDir) {
-        this.#fileStats.prepared++;
+        this.#stats.prepared++;
       }
     }
 
     getLogger().log(
       6,
-      `Directory ${this.src.rel} prepared (${this.#fileStats.prepared} files)`,
+      `Directory ${this.src.rel} prepared (${this.#stats.prepared} files)`,
     );
     return this;
   }
@@ -114,6 +115,7 @@ export class Directory extends Dirent {
       } else if (!dirent.modified) {
         newDirentList.push(dirent);
       } else {
+        console.log("gonna delete file", dirent.src.abs);
         await deleteFile(dirent.src.abs);
       }
     }
@@ -131,13 +133,13 @@ export class Directory extends Dirent {
         await dirent.process(rootDirectory || this);
       } else if (dirent.shouldBeProcessed()) {
         await dirent.process(rootDirectory || this);
-        this.#fileStats.processed++;
+        this.#stats.processed++;
       }
     }
 
     getLogger().log(
       6,
-      `Directory ${this.src.rel} processed (${this.#fileStats.processed} files)`,
+      `Directory ${this.src.rel} processed (${this.#stats.processed} files)`,
     );
     return this;
   }
@@ -187,8 +189,17 @@ export class Directory extends Dirent {
     return allFiles;
   }
 
-  get allDists() {
-    return [].concat(...this.allFiles().map((file) => file.dist));
+  get allStats() {
+    const allStats = this.#stats;
+    for (let dirent of this.#direntList) {
+      if (dirent.isDir) {
+        const direntStats = dirent.allStats;
+        allStats.loaded += direntStats.loaded;
+        allStats.prepared += direntStats.prepared;
+        allStats.processed += direntStats.processed;
+      }
+    }
+    return allStats;
   }
 }
 

@@ -1,5 +1,4 @@
 import DirentData from "./DirentData.js";
-import { getLogger } from "../utils/index.js";
 
 export class Dirent {
   #src;
@@ -15,10 +14,6 @@ export class Dirent {
   }
 
   constructor(absPath, relPath) {
-    getLogger().log(
-      5,
-      `Creating dirent [absPath=${absPath}, relPath=${relPath}]`,
-    );
     this.#src = new DirentData(absPath, relPath);
   }
 

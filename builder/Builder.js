@@ -262,9 +262,9 @@ export class Builder {
 
     getLogger().log(3, "Saving current build report finished");
 
-    getLogger().log(1, "Templates:", this.#files.templates.src.fileStats);
-    getLogger().log(1, "Partials:", this.#files.partials.src.fileStats);
-    getLogger().log(1, "Public:", this.#files.public.src.fileStats);
+    getLogger().log(1, "Templates:", this.#files.templates.src.allStats);
+    getLogger().log(1, "Partials:", this.#files.partials.src.allStats);
+    getLogger().log(1, "Public:", this.#files.public.src.allStats);
   }
 }
 

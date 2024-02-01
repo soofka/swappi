@@ -19,7 +19,7 @@ export class File extends Dirent {
   set dist(value) {
     this.#dist = value;
   }
-  #modified;
+  #modified = true;
   get modified() {
     return this.#modified;
   }

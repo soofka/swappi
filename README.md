@@ -38,3 +38,9 @@
 - service worker
 - verbosity logs
 - --run --build --test --generate
+
+### bugs
+
+- work dirs can be removed
+- /templates dir is probably not created properly
+- i am still processing too many files
