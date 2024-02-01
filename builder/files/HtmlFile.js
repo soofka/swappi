@@ -24,10 +24,7 @@ export class HtmlFile extends FileWithPartials {
     let content = this.content;
 
     if (this.#htmlParser) {
-      this.executePartials(
-        (element, content) => this.#htmlParser(element).replaceWith(content),
-        rootDirectory,
-      );
+      await this.executePartials(rootDirectory);
       content = this.#htmlParser.html();
     }
 

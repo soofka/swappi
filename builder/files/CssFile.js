@@ -29,10 +29,7 @@ export class CssFile extends FileWithPartials {
     let content = this.content;
 
     if (this.#cssParser) {
-      this.executePartials(
-        (element, content) => (element = content),
-        rootDirectory,
-      );
+      await this.executePartials(rootDirectory);
       content = css.stringify(this.#cssParser);
     }
 

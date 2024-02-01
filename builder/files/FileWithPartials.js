@@ -27,7 +27,7 @@ export class FileWithPartials extends File {
   async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
-      `Preparing file with partials ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+      `Preparing file with partials ${this.src.rel} for processing [distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
     await super.prepareForProcessing(
       distPath,
@@ -42,7 +42,7 @@ export class FileWithPartials extends File {
 
     getLogger().log(
       7,
-      `File with partials ${this.src.rel} prepared for processing (partials length: ${this.#partials.length})`,
+      `File with partials ${this.src.rel} prepared for processing (partials length: ${Object.keys(this.#partials).length})`,
     );
     return this;
   }
@@ -67,6 +67,7 @@ export class FileWithPartials extends File {
 
       if (partialFile) {
         newPartials[key] = this.#partials[key];
+        newPartials[key].file = partialFile;
       }
     }
     this.#partials = newPartials;
@@ -78,20 +79,21 @@ export class FileWithPartials extends File {
     return this;
   }
 
-  async executePartials(replaceFunction, rootDirectory) {
+  async executePartials(rootDirectory) {
+    const executing = [];
     for (let partial of Object.keys(this.partials)) {
       for (let element of this.partials[partial].elements) {
-        replaceFunction(
-          element,
-          await this.executePartial(
-            isInObject(this.#partials[partial].file, "module") &&
-              this.#partials[partial].file.module,
+        executing.push(
+          this.executePartial(
+            this.#partials[partial].file.module,
             element,
             rootDirectory,
           ),
         );
       }
     }
+
+    return await Promise.all(executing);
   }
 
   async executePartial(module, element, rootDirectory) {
