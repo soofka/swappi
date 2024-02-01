@@ -115,7 +115,6 @@ export class Directory extends Dirent {
       } else if (!dirent.modified) {
         newDirentList.push(dirent);
       } else {
-        console.log("gonna delete file", dirent.src.abs);
         await deleteFile(dirent.src.abs);
       }
     }

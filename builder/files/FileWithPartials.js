@@ -73,10 +73,6 @@ export class FileWithPartials extends File {
         }
         return false;
       })();
-
-      if (this.modified) {
-        console.log("FILE", this.src.rel, "IS MODIFIED BECAUSE OF PARTIALS");
-      }
     }
 
     getLogger().log(
