@@ -64,12 +64,19 @@ export class FileWithPartials extends File {
     if (!this.modified) {
       this.modified = (() => {
         for (let key of Object.keys(this.#partials)) {
-          if (this.#partials[key].file && this.#partials[key].file.modified) {
+          if (
+            this.#partials[key].file &&
+            !this.#partials[key].file.foundInReport
+          ) {
             return true;
           }
         }
         return false;
       })();
+
+      if (this.modified) {
+        console.log("FILE", this.src.rel, "IS MODIFIED BECAUSE OF PARTIALS");
+      }
     }
 
     getLogger().log(

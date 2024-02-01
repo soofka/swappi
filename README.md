@@ -24,11 +24,10 @@
 
 ### todo
 
+- fix partials content
 - remove from public after processing
 - add partials to json files
 - prepare and process images appropriately
-- pass data to partials and make them work again
-- print build report in console
 - analyze if this actually works
 - write unit tests
 
@@ -43,4 +42,3 @@
 
 - work dirs can be removed
 - /templates dir is probably not created properly
-- i am still processing too many files

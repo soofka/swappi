@@ -26,6 +26,14 @@ export class File extends Dirent {
   set modified(value) {
     this.#modified = value;
   }
+  #foundInReport = false;
+  get foundInReport() {
+    return this.#foundInReport;
+  }
+  #foundInOldDist = false;
+  get foundInOldDist() {
+    return this.#foundInOldDist;
+  }
   #content = "";
   get content() {
     return this.#content;
@@ -94,7 +102,10 @@ export class File extends Dirent {
 
     const distDirentData = this.src.clone();
     if (distPath) {
-      distDirentData.absDir = path.join(distPath, distDirentData.relDir);
+      distDirentData.absDir =
+        distDirentData.relDir === path.sep
+          ? distPath
+          : path.join(distPath, distDirentData.relDir);
     }
     this.#dist.push(distDirentData);
 
@@ -108,20 +119,42 @@ export class File extends Dirent {
   checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
     getLogger().log(
       7,
-      `Checking file ${this.src.rel} for modifications [isConfigModified=${isConfigModified}. reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`,
+      `Checking file ${this.src.rel} for modifications [isConfigModified=${isConfigModified}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`,
     );
 
-    if (isConfigModified) {
-      this.#modified = true;
-    } else if (
-      reportDirectory &&
-      !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this))
+    this.#foundInReport = this.isInReport(reportDirectory);
+
+    const oldDistFiles = this.findInOldDist(oldDistDirectory);
+    for (let distFile of oldDistFiles) {
+      distFile.modified = false;
+    }
+
+    this.#foundInOldDist = oldDistFiles.length > 0;
+    this.#modified =
+      isConfigModified || !this.#foundInReport || !this.#foundInOldDist;
+
+    getLogger().log(
+      7,
+      `File ${this.src.rel} checked for modifications (modified=${this.#modified})`,
+    );
+    return this;
+  }
+
+  isInReport(report) {
+    if (
+      report &&
+      isInArray(report.allFiles, (element) => element.isEqual(this))
     ) {
-      this.#modified = true;
-    } else if (oldDistDirectory) {
-      let distFiles = [];
+      return true;
+    }
+    return false;
+  }
+
+  findInOldDist(oldDist) {
+    let distFiles = [];
+    if (oldDist) {
       for (let dist of this.dist) {
-        const distFile = findInArray(oldDistDirectory.allFiles, (element) =>
+        const distFile = findInArray(oldDist.allFiles, (element) =>
           element.src.isEqual(dist),
         );
         if (distFile) {
@@ -131,21 +164,8 @@ export class File extends Dirent {
           break;
         }
       }
-      if (distFiles.length > 0) {
-        this.#modified = false;
-        for (let distFile of distFiles) {
-          distFile.modified = false;
-        }
-      } else {
-        this.#modified = true;
-      }
     }
-
-    getLogger().log(
-      7,
-      `File ${this.src.rel} checked for modifications (modified=${this.#modified})`,
-    );
-    return this;
+    return distFiles;
   }
 
   shouldBeProcessed() {
