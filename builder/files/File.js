@@ -67,11 +67,11 @@ export class File extends Dirent {
       `Preparing file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
 
-    const distDirentData = this.src.clone();
-    if (distPath) {
-      distDirentData.absDir = path.join(distPath, distDirentData.relDir);
-    }
-    this.#dist.push(distDirentData);
+    await this.prepareForProcessing(
+      distPath,
+      reportDirectory,
+      additionalDirectories,
+    );
     this.checkForModifications(
       isConfigModified,
       reportDirectory,
@@ -81,9 +81,75 @@ export class File extends Dirent {
 
     getLogger().log(
       7,
-      `File ${this.src.rel} prepared (modified: ${this.#modified}, dist length: ${this.#dist.length})`,
+      `File ${this.src.rel} prepared (modified: ${this.#modified}, shouldBeProcessed: ${this.shouldBeProcessed()}, dist length: ${this.#dist.length})`,
     );
     return this;
+  }
+
+  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
+    getLogger().log(
+      7,
+      `Preparing file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+    );
+
+    const distDirentData = this.src.clone();
+    if (distPath) {
+      distDirentData.absDir = path.join(distPath, distDirentData.relDir);
+    }
+    this.#dist.push(distDirentData);
+
+    getLogger().log(
+      7,
+      `File ${this.src.rel} prepared for processing (dist length: ${this.#dist.length})`,
+    );
+    return this;
+  }
+
+  checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
+    getLogger().log(
+      7,
+      `Checking file ${this.src.rel} for modifications [isConfigModified=${isConfigModified}. reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`,
+    );
+
+    if (isConfigModified) {
+      this.#modified = true;
+    } else if (
+      reportDirectory &&
+      !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this))
+    ) {
+      this.#modified = true;
+    } else if (oldDistDirectory) {
+      let distFiles = [];
+      for (let dist of this.dist) {
+        const distFile = findInArray(oldDistDirectory.allFiles, (element) =>
+          element.src.isEqual(dist),
+        );
+        if (distFile) {
+          distFiles.push(distFile);
+        } else {
+          distFiles = [];
+          break;
+        }
+      }
+      if (distFiles.length > 0) {
+        this.#modified = false;
+        for (let distFile of distFiles) {
+          distFile.modified = false;
+        }
+      } else {
+        this.#modified = true;
+      }
+    }
+
+    getLogger().log(
+      7,
+      `File ${this.src.rel} checked for modifications (modified=${this.#modified})`,
+    );
+    return this;
+  }
+
+  shouldBeProcessed() {
+    return this.#modified;
   }
 
   async process(rootDirectory) {
@@ -105,47 +171,6 @@ export class File extends Dirent {
 
   async save(dist, distIndex, content) {
     await saveFile(dist.abs, content);
-  }
-
-  checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
-    if (isConfigModified) {
-      this.#modified = true;
-      return;
-    }
-    if (
-      reportDirectory &&
-      !isInArray(reportDirectory.allFiles, (element) => element.isEqual(this))
-    ) {
-      this.#modified = true;
-      return;
-    }
-    if (oldDistDirectory) {
-      let distFiles = [];
-      for (let dist of this.dist) {
-        const distFile = findInArray(oldDistDirectory.allFiles, (element) =>
-          element.src.isEqual(dist),
-        );
-        if (distFile) {
-          distFiles.push(distFile);
-        } else {
-          distFiles = [];
-          break;
-        }
-      }
-      if (distFiles.length > 0) {
-        for (let distFile of distFiles) {
-          distFile.#modified = false;
-        }
-      } else {
-        this.#modified = true;
-        return;
-      }
-    }
-    this.#modified = false;
-  }
-
-  shouldBeProcessed() {
-    return this.#modified;
   }
 
   isEqual(file, withDist = true) {

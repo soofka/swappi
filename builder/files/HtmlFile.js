@@ -7,18 +7,12 @@ import { getConfig, getLogger } from "../utils/index.js";
 export class HtmlFile extends FileWithPartials {
   #htmlParser;
 
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
+  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
-      `Preparing html file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+      `Preparing html file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    await super.prepare(
-      isConfigModified,
+    await super.prepareForProcessing(
       distPath,
       reportDirectory,
       additionalDirectories,
@@ -26,28 +20,23 @@ export class HtmlFile extends FileWithPartials {
 
     if (isInObject(additionalDirectories, "partials")) {
       this.#htmlParser = cheerio.load(this.content);
-      const partials = {};
 
       for (let element of this.#htmlParser(
         `[${getConfig().constants.htmlPartialAttribute}]`,
       )) {
         const elementParsed = this.#htmlParser(element);
-        const name = elementParsed.attr(
-          getConfig().constants.htmlPartialAttribute,
+        this.addPartial(
+          elementParsed.attr(getConfig().constants.htmlPartialAttribute),
+          elementParsed,
         );
-        if (isInObject(partials, name)) {
-          partials[name].elements.push(elementParsed);
-        } else {
-          partials[name] = { elements: [elementParsed] };
-        }
       }
 
-      this.preparePartials(additionalDirectories.partials, partials);
+      this.preparePartials(additionalDirectories.partials);
     }
 
     getLogger().log(
       7,
-      `Html file ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.dist.length})`,
+      `Html file ${this.src.rel} prepared for processing (dist length: ${this.dist.length})`,
     );
     return this;
   }

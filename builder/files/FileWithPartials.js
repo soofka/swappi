@@ -10,14 +10,26 @@ import { getConfig, getLogger } from "../utils/index.js";
 
 export class FileWithPartials extends File {
   #partials = {};
+  get partials() {
+    return this.#partials;
+  }
+  set partials(value) {
+    this.#partials = value;
+  }
 
-  preparePartials(partialsDirectory, partials) {
+  addPartial(name, partial) {
+    if (isInObject(this.#partials, name)) {
+      this.partials[name].elements.push(partial);
+    } else {
+      this.partials[name] = { elements: [partial] };
+    }
+  }
+
+  preparePartials(partialsDirectory) {
     getLogger().log(
       7,
-      `Preparing partials for file ${this.src.rel} [partialsDirectory=${partialsDirectory}, partials=${partials}]`,
+      `Preparing partials for file ${this.src.rel} [partialsDirectory=${partialsDirectory}]`,
     );
-
-    this.#partials = partials;
 
     for (let key of Object.keys(this.#partials)) {
       this.#partials[key].file = findInArray(
@@ -29,13 +41,41 @@ export class FileWithPartials extends File {
               distElement.ext === this.src.ext && distElement.name === key,
           ),
       );
-
-      if (this.#partials[key].file && this.#partials[key].file.modified) {
-        this.modified = true;
-      }
     }
 
-    getLogger().log(7, `Preparing partials for file ${this.src.rel} finished`);
+    getLogger().log(
+      7,
+      `Preparing partials for file ${this.src.rel} finished (partials length: ${Object.keys(this.#partials).length})`,
+    );
+    return this;
+  }
+
+  checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
+    getLogger().log(
+      7,
+      `Checking file with partials ${this.src.rel} for modifications [isConfigModified=${isConfigModified}. reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`,
+    );
+    super.checkForModifications(
+      isConfigModified,
+      reportDirectory,
+      oldDistDirectory,
+    );
+
+    if (!this.modified) {
+      this.modified = (() => {
+        for (let key of Object.keys(this.#partials)) {
+          if (this.#partials[key].file && this.#partials[key].file.modified) {
+            return true;
+          }
+        }
+        return false;
+      })();
+    }
+
+    getLogger().log(
+      7,
+      `File with partials ${this.src.rel} checked for modifications (modified=${this.modified})`,
+    );
     return this;
   }
 

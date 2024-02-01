@@ -7,18 +7,12 @@ import { getConfig, getLogger } from "../utils/index.js";
 export class CssFile extends FileWithPartials {
   #cssParser;
 
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
+  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
-      `Preparing css file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+      `Preparing css file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    await super.prepare(
-      isConfigModified,
+    await super.prepareForProcessing(
       distPath,
       reportDirectory,
       additionalDirectories,
@@ -26,7 +20,6 @@ export class CssFile extends FileWithPartials {
 
     if (isInObject(additionalDirectories, "partials")) {
       this.#cssParser = css.parse(this.content);
-      const partials = {};
 
       for (let rule of this.#cssParser.stylesheet.rules.filter(
         (rule) => rule.type === "rule",
@@ -37,21 +30,19 @@ export class CssFile extends FileWithPartials {
             declaration.property ===
               getConfig().constants.cssPartialDeclaration,
         )) {
-          const name = declaration.value.substring(1).split(":")[0];
-          if (isInObject(partials, name)) {
-            partials[name].elements.push(declaration);
-          } else {
-            partials[name] = { elements: [declaration] };
-          }
+          this.addPartial(
+            declaration.value.substring(1).split(":")[0],
+            declaration,
+          );
         }
       }
 
-      this.preparePartials(additionalDirectories.partials, partials);
+      this.preparePartials(additionalDirectories.partials);
     }
 
     getLogger().log(
       7,
-      `Css file ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.dist.length})`,
+      `Css file ${this.src.rel} prepared for processing (dist length: ${this.dist.length})`,
     );
     return this;
   }

@@ -5,18 +5,12 @@ import { getLogger } from "../utils/index.js";
 export class PartialFile extends ModuleFile {
   #executable = false;
 
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
+  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
-      `Preparing partial file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+      `Preparing partial file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    await super.prepare(
-      isConfigModified,
+    await super.prepareForProcessing(
       distPath,
       reportDirectory,
       additionalDirectories,
@@ -28,13 +22,11 @@ export class PartialFile extends ModuleFile {
       isFunction(this.module.render)
     ) {
       this.#executable = true;
-    } else {
-      this.checkForModifications(isConfigModified, reportDirectory);
     }
 
     getLogger().log(
       7,
-      `Partial file ${this.src.rel} prepared (modified: ${this.modified}, executable: ${this.#executable})`,
+      `Partial file ${this.src.rel} prepared for processing (executable: ${this.#executable}, shouldBeProcessed: ${this.shouldBeProcessed()})`,
     );
     return this;
   }

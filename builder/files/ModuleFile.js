@@ -13,18 +13,12 @@ export class ModuleFile extends File {
     return this.#module;
   }
 
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
+  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
     getLogger().log(
       7,
-      `Preparing module file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
+      `Preparing module file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
     );
-    await super.prepare(
-      isConfigModified,
+    await super.prepareForProcessing(
       distPath,
       reportDirectory,
       additionalDirectories,
@@ -56,18 +50,11 @@ export class ModuleFile extends File {
         });
         this.dist = newDist;
       }
-
-      this.checkForModifications(
-        isConfigModified,
-        reportDirectory,
-        isInObject(additionalDirectories, "oldDist") &&
-          additionalDirectories.oldDist,
-      );
     }
 
     getLogger().log(
       7,
-      `Module file ${this.src.rel} prepared (modified: ${this.modified}, dist length: ${this.dist.length})`,
+      `Module file ${this.src.rel} prepared for processing (dist length: ${this.dist.length})`,
     );
     return this;
   }
