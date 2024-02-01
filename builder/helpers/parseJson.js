@@ -7,8 +7,7 @@ export function parseJson(json) {
     (e) =>
       getLogger().warn(
         8,
-        `Failed to parse JSON ${json}`,
-        `(${e.name}: ${e.message})`,
+        `Failed to parse JSON ${json} (${e.name}: ${e.message})`,
       ),
   );
 }

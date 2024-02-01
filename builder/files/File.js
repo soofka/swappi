@@ -175,11 +175,18 @@ export class File extends Dirent {
   async process(rootDirectory) {
     getLogger().log(7, `Processing file ${this.src.rel}`);
 
+    const executing = [];
     for (let distIndex in this.dist) {
       const dist = this.dist[distIndex];
-      const content = await this.execute(dist, distIndex, rootDirectory);
-      await this.save(dist, distIndex, content);
+      executing.push(this.execute(dist, distIndex, rootDirectory));
     }
+    const content = await Promise.all(executing);
+    const saving = [];
+    for (let distIndex in this.dist) {
+      const dist = this.dist[distIndex];
+      saving.push(this.save(dist, distIndex, content[distIndex]));
+    }
+    await Promise.all(saving);
 
     getLogger().log(7, `File ${this.src.rel} processed`);
     return this;
@@ -202,7 +209,9 @@ export class File extends Dirent {
           }
         }
       }
-      return this.#contentHash === file.contentHash;
+      return this.#contentHash && file.contentHash
+        ? this.#contentHash === file.contentHash
+        : true;
     }
     return false;
   }

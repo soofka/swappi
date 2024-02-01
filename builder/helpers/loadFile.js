@@ -8,8 +8,7 @@ export function loadFile(absPath, options = { encoding: "utf8" }) {
     (e) =>
       getLogger().warn(
         8,
-        `Failed to load file ${absPath}`,
-        `(${e.name}: ${e.message})`,
+        `Failed to load file ${absPath} (${e.name}: ${e.message})`,
       ),
     (e) => e.code !== "ENOENT",
   );

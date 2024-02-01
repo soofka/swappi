@@ -11,8 +11,7 @@ export function loadDir(absPath, options = { withFileTypes: true }) {
     async (e) => {
       getLogger().warn(
         8,
-        `Failed to load dir ${absPath}, attempting to create missing directories and load again`,
-        `(${e.name}: ${e.message})`,
+        `Failed to load dir ${absPath}, attempting to create missing directories and load again (${e.name}: ${e.message})`,
       );
       await createDir(absPath);
       return await loadDirFunction();

@@ -4,6 +4,8 @@
 
 ### todo:
 
+- fix partials content
+- add all assets properly to files through partials/templates
 - scroll anchor bug again
 - build as per comments
 - aria tags
@@ -24,11 +26,9 @@
 
 ### todo
 
-- fix partials content
+- hashes!!!
 - remove from public after processing
-- add partials to json files
 - prepare and process images appropriately
-- analyze if this actually works
 - write unit tests
 - static partials
 - support for ts files
@@ -37,10 +37,10 @@
 - honor config options
 - figure out image width vs pixel density
 - service worker
-- verbosity logs
 - --run --build --test --generate
 
 ### bugs
 
+- partials, templates generation
 - work dirs can be removed
-- /templates dir is probably not created properly
+- /templates dir is probably not created properly on first run

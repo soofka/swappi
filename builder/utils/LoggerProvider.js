@@ -8,24 +8,24 @@ class LoggerProvider {
     this.#verbosity = verbosity;
   }
 
-  log(verbosity, ...messageArgs) {
-    this.#log(verbosity, "log", messageArgs);
+  log(verbosity, message) {
+    this.#console(verbosity, "log", message);
   }
 
-  warn(verbosity, ...messageArgs) {
-    this.#log(verbosity, "warn", messageArgs);
+  warn(verbosity, message) {
+    this.#console(verbosity, "warn", message);
   }
 
-  error(verbosity, ...messageArgs) {
-    this.#log(verbosity, "error", messageArgs);
+  error(verbosity, message) {
+    this.#console(verbosity, "error", message);
   }
 
-  #log(verbosity, method, messageArgs) {
+  #console(verbosity, method, text, withPrefix = true) {
     if (verbosity <= this.#verbosity) {
       console[method](
-        `${method.toUpperCase()}\t`,
-        this.#prefix.repeat(verbosity),
-        ...messageArgs,
+        withPrefix
+          ? `${method.toUpperCase()}\t${this.#prefix.repeat(verbosity)}${text}`
+          : text,
       );
     }
   }

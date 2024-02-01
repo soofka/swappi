@@ -29,43 +29,34 @@ export class Directory extends Dirent {
     this.isDir = true;
   }
 
-  async load() {
+  async load(withFiles = true) {
     getLogger().log(6, `Loading directory ${this.src.rel}`);
 
-    const dir = await loadDir(this.src.abs);
-    if (dir) {
-      for (let nodeDirent of dir) {
-        const srcPath = path.join(this.src.abs, nodeDirent.name);
-        const relPath = this.src.relDir === "" ? path.sep : this.src.rel;
+    let fileCount = 0;
+    const loading = [];
+    for (let nodeDirent of await loadDir(this.src.abs)) {
+      const srcPath = path.join(this.src.abs, nodeDirent.name);
+      const relPath = this.src.relDir === "" ? path.sep : this.src.rel;
 
-        let dirent;
-        if (nodeDirent.isFile()) {
-          dirent = this.#getFile(nodeDirent);
-          dirent.src.init(srcPath, relPath);
-        } else if (nodeDirent.isDirectory()) {
-          dirent = new Directory(this.#getFile, srcPath, relPath);
+      let dirent;
+      if (nodeDirent.isFile()) {
+        dirent = this.#getFile(nodeDirent);
+        dirent.src.init(srcPath, relPath);
+        this.#direntList.push(dirent);
+
+        if (withFiles) {
+          loading.push(dirent.load());
+          fileCount++;
         }
-
-        if (dirent) {
-          await dirent.load();
-          this.#direntList.push(dirent);
-
-          if (!dirent.isDir) {
-            this.#stats.loaded++;
-          }
-        }
-      }
-    } else {
-      getLogger().warn(
-        6,
-        `Directory ${this.src.abs} does not exist in file system`,
-      );
-
-      const newDir = await createDir(this.src.abs);
-      if (newDir) {
-        getLogger().log(6, `Directory ${this.src.abs} created`);
+      } else if (nodeDirent.isDirectory()) {
+        dirent = new Directory(this.#getFile, srcPath, relPath);
+        this.#direntList.push(dirent);
+        loading.push(dirent.load());
       }
     }
+
+    await Promise.all(loading);
+    this.#stats.loaded += fileCount;
 
     getLogger().log(
       6,
@@ -85,18 +76,26 @@ export class Directory extends Dirent {
       `Preparing directory ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory} additionalDirectories=${additionalDirectories}]`,
     );
 
+    let fileCount = 0;
+    const preparing = [];
     for (let dirent of this.#direntList) {
-      await dirent.prepare(
-        isConfigModified,
-        distPath,
-        reportDirectory,
-        additionalDirectories,
+      preparing.push(
+        dirent.prepare(
+          isConfigModified,
+          distPath,
+          reportDirectory,
+          additionalDirectories,
+        ),
       );
 
       if (!dirent.isDir) {
-        this.#stats.prepared++;
+        console.log(">>>ADDING FILE", dirent.src.rel);
+        fileCount++;
       }
     }
+
+    await Promise.all(preparing);
+    this.#stats.prepared += fileCount;
 
     getLogger().log(
       6,
@@ -108,33 +107,46 @@ export class Directory extends Dirent {
   async reset() {
     getLogger().log(6, `Reseting directory ${this.src.rel}`);
 
+    let fileCount = 0;
+    const reseting = [];
     const newDirentList = [];
     for (let dirent of this.#direntList) {
       if (dirent.isDir) {
-        newDirentList.push(await dirent.reset());
+        reseting.push(dirent.reset());
       } else if (!dirent.modified) {
         newDirentList.push(dirent);
       } else {
-        await deleteFile(dirent.src.abs);
+        reseting.push(deleteFile(dirent.src.abs));
+        fileCount++;
       }
     }
-    this.#direntList = newDirentList;
 
-    getLogger().log(6, `Directory ${this.src.rel} reset`);
+    const resetingResults = await Promise.all(reseting);
+    this.#direntList = [...newDirentList, ...resetingResults];
+
+    getLogger().log(
+      6,
+      `Directory ${this.src.rel} reset (${fileCount} files deleted)`,
+    );
     return this;
   }
 
   async process(rootDirectory) {
     getLogger().log(6, `Processing directory ${this.src.rel}`);
 
+    let fileCount = 0;
+    const processing = [];
     for (let dirent of this.#direntList) {
       if (dirent.isDir) {
-        await dirent.process(rootDirectory || this);
+        processing.push(dirent.process(rootDirectory || this));
       } else if (dirent.shouldBeProcessed()) {
-        await dirent.process(rootDirectory || this);
-        this.#stats.processed++;
+        processing.push(dirent.process(rootDirectory || this));
+        fileCount++;
       }
     }
+
+    await Promise.all(processing);
+    this.#stats.processed += fileCount;
 
     getLogger().log(
       6,
@@ -189,7 +201,11 @@ export class Directory extends Dirent {
   }
 
   get allStats() {
-    const allStats = this.#stats;
+    const allStats = {
+      loaded: this.#stats.loaded,
+      prepared: this.#stats.prepared,
+      processed: this.#stats.processed,
+    };
     for (let dirent of this.#direntList) {
       if (dirent.isDir) {
         const direntStats = dirent.allStats;

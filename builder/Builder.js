@@ -1,3 +1,4 @@
+import { performance } from "perf_hooks";
 import defaultConfig from "./config.js";
 import { Directory } from "./files/index.js";
 import {
@@ -38,15 +39,19 @@ export class Builder {
   }
 
   async init() {
+    const startTime = performance.now();
     getLogger().log(1, "Initializing build");
-    getLogger().log(4, "Config:", JSON.stringify(getConfig()));
+    getLogger().log(10, `Config: ${JSON.stringify(getConfig())}`);
 
     await this.#initReport();
-    await this.#initTemplates();
-    await this.#initPartials();
+    await Promise.all([this.#initTemplates(), this.#initPartials()]);
     await this.#initPublic();
 
-    getLogger().log(1, "Build initialized");
+    const endTime = performance.now();
+    getLogger().log(
+      1,
+      `Build initialized in ${Math.round(endTime - startTime)}ms`,
+    );
   }
 
   async #initReport() {
@@ -73,13 +78,13 @@ export class Builder {
         );
 
         if (isInObject(report.files, "templates")) {
-          this.#files.report.templates = new Directory((dirent) =>
+          this.#files.report.templates = new Directory(() =>
             getFileProvider().getTemplateFile(),
           ).deserialize(report.files.templates);
         }
 
         if (isInObject(report.files, "partials")) {
-          this.#files.report.partials = new Directory((dirent) =>
+          this.#files.report.partials = new Directory(() =>
             getFileProvider().getPartialFile(),
           ).deserialize(report.files.partials);
         }
@@ -91,7 +96,7 @@ export class Builder {
         }
 
         getLogger().log(3, "Loading previous build report finished");
-        getLogger().log(4, "Previous bulid report:", reportJson);
+        getLogger().log(10, `Previous bulid report: ${reportJson}`);
       } else {
         getLogger().warn(
           3,
@@ -118,7 +123,7 @@ export class Builder {
       (nodeDirent) => getFileProvider().getFileFromNodeDirent(nodeDirent),
       getConfig().paths.templates.dist,
     );
-    await this.#files.templates.dist.load();
+    await this.#files.templates.dist.load(false);
 
     this.#files.templates.src = new Directory(
       () => getFileProvider().getTemplateFile(),
@@ -134,9 +139,8 @@ export class Builder {
 
     getLogger().log(2, "Initializing templates finished");
     getLogger().log(
-      4,
-      "Templates:",
-      JSON.stringify(this.#files.templates.src.serialize()),
+      10,
+      `Templates: ${JSON.stringify(this.#files.templates.src.serialize())}`,
     );
   }
 
@@ -150,7 +154,7 @@ export class Builder {
       (nodeDirent) => getFileProvider().getFileFromNodeDirent(nodeDirent),
       getConfig().paths.partials.dist,
     );
-    await this.#files.partials.dist.load();
+    await this.#files.partials.dist.load(false);
 
     this.#files.partials.src = new Directory(
       () => getFileProvider().getPartialFile(),
@@ -166,9 +170,8 @@ export class Builder {
 
     getLogger().log(2, "Initializing partials finished");
     getLogger().log(
-      4,
-      "Partials:",
-      JSON.stringify(this.#files.partials.src.serialize()),
+      10,
+      `Partials: ${JSON.stringify(this.#files.partials.src.serialize())}`,
     );
   }
 
@@ -182,7 +185,7 @@ export class Builder {
       (nodeDirent) => getFileProvider().getFileFromNodeDirent(nodeDirent),
       getConfig().paths.public.dist,
     );
-    await this.#files.public.dist.load();
+    await this.#files.public.dist.load(false);
 
     this.#files.public.src = new Directory(
       (nodeDirent) => getFileProvider().getFileFromNodeDirent(nodeDirent),
@@ -201,21 +204,27 @@ export class Builder {
 
     getLogger().log(2, "Initializing public finished");
     getLogger().log(
-      4,
-      "Public:",
-      JSON.stringify(this.#files.public.src.serialize()),
+      10,
+      `Public: ${JSON.stringify(this.#files.public.src.serialize())}`,
     );
   }
 
   async build() {
+    const startTime = performance.now();
     getLogger().log(1, "Building");
 
-    await this.#buildTemplates();
-    await this.#buildPartials();
-    await this.#buildPublic();
+    await Promise.all([
+      this.#buildTemplates(),
+      this.#buildPartials(),
+      this.#buildPublic(),
+    ]);
     await this.#buildReport();
 
-    getLogger().log(1, "Building finished");
+    const endTime = performance.now();
+    getLogger().log(
+      1,
+      `Build finished in ${Math.round(endTime - startTime)}ms`,
+    );
   }
 
   async #buildTemplates() {
@@ -246,25 +255,47 @@ export class Builder {
   }
 
   async #buildReport() {
-    getLogger().log(3, "Saving current build report");
+    if (
+      this.#files.templates.src.allStats.processed +
+        this.#files.partials.src.allStats.processed +
+        this.#files.public.src.allStats.processed >
+      0
+    ) {
+      getLogger().log(3, "Saving current build report");
 
-    await saveFile(
-      getConfig().paths.report,
-      JSON.stringify({
-        config: getConfig(),
-        files: {
-          templates: this.#files.templates.src.serialize(),
-          partials: this.#files.partials.src.serialize(),
-          public: this.#files.public.src.serialize(),
-        },
-      }),
+      await saveFile(
+        getConfig().paths.report,
+        JSON.stringify({
+          config: getConfig(),
+          files: {
+            templates: this.#files.templates.src.serialize(),
+            partials: this.#files.partials.src.serialize(),
+            public: this.#files.public.src.serialize(),
+          },
+        }),
+      );
+
+      getLogger().log(3, "Saving current build report finished");
+    } else {
+      getLogger().log(
+        3,
+        "No files were processed in this build; build report is not generated",
+      );
+    }
+
+    getLogger().log("Build report:");
+    getLogger().log(
+      1,
+      `Templates: ${JSON.stringify(this.#files.templates.src.allStats)}`,
     );
-
-    getLogger().log(3, "Saving current build report finished");
-
-    getLogger().log(1, "Templates:", this.#files.templates.src.allStats);
-    getLogger().log(1, "Partials:", this.#files.partials.src.allStats);
-    getLogger().log(1, "Public:", this.#files.public.src.allStats);
+    getLogger().log(
+      1,
+      `Partials: ${JSON.stringify(this.#files.partials.src.allStats)}`,
+    );
+    getLogger().log(
+      1,
+      `Public: ${JSON.stringify(this.#files.public.src.allStats)}`,
+    );
   }
 }
 
