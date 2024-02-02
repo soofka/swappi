@@ -37,7 +37,6 @@ export class Directory extends Dirent {
       if (nodeDirent.isFile()) {
         dirent = this.#getFile(nodeDirent);
         dirent.src.init(srcPath, relPath);
-        console.log("GOT FILE", dirent.serialize());
         this.#direntList.push(dirent);
 
         if (withFiles) {

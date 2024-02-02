@@ -38,6 +38,13 @@ export class File extends Dirent {
   get content() {
     return this.#content;
   }
+  #encoding = "utf8";
+  get encoding() {
+    return this.#encoding;
+  }
+  set encoding(value) {
+    this.#encoding = value;
+  }
 
   constructor(srcAbsPath, relPath, hashable = true) {
     super(srcAbsPath, relPath, hashable);
@@ -47,7 +54,7 @@ export class File extends Dirent {
   async load() {
     getLogger().log(7, `Loading file ${this.src.rel}`);
 
-    this.#content = await loadFile(this.src.abs);
+    this.#content = await loadFile(this.src.abs, this.#encoding);
 
     if (!this.src.hash || this.src.hash === "") {
       this.src.hash = crypto

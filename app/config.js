@@ -32,9 +32,6 @@ export const config = {
     langs: ["en", "pl"],
     colors,
 
-    imgWidths: [256, 320, 640, 1280, 1920, 2560],
-    imgTypes: ["webp", "avif", "jpeg"],
-
     labels: {
       en: {
         meta: {

@@ -46,13 +46,13 @@ export class ModuleFile extends File {
         this.dist[0].name = name;
         this.dist[0].ext = ext;
       } else if (isObject(this.#module)) {
-        const newDist = Object.keys(this.#module).map((key) => {
-          const distDirentData = this.dist[0].clone();
-          distDirentData.name = `${name}${key}`;
-          distDirentData.ext = ext;
-          return distDirentData;
+        const newDists = Object.keys(this.#module).map((key) => {
+          const newDist = this.dist[0].clone();
+          newDist.name = `${name}${key}`;
+          newDist.ext = ext;
+          return newDist;
         });
-        this.dist = newDist;
+        this.dist = newDists;
       }
     }
 
