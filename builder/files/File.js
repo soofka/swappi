@@ -48,13 +48,16 @@ export class File extends Dirent {
     getLogger().log(7, `Loading file ${this.src.rel}`);
 
     this.#content = await loadFile(this.src.abs);
-    this.src.hash = crypto
-      .createHash(
-        getConfig().constants.hashAlgorithm,
-        getConfig().constants.hashAlgorithmOptions,
-      )
-      .update(this.#content)
-      .digest("hex");
+
+    if (!this.src.hash || this.src.hash === "") {
+      this.src.hash = crypto
+        .createHash(
+          getConfig().constants.hashAlgorithm,
+          getConfig().constants.hashAlgorithmOptions,
+        )
+        .update(this.#content)
+        .digest("hex");
+    }
 
     getLogger().log(7, `File ${this.src.rel} loaded`);
     return this;

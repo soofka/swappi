@@ -91,7 +91,6 @@ export class Builder {
 
         if (isInObject(report.files, "public")) {
           this.#files.report.public = new Directory((dirent) => {
-            console.log("zonk123", dirent);
             return getFileProvider().getFileFromDirentData(dirent.src);
           }).deserialize(report.files.public);
         }

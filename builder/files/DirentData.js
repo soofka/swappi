@@ -3,40 +3,40 @@ import { getDirentObject } from "../helpers/index.js";
 import { getConfig } from "../utils/index.js";
 
 export class DirentData {
-  #absDir;
+  #absDir = "";
   get absDir() {
     return this.#absDir;
   }
-  set absDir(value) {
+  set absDir(value = "") {
     this.#absDir = value;
   }
-  #relDir;
+  #relDir = "";
   get relDir() {
     return this.#relDir;
   }
-  set relDir(value) {
+  set relDir(value = "") {
     this.#relDir = value;
   }
-  #name;
+  #name = "";
   get name() {
     return this.#name;
   }
-  set name(value) {
+  set name(value = "") {
     this.#name = value;
   }
-  #hash;
+  #hash = "";
   get hash() {
     return this.#hash;
   }
-  set hash(value) {
+  set hash(value = "") {
     this.#hash = value;
   }
   #hashable;
-  #ext;
+  #ext = "";
   get ext() {
     return this.#ext;
   }
-  set ext(value) {
+  set ext(value = "") {
     this.#ext = value;
   }
 
@@ -113,7 +113,7 @@ export class DirentData {
   }
 
   get full() {
-    return `${this.#name}${this.#hashable ? (this.#hash === "" ? "" : `${getConfig().constants.hashSeparator}${this.#hash}`) : ""}${this.#ext}`;
+    return `${this.#name}${this.#hashable === true ? (this.#hash && this.#hash !== "" ? `${getConfig().constants.hashSeparator}${this.#hash}` : "") : ""}${this.#ext}`;
   }
   get abs() {
     return path.join(this.#absDir, this.full);

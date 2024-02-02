@@ -37,6 +37,7 @@ export class Directory extends Dirent {
       if (nodeDirent.isFile()) {
         dirent = this.#getFile(nodeDirent);
         dirent.src.init(srcPath, relPath);
+        console.log("GOT FILE", dirent.serialize());
         this.#direntList.push(dirent);
 
         if (withFiles) {
@@ -174,7 +175,6 @@ export class Directory extends Dirent {
 
     for (let index in direntList) {
       const dirent = direntList[index];
-      console.log("zonk", dirent);
       if (isInObject(dirent, "direntList")) {
         this.#direntList.push(new Directory(this.#getFile).deserialize(dirent));
       } else {
