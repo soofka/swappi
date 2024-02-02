@@ -26,7 +26,6 @@
 
 ### todo
 
-- prepare and process images appropriately
 - write unit tests
 - static partials
 - support for ts files
