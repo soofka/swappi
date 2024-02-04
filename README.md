@@ -33,7 +33,7 @@
 - client script
 
 - browser support transpilation
-- honor config options
+- honor config options and cli arguments
 - figure out image width vs pixel density
 - service worker
 - --watch --build --test --generate + node api

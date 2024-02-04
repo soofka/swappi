@@ -17,13 +17,13 @@ init({
     type: "boolean",
     short: "f",
     default: false,
-    description: "Force processing of all files",
+    description: "Force processing all files",
   },
   silent: {
     type: "boolean",
     short: "s",
     default: false,
-    description: "Do not print any console logs",
+    description: "Do not print any logs to console",
   },
   logfile: {
     type: "string",
@@ -98,7 +98,7 @@ function printHelp(argsOptions) {
   for (let key of Object.keys(argsOptions)) {
     const arg = argsOptions[key];
     console.log(
-      `-${key}, --${arg.short} (${arg.type},default: ${arg.default}): ${arg.description}`,
+      `-${key}, --${arg.short} (${arg.type}, default: ${arg.type === "string" ? '"' : ""}${arg.default}${arg.type === "string" ? '"' : ""}): ${arg.description}`,
     );
   }
   console.log("---");
