@@ -10,3 +10,4 @@ if (esMain(import.meta)) {
 }
 
 export { Swapp, files, helpers, utils };
+export default Swapp;
