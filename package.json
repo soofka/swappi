@@ -4,6 +4,10 @@
   "author": "swn.ski",
   "description": "swn.ski",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/soofka/swn.ski"
+  },
   "scripts": {
     "build": "node app/build.js",
     "start": "node app/start.js",

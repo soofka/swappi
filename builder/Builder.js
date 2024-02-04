@@ -1,5 +1,5 @@
 import { performance } from "perf_hooks";
-import defaultConfig from "./config.js";
+import defaultConfig from "./swapp.config.js";
 import { Directory } from "./files/index.js";
 import {
   deepMerge,
