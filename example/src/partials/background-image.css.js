@@ -1,4 +1,4 @@
-import { helpers } from "../../../src/index.js"; //fix this
+import { helpers } from "../../../dist/index.js"; //fix this
 
 const backgroundImage = (cssDeclaration, data, rootDirectory) => {
   const valueArray = [];

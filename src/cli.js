@@ -10,8 +10,8 @@ import {
   loadModule,
 } from "./swapp/helpers/index.js";
 
-export function swapp() {
-  return init({
+export function swappCli() {
+  return cli({
     build: {
       type: "boolean",
       short: "b",
@@ -75,7 +75,7 @@ export function swapp() {
   });
 }
 
-async function init(argsOptions) {
+async function cli(argsOptions) {
   const startTime = performance.now();
   const args = getArgs(argsOptions);
   const packageJson = await loadJson(path.resolve("package.json"));
@@ -167,4 +167,4 @@ function printHeader(packageJson) {
   }
 }
 
-export default swapp;
+export default swappCli;
