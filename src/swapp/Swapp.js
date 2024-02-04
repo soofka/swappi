@@ -6,8 +6,7 @@ import {
   isDeepEqual,
   isInObject,
   isObject,
-  loadFile,
-  parseJson,
+  loadJson,
   saveFile,
 } from "./helpers/index.js";
 import {
@@ -19,7 +18,7 @@ import {
   getLogger,
 } from "./utils/index.js";
 
-export class Builder {
+export class Swapp {
   #files = {
     public: { src: {}, dist: {} },
     partials: { src: {}, dist: {} },
@@ -36,6 +35,27 @@ export class Builder {
     initConfigProvider(deepMerge(defaultConfig, config));
     initLoggerProvider(getConfig().options.verbosity);
     initFileProvider(getConfig().constants.filesGroupMap);
+  }
+
+  async build() {
+    await this.init();
+    await this.process();
+    return this;
+  }
+
+  async run() {
+    getLogger().log(1, "Run not yet implemented");
+    return this;
+  }
+
+  async watch() {
+    getLogger().log(1, "Watch not yet implemented");
+    return this;
+  }
+
+  async generate() {
+    getLogger().log(1, "Generate not yet implemented");
+    return this;
   }
 
   async init() {
@@ -61,52 +81,44 @@ export class Builder {
     );
 
     getLogger().log(3, "Loading previous build report");
-    const reportJson = await loadFile(getConfig().paths.report);
-    if (reportJson) {
-      const report = await parseJson(reportJson);
-      if (
-        report &&
-        isInObject(report, "config") &&
-        isObject(report.config) &&
-        isInObject(report, "files") &&
-        isObject(report.files)
-      ) {
-        this.#isConfigModified = !isDeepEqual(getConfig(), report.config);
-        getLogger().log(
-          4,
-          `Config has ${this.#isConfigModified ? "" : "not "}changed`,
-        );
+    const report = loadJson(getConfig().paths.report);
+    if (
+      report &&
+      isInObject(report, "config") &&
+      isObject(report.config) &&
+      isInObject(report, "files") &&
+      isObject(report.files)
+    ) {
+      this.#isConfigModified = !isDeepEqual(getConfig(), report.config);
+      getLogger().log(
+        4,
+        `Config has ${this.#isConfigModified ? "" : "not "}changed`,
+      );
 
-        if (isInObject(report.files, "templates")) {
-          this.#files.report.templates = new Directory(() =>
-            getFileProvider().getTemplateFile(),
-          ).deserialize(report.files.templates);
-        }
-
-        if (isInObject(report.files, "partials")) {
-          this.#files.report.partials = new Directory(() =>
-            getFileProvider().getPartialFile(),
-          ).deserialize(report.files.partials);
-        }
-
-        if (isInObject(report.files, "public")) {
-          this.#files.report.public = new Directory((dirent) => {
-            return getFileProvider().getFileFromDirentData(dirent.src);
-          }).deserialize(report.files.public);
-        }
-
-        getLogger().log(3, "Loading previous build report finished");
-        getLogger().log(10, `Previous bulid report: ${reportJson}`);
-      } else {
-        getLogger().warn(
-          3,
-          `Invalid previous build report content (content: ${reportJson})`,
-        );
+      if (isInObject(report.files, "templates")) {
+        this.#files.report.templates = new Directory(() =>
+          getFileProvider().getTemplateFile(),
+        ).deserialize(report.files.templates);
       }
+
+      if (isInObject(report.files, "partials")) {
+        this.#files.report.partials = new Directory(() =>
+          getFileProvider().getPartialFile(),
+        ).deserialize(report.files.partials);
+      }
+
+      if (isInObject(report.files, "public")) {
+        this.#files.report.public = new Directory((dirent) => {
+          return getFileProvider().getFileFromDirentData(dirent.src);
+        }).deserialize(report.files.public);
+      }
+
+      getLogger().log(3, "Loading previous build report finished");
+      getLogger().log(10, `Previous bulid report: ${report}`);
     } else {
       getLogger().warn(
         3,
-        `Previous build report not found (path: ${getConfig().paths.report})`,
+        `Invalid previous build report content (content: ${report})`,
       );
     }
 
@@ -209,48 +221,46 @@ export class Builder {
     );
   }
 
-  async build() {
+  async process() {
     const startTime = performance.now();
-    getLogger().log(1, "Building");
+    getLogger().log(1, "Processing");
 
-    // await Promise.all([this.#buildTemplates(), this.#buildPartials()]);
-    await this.#buildTemplates();
-    await this.#buildPartials();
-    await this.#buildPublic();
+    await Promise.all([this.#processTemplates(), this.#processPartials()]);
+    await this.#processPublic();
     await this.#buildReport();
 
     const endTime = performance.now();
     getLogger().log(
       1,
-      `Build finished in ${Math.round(endTime - startTime)}ms`,
+      `Processing finished in ${Math.round(endTime - startTime)}ms`,
     );
   }
 
-  async #buildTemplates() {
-    getLogger().log(2, "Building templates");
+  async #processTemplates() {
+    getLogger().log(2, "Processing templates");
 
     await this.#files.templates.dist.reset();
     await this.#files.templates.src.process();
 
-    getLogger().log(2, "Building templates finished");
+    getLogger().log(2, "Processing templates finished");
   }
 
-  async #buildPartials() {
-    getLogger().log(2, "Building partials");
+  async #processPartials() {
+    getLogger().log(2, "Processing partials");
 
     await this.#files.partials.dist.reset();
     await this.#files.partials.src.process();
 
-    getLogger().log(2, "Building partials finished");
+    getLogger().log(2, "Processing partials finished");
   }
 
-  async #buildPublic() {
-    getLogger().log(2, "Building public");
+  async #processPublic() {
+    getLogger().log(2, "Processing public");
 
     await this.#files.public.dist.reset();
     await this.#files.public.src.process();
 
-    getLogger().log(2, "Building public finished");
+    getLogger().log(2, "Processing public finished");
   }
 
   async #buildReport() {
@@ -298,4 +308,4 @@ export class Builder {
   }
 }
 
-export default Builder;
+export default Swapp;

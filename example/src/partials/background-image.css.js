@@ -1,12 +1,11 @@
-import {
-  findInArray,
-  getDirentObject,
-} from "../../../builder/helpers/index.js"; //fix this
+import { helpers } from "../../../src/index.js"; //fix this
 
 const backgroundImage = (cssDeclaration, data, rootDirectory) => {
   const valueArray = [];
-  const { name, ext } = getDirentObject(cssDeclaration.value.split(":")[1]);
-  const imgFile = findInArray(
+  const { name, ext } = helpers.getDirentObject(
+    cssDeclaration.value.split(":")[1],
+  );
+  const imgFile = helpers.findInArray(
     rootDirectory.allFiles,
     (element) => element.src.name === name && element.src.ext === ext,
   );

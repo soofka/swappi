@@ -1,7 +1,4 @@
-import {
-  findInArray,
-  getDirentObject,
-} from "../../../builder/helpers/index.js"; //fix this
+import { helpers } from "../../../src/index.js"; //fix this
 
 const img = (htmlElement, data, rootDirectory) => {
   let picture = "<picture";
@@ -13,8 +10,8 @@ const img = (htmlElement, data, rootDirectory) => {
   picture += ">";
 
   const valueArray = [];
-  const { name, ext } = getDirentObject(htmlElement.attr("src"));
-  const imgFile = findInArray(
+  const { name, ext } = helpers.getDirentObject(htmlElement.attr("src"));
+  const imgFile = helpers.findInArray(
     rootDirectory.allFiles,
     (element) => element.src.name === name && element.src.ext === ext,
   );

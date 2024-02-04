@@ -1,6 +1,6 @@
 import path from "path";
 
-const appPath = path.resolve("app");
+const appPath = path.resolve("example");
 const colors = ["#f4f7fc", "#dfe7f2", "#8fa4c3", "#586c91", "#283347"];
 
 export const config = {

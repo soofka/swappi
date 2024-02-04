@@ -11,6 +11,7 @@ import isInObject from "./isInObject.js";
 import isObject from "./isObject.js";
 import loadDir from "./loadDir.js";
 import loadFile from "./loadFile.js";
+import loadJson from "./loadJson.js";
 import loadModule from "./loadModule.js";
 import parseJson from "./parseJson.js";
 import saveFile from "./saveFile.js";
@@ -30,6 +31,7 @@ export {
   isObject,
   loadDir,
   loadFile,
+  loadJson,
   loadModule,
   parseJson,
   saveFile,
