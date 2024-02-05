@@ -1,128 +1,98 @@
-import { performance } from "perf_hooks";
-import defaultConfig from "./swapp.config.js";
-import { Directory } from "./files/index.js";
+import { Directory } from "./core/index.js";
 import {
-  deepMerge,
   isDeepEqual,
   isInObject,
   isObject,
   loadJson,
   saveFile,
-} from "./helpers/index.js";
-import {
-  initConfigProvider,
-  getConfig,
-  initFileProvider,
-  getFileProvider,
-  initLoggerProvider,
-  getLogger,
-} from "./utils/index.js";
+} from "../helpers/index.js";
+import { getConfig, getLogger } from "../utils/index.js";
 
-export class Swapp {
-  #files = {
-    public: { src: {}, dist: {} },
-    partials: { src: {}, dist: {} },
-    templates: { src: {}, dist: {} },
-    report: {
-      public: undefined,
-      partials: undefined,
-      templates: undefined,
-    },
+export class SwappskiBuilder {
+  #dirs = {
+    src: {},
+    dist: {},
   };
+  #report;
+  #processors;
   #isConfigModified = true;
 
-  constructor(config) {
-    initConfigProvider(deepMerge(defaultConfig, config));
-    initLoggerProvider(getConfig().options.verbosity);
-    initFileProvider(getConfig().constants.filesGroupMap);
-  }
-
   async build() {
-    await this.init();
-    await this.process();
-    return this;
-  }
-
-  async run() {
-    getLogger().log(1, "Run not yet implemented");
-    return this;
-  }
-
-  async watch() {
-    getLogger().log(1, "Watch not yet implemented");
-    return this;
-  }
-
-  async generate() {
-    getLogger().log(1, "Generate not yet implemented");
-    return this;
-  }
-
-  async init() {
-    const startTime = performance.now();
-    getLogger().log(1, "Initializing build");
-    getLogger().log(10, `Config: ${JSON.stringify(getConfig())}`);
+    getLogger()
+      .log(`Config: ${JSON.stringify(getConfig())}`, 10)
+      .logLevelUp();
 
     await this.#initReport();
-    await Promise.all([this.#initTemplates(), this.#initPartials()]);
-    await this.#initPublic();
+    await this.#initProcessors();
 
-    const endTime = performance.now();
-    getLogger().log(
-      1,
-      `Build initialized in ${Math.round(endTime - startTime)}ms`,
-    );
+    await this.#processDirs();
+    await this.#buildReport();
+
+    getLogger().logLevelDown();
+    return this;
   }
 
   async #initReport() {
-    getLogger().log(
-      2,
-      `Initializing previous build report (path: ${getConfig().paths.report})`,
-    );
+    getLogger()
+      .log(
+        `Initializing previous build report (config.reportFile: ${getConfig().reportFile})`,
+      )
+      .logLevelUp();
 
-    getLogger().log(3, "Loading previous build report");
-    const report = loadJson(getConfig().paths.report);
-    if (
-      report &&
-      isInObject(report, "config") &&
-      isObject(report.config) &&
-      isInObject(report, "files") &&
-      isObject(report.files)
-    ) {
-      this.#isConfigModified = !isDeepEqual(getConfig(), report.config);
-      getLogger().log(
-        4,
-        `Config has ${this.#isConfigModified ? "" : "not "}changed`,
-      );
+    if (getConfig().reportFile && getConfig().reportFile.length > 0) {
+      getLogger().log("Loading previous build report");
 
-      if (isInObject(report.files, "templates")) {
-        this.#files.report.templates = new Directory(() =>
-          getFileProvider().getTemplateFile(),
-        ).deserialize(report.files.templates);
+      const report = loadJson(getConfig().paths.report);
+      if (
+        report &&
+        isInObject(report, "config") &&
+        isObject(report.config) &&
+        isInObject(report, "dirs") &&
+        isObject(report.dirs)
+      ) {
+        this.#isConfigModified = !isDeepEqual(getConfig(), report.config);
+
+        getLogger().log(
+          `Config has ${this.#isConfigModified ? "" : "not "}changed`,
+        );
+
+        this.#report = new Directory().deserialize(report.dirs);
+
+        getLogger()
+          .log("Loading previous build report finished")
+          .log(`Previous bulid report: ${report}`, 10);
+      } else {
+        getLogger().warn(
+          `Invalid previous build report content (content: ${report})`,
+        );
       }
-
-      if (isInObject(report.files, "partials")) {
-        this.#files.report.partials = new Directory(() =>
-          getFileProvider().getPartialFile(),
-        ).deserialize(report.files.partials);
-      }
-
-      if (isInObject(report.files, "public")) {
-        this.#files.report.public = new Directory((dirent) => {
-          return getFileProvider().getFileFromDirentData(dirent.src);
-        }).deserialize(report.files.public);
-      }
-
-      getLogger().log(3, "Loading previous build report finished");
-      getLogger().log(10, `Previous bulid report: ${report}`);
     } else {
-      getLogger().warn(
-        3,
-        `Invalid previous build report content (content: ${report})`,
-      );
+      getLogger().log("Previous build report is disabled in config");
     }
 
-    getLogger().log(2, "Previous bulid report initialized");
+    getLogger().logLevelDown().log("Previous bulid report initialized");
+  }
+
+  async #initProcessors() {
+    getLogger()
+      .log(
+        `Initializing processors (config.src: ${getConfig().src}, config.dist: ${getConfig().dist})`,
+      )
+      .logLevelUp();
+
+    this.#dirs.dist = await new Directory(getConfig().dist).load(false);
+    this.#dirs.src = await (
+      await new Directory(getConfig().src).load()
+    ).prepare(this.#isConfigModified, getConfig().dist, this.#report, {
+      oldDist: this.#dirs.base.dist,
+    });
+
+    for (let processor of this.#processors) {
+      await processor.init(this.#dirs);
+    }
+
+    getLogger().log(`Files: ${JSON.stringify(this.#dirs.serialize())}`, 10);
+    getLogger().logLevelDown().log("Initializing files finished");
   }
 
   async #initTemplates() {
@@ -221,7 +191,7 @@ export class Swapp {
     );
   }
 
-  async process() {
+  async #process() {
     const startTime = performance.now();
     getLogger().log(1, "Processing");
 
@@ -308,4 +278,4 @@ export class Swapp {
   }
 }
 
-export default Swapp;
+export default SwappskiBuilder;

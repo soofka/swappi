@@ -1,3 +1,5 @@
+import defaultConfig from "../swappski.config.js";
+import { deepMerge } from "../helpers/index.js";
 import decorateWithSingleton from "./decorateWithSingleton.js";
 
 class ConfigProvider {
@@ -7,7 +9,7 @@ class ConfigProvider {
   }
 
   constructor(config) {
-    this.#config = config;
+    this.#config = deepMerge(defaultConfig, config);
   }
 }
 

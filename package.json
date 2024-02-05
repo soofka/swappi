@@ -1,17 +1,25 @@
 {
-  "name": "simple-web-app",
+  "name": "swappski",
   "version": "0.1.0",
   "author": "soofka",
-  "description": "Simple web app generator",
+  "description": "swappski",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/soofka/swapp"
+    "url": "https://github.com/soofka/swappski"
   },
   "scripts": {
-    "build": "node build.js",
     "test": "node test.js",
-    "build-example": "node dist/index.js -c example/config.js"
+    "build": "npm run test && node build.js",
+    "start": "npm run build && node dist/index.js",
+    "build-basic": "npm run start -- -c examples/basic/config.js",
+    "run-basic": "npm run bulid-basic -- -r",
+    "watch-basic": "npm run build-basic -w",
+    "generate-basic": "npm run build-basic -g",
+    "build-full": "npm run start -- -c examples/full/config.js",
+    "run-full": "npm run bulid-full -- -r",
+    "watch-full": "npm run build-full -w",
+    "generate-full": "npm run build-full -g"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

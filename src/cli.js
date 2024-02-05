@@ -2,15 +2,15 @@ import path from "path";
 import { argv } from "process";
 import { performance } from "perf_hooks";
 import { parseArgs } from "node:util";
-import Swapp from "./swapp/index.js";
+import Swappski from "./swappski/index.js";
 import {
   isObject,
   isInObject,
   loadJson,
   loadModule,
-} from "./swapp/helpers/index.js";
+} from "./swappski/helpers/index.js";
 
-export function swappCli() {
+export function swappskiCli() {
   return cli({
     build: {
       type: "boolean",
@@ -40,12 +40,13 @@ export function swappCli() {
       type: "string",
       short: "g",
       default: "",
-      description: "Generates application template at given path",
+      description:
+        'Generates application template at given path (basic by default, full if provided with option "full")',
     },
     config: {
       type: "string",
       short: "c",
-      default: "swapp.config.js",
+      default: "swappski.config.js",
       description: "Config file path",
     },
     force: {
@@ -77,7 +78,7 @@ export function swappCli() {
 
 async function cli(argsOptions) {
   const startTime = performance.now();
-  const args = getArgs(argsOptions);
+  const { args, positionals } = getArgs(argsOptions);
   const packageJson = await loadJson(path.resolve("package.json"));
 
   if (args.help) {
@@ -90,19 +91,28 @@ async function cli(argsOptions) {
         printHeader(packageJson);
       }
 
-      const swapp = new Swapp(config);
+      const swappski = new Swappski(config);
       const operations = [];
       if (args.build) {
-        operations.push(swapp.build());
-      }
-      if (args.run) {
-        operations.push(swapp.run(args.port));
-      }
-      if (args.watch) {
-        operations.push(swapp.watch());
+        operations.push(swappski.build(config));
       }
       if (args.generate) {
-        operations.push(swapp.generate());
+        operations.push(
+          swappski.generate(
+            positionals.length > 0 && positionals[0] === "full"
+              ? "full"
+              : "basic",
+          ),
+        );
+      }
+      if (args.run) {
+        operations.push(swappski.run(config));
+      }
+      if (args.test) {
+        operations.push(swappski.test(config));
+      }
+      if (args.watch) {
+        operations.push(swappski.watch(config));
       }
       await Promise.all(operations);
 
@@ -118,10 +128,11 @@ async function cli(argsOptions) {
 }
 
 function getArgs(argsOptions) {
-  return parseArgs({
+  const obj = parseArgs({
     args: argv.slice(2),
     options: argsOptions,
-  }).values;
+  });
+  return { args: obj.values, positionals: obj.positionals };
 }
 
 async function processArgs(args) {
