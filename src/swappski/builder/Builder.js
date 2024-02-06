@@ -8,13 +8,13 @@ import {
 } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
-export class SwappskiBuilder {
+export class Builder {
   #dirs = {
     src: {},
     dist: {},
   };
   #report;
-  #processors;
+  #controller;
   #isConfigModified = true;
 
   async build() {
@@ -80,16 +80,40 @@ export class SwappskiBuilder {
       )
       .logLevelUp();
 
-    this.#dirs.dist = await new Directory(getConfig().dist).load(false);
-    this.#dirs.src = await (
-      await new Directory(getConfig().src).load()
-    ).prepare(this.#isConfigModified, getConfig().dist, this.#report, {
-      oldDist: this.#dirs.base.dist,
-    });
+    this.#controller = new Controller();
+    this.#files = this.#controller.prepare(
+      await new Directory(getConfig().dist).load(false),
+      await new Directory(getConfig().src).load(),
+      this.#report,
+      getConfig().dist,
+      this.#isConfigModified,
+    );
+    // this.#dirs.dist = await new Directory(getConfig().dist).load(false);
+    // this.#dirs.src = await new Directory(getConfig().src).load();
 
-    for (let processor of this.#processors) {
-      await processor.init(this.#dirs);
-    }
+    // this.#processors.prepare(
+    //   this.#dirs.src,
+    //   getConfig().dist,
+    //   this.#report,
+    //   this.#dirs.dist,
+    // );
+
+    // // for (let processor of this.#processors) {
+    // //   await processor.load(this.#dirs);
+    // // }
+
+    // this.#dirs.src.prepare(
+    //   this.#isConfigModified,
+    //   getConfig().dist,
+    //   this.#report,
+    //   {
+    //     oldDist: this.#dirs.base.dist,
+    //   },
+    // );
+
+    // for (let processor of this.#processors) {
+    //   await processor.prepare(this.#dirs);
+    // }
 
     getLogger().log(`Files: ${JSON.stringify(this.#dirs.serialize())}`, 10);
     getLogger().logLevelDown().log("Initializing files finished");
@@ -278,4 +302,4 @@ export class SwappskiBuilder {
   }
 }
 
-export default SwappskiBuilder;
+export default Builder;

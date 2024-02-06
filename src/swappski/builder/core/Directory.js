@@ -35,12 +35,13 @@ export class Directory extends Dirent {
 
       let dirent;
       if (nodeDirent.isFile()) {
-        dirent = this.#getFile(nodeDirent);
-        dirent.src.init(srcPath, relPath);
+        let dirent2 = new File(srcPath, relPath);
+        // dirent = this.#getFile(nodeDirent);
+        // dirent.src.init(srcPath, relPath);
         this.#direntList.push(dirent);
 
-        if (withFiles) {
-          loading.push(dirent.load());
+        if (fileProcessors) {
+          loading.push(dirent.addProcessors(fileProcessors).load());
           fileCount++;
         }
       } else if (nodeDirent.isDirectory()) {

@@ -45,10 +45,19 @@ export class File extends Dirent {
   set encoding(value) {
     this.#encoding = value;
   }
+  #processors = [];
 
   constructor(srcAbsPath, relPath, hashable = true) {
     super(srcAbsPath, relPath, hashable);
     this.isDir = false;
+  }
+
+  addProcessors(processors) {
+    for (let processor of processors) {
+      if (processor.test(this)) {
+        this.#processors.push(processor);
+      }
+    }
   }
 
   async load() {
