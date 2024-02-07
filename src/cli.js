@@ -1,6 +1,5 @@
 import path from "path";
 import { argv } from "process";
-import { performance } from "perf_hooks";
 import { parseArgs } from "node:util";
 import Swappski from "./swappski/index.js";
 import {

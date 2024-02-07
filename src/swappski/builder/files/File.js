@@ -19,21 +19,21 @@ export class File extends Dirent {
   set dist(value) {
     this.#dist = value;
   }
-  #isModified = true;
-  get isModified() {
-    return this.#isModified;
+  #modified = true;
+  get modified() {
+    return this.#modified;
   }
-  set isModified(value) {
-    this.#isModified = value;
+  set modified(value) {
+    this.#modified = value;
   }
-  // #isInReport = false;
-  // get isInReport() {
-  //   return this.#isInReport;
-  // }
-  // #isInDist = false;
-  // get isInDist() {
-  //   return this.#isInDist;
-  // }
+  #foundInReport = false;
+  get foundInReport() {
+    return this.#foundInReport;
+  }
+  #foundInOldDist = false;
+  get foundInOldDist() {
+    return this.#foundInOldDist;
+  }
   #content = "";
   get content() {
     return this.#content;
@@ -46,8 +46,8 @@ export class File extends Dirent {
     this.#encoding = value;
   }
 
-  constructor(srcAbsPath, relDir) {
-    super(srcAbsPath, relDir);
+  constructor(srcAbsPath, relPath, hashable = true) {
+    super(srcAbsPath, relPath, hashable);
     this.isDir = false;
   }
 

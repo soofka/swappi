@@ -81,9 +81,10 @@ export class Builder {
       .logLevelUp();
 
     this.#controller = new Controller();
+    // this.#report = this.getReport();
     this.#files = this.#controller.prepare(
-      await new Directory(getConfig().dist).load(false),
       await new Directory(getConfig().src).load(),
+      await new Directory(getConfig().dist).load(false),
       this.#report,
       getConfig().dist,
       this.#isConfigModified,
