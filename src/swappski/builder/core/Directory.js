@@ -1,200 +1,120 @@
 import path from "path";
 import Dirent from "./Dirent.js";
-import { deleteFile, isInObject, loadDir } from "../helpers/index.js";
-import { getLogger } from "../utils/index.js";
+import { deleteDir, isInObject, loadDir } from "../../helpers/index.js";
 
 export class Directory extends Dirent {
-  #direntList = [];
-  get direntList() {
-    return this.#direntList;
-  }
+  #dirents = [];
 
   constructor(absPath, relDir) {
     super(absPath, relDir);
     this.isDir = true;
   }
 
-  async load(withFiles = true) {
-    getLogger().log(6, `Loading directory ${this.src.rel}`);
-
-    const loading = [];
+  async init() {
     for (let nodeDirent of await loadDir(this.src.abs)) {
       const srcPath = path.join(this.src.abs, nodeDirent.name);
       const relDir = this.src.relDir === "" ? path.sep : this.src.rel;
 
-      let dirent;
       if (nodeDirent.isFile()) {
-        dirent = new File(srcPath, relDir);
-        this.#direntList.push(dirent);
-        if (withFiles) {
-          loading.push(dirent.load());
-        }
+        this.#dirents.push(new File(srcPath, relDir));
       } else if (nodeDirent.isDirectory()) {
-        dirent = new Directory(srcPath, relDir);
-        this.#direntList.push(dirent);
-        loading.push(dirent.load());
+        this.#dirents.push(new Directory(srcPath, relDir));
       }
     }
-
-    await Promise.all(loading);
-
-    getLogger().log(6, `Directory ${this.src.rel} loaded`);
     return this;
   }
 
-  async prepare2() {}
-
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
-    getLogger().log(
-      6,
-      `Preparing directory ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory} additionalDirectories=${additionalDirectories}]`,
-    );
-
-    let fileCount = 0;
-    const preparing = [];
-    for (let dirent of this.#direntList) {
-      preparing.push(
-        dirent.prepare(
-          isConfigModified,
-          distPath,
-          reportDirectory,
-          additionalDirectories,
-        ),
-      );
-
-      if (!dirent.isDir) {
-        fileCount++;
-      }
+  load() {
+    const loading = [];
+    for (let dirent of this.#dirents) {
+      loading.push(dirent.load());
     }
-
-    await Promise.all(preparing);
-    this.#stats.prepared += fileCount;
-
-    getLogger().log(
-      6,
-      `Directory ${this.src.rel} prepared (${this.#stats.prepared} files)`,
-    );
-    return this;
+    return loading;
   }
 
-  async reset() {
-    getLogger().log(6, `Reseting directory ${this.src.rel}`);
+  save() {
+    const saving = [];
+    for (let dirent of this.#dirents) {
+      saving.push(...dirent.save());
+    }
+    return saving;
+  }
 
-    let fileCount = 0;
-    const reseting = [];
-    const newDirentList = [];
-    for (let dirent of this.#direntList) {
+  delete() {
+    const deleting = [];
+    let deleteThis = true;
+    for (let dirent of this.#dirents) {
       if (dirent.isDir) {
-        reseting.push(dirent.reset());
-      } else if (!dirent.modified) {
-        newDirentList.push(dirent);
+        deleting.push(...dirent.delete());
       } else {
-        reseting.push(deleteFile(dirent.src.abs));
-        fileCount++;
+        if (dirent.modified) {
+          deleting.push(dirent.delete());
+        } else {
+          deleteThis = false;
+        }
       }
     }
-
-    const resetingResults = await Promise.all(reseting);
-    this.#direntList = [...newDirentList, ...resetingResults];
-
-    getLogger().log(
-      6,
-      `Directory ${this.src.rel} reset (${fileCount} files deleted)`,
-    );
-    return this;
-  }
-
-  async process(rootDirectory) {
-    getLogger().log(6, `Processing directory ${this.src.rel}`);
-
-    let fileCount = 0;
-    const processing = [];
-    for (let dirent of this.#direntList) {
-      if (dirent.isDir) {
-        processing.push(dirent.process(rootDirectory || this));
-      } else if (dirent.shouldBeProcessed()) {
-        processing.push(dirent.process(rootDirectory || this));
-        fileCount++;
-      }
+    if (deleteThis) {
+      deleting.push(deleteDir(this.src.abs));
     }
-
-    await Promise.all(processing);
-    this.#stats.processed += fileCount;
-
-    getLogger().log(
-      6,
-      `Directory ${this.src.rel} processed (${this.#stats.processed} files)`,
-    );
-    return this;
+    return deleting;
   }
 
-  isEqual(directory) {
+  isEqual(directory, deep = false) {
     if (super.isEqual(directory)) {
-      return this.#direntList.length === directory.direntList.length;
+      if (deep) {
+        for (let index in this.#dirents) {
+          if (!this.#dirents[index].isEqual(directory[index])) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return this.#dirents.length === directory.dirents.length;
+      }
     }
     return false;
   }
 
-  serialize(src = true, dist = true, content = false) {
-    const root = super.serialize(src);
+  serialize(src = true, dist = true) {
+    const obj = super.serialize(src);
 
-    if (this.#direntList.length > 0) {
-      root.direntList = [];
-      for (let dirent of this.#direntList) {
-        root.direntList.push(dirent.serialize(src, dist, content));
+    if (this.#dirents.length > 0) {
+      obj.dirents = [];
+      for (let dirent of this.#dirents) {
+        obj.dirents.push(dirent.serialize(src, dist));
       }
     }
 
-    return root;
+    return obj;
   }
 
-  deserialize({ src = {}, direntList = [] }) {
+  deserialize({ src = {}, dirents = [] }) {
     super.deserialize({ src });
 
-    for (let index in direntList) {
-      const dirent = direntList[index];
-      if (isInObject(dirent, "direntList")) {
-        this.#direntList.push(new Directory(this.#getFile).deserialize(dirent));
+    for (let dirent of dirents) {
+      let obj = {};
+      if (isInObject(dirent, "dirents")) {
+        obj = new Directory();
       } else {
-        this.#direntList.push(this.#getFile(dirent).deserialize(dirent));
+        obj = new File();
       }
+      this.dirents.push(obj.deserialize(dirent));
     }
 
     return this;
   }
 
-  get allFiles() {
-    let allFiles = [];
-    for (let dirent of this.#direntList) {
+  get files() {
+    let files = [];
+    for (let dirent of this.#dirents) {
       if (dirent.isDir) {
-        allFiles.push(...dirent.allFiles);
+        files.push(...dirent.files);
       } else {
-        allFiles.push(dirent);
+        files.push(dirent);
       }
     }
-    return allFiles;
-  }
-
-  get allStats() {
-    const allStats = {
-      loaded: this.#stats.loaded,
-      prepared: this.#stats.prepared,
-      processed: this.#stats.processed,
-    };
-    for (let dirent of this.#direntList) {
-      if (dirent.isDir) {
-        const direntStats = dirent.allStats;
-        allStats.loaded += direntStats.loaded;
-        allStats.prepared += direntStats.prepared;
-        allStats.processed += direntStats.processed;
-      }
-    }
-    return allStats;
+    return files;
   }
 }
 

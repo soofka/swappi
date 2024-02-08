@@ -4,7 +4,14 @@ import { getConfig } from "../../utils.js";
 
 export class HtmlPartialInjector extends PartialInjector {
   constructor(options) {
-    super(options, ".html");
+    super(
+      options,
+      {
+        test: (direntData) => direntData.full.endsWith(".partial.html.js"),
+        attribute: "data-swapp-partial",
+      },
+      ".html",
+    );
   }
 
   async processPartials(content) {

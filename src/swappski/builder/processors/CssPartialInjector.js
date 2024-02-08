@@ -3,11 +3,18 @@ import PartialInjector from "./PartialInjector.js";
 
 export class CssPartialInjector extends PartialInjector {
   constructor(options) {
-    super(options, ".css");
+    super(
+      options,
+      {
+        test: (direntData) => direntData.full.endsWith(".partial.css.js"),
+        declaration: "-swapp-partial",
+      },
+      ".css",
+    );
   }
 
-  async processPartials(content) {
-    const cssParser = css.parse(content);
+  async processPartials(dist) {
+    const cssParser = css.parse(dist.content);
     for (let rule of cssParser.stylesheet.rules.filter(
       (rule) => rule.type === "rule",
     )) {
@@ -25,7 +32,8 @@ export class CssPartialInjector extends PartialInjector {
         }
       }
     }
-    return css.stringify(cssParser);
+    dist.content = css.stringify(cssParser);
+    return dist;
   }
 }
 

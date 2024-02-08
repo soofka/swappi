@@ -1,23 +1,21 @@
-import path from "path";
 import crypto from "crypto";
 import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
 import {
-  findInArray,
+  deleteFile,
   isInArray,
-  isInObject,
   loadFile,
   saveFile,
-} from "../helpers/index.js";
-import { getConfig, getLogger } from "../utils/index.js";
+} from "../../helpers/index.js";
+import { getConfig } from "../../utils/index.js";
 
 export class File extends Dirent {
-  #dist = [];
-  get dist() {
-    return this.#dist;
+  #dists = [];
+  get dists() {
+    return this.#dists;
   }
-  set dist(value) {
-    this.#dist = value;
+  set dists(value) {
+    this.#dists = value;
   }
   #isModified = true;
   get isModified() {
@@ -26,24 +24,19 @@ export class File extends Dirent {
   set isModified(value) {
     this.#isModified = value;
   }
-  // #isInReport = false;
-  // get isInReport() {
-  //   return this.#isInReport;
-  // }
-  // #isInDist = false;
-  // get isInDist() {
-  //   return this.#isInDist;
-  // }
-  #content = "";
-  get content() {
-    return this.#content;
+  #isInReport = false;
+  get isInReport() {
+    return this.#isInReport;
   }
-  #encoding = "utf8";
-  get encoding() {
-    return this.#encoding;
+  set isInReport(value) {
+    this.#isInReport = value;
   }
-  set encoding(value) {
-    this.#encoding = value;
+  #existingDists = [];
+  get existingDists() {
+    return this.#existingDists;
+  }
+  set existingDists(value) {
+    this.#existingDists = value;
   }
 
   constructor(srcAbsPath, relDir) {
@@ -52,163 +45,44 @@ export class File extends Dirent {
   }
 
   async load() {
-    getLogger().log(7, `Loading file ${this.src.rel}`);
-
-    this.#content = await loadFile(this.src.abs, this.#encoding);
-
-    if (!this.src.hash || this.src.hash === "") {
-      this.src.hash = crypto
+    this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
+    if (!this.src.contentHash || this.src.contentHash === "") {
+      this.src.contentHash = crypto
         .createHash(
           getConfig().constants.hashAlgorithm,
           getConfig().constants.hashAlgorithmOptions,
         )
-        .update(this.#content)
+        .update(this.src.content)
         .digest("hex");
     }
-
-    getLogger().log(7, `File ${this.src.rel} loaded`);
+    if (this.#dists.length === 0) {
+      const distDirentData = this.src.clone();
+      distDirentData.absDir =
+        distDirentData.relDir === path.sep
+          ? distPath
+          : path.join(distPath, distDirentData.relDir);
+      this.#dists = [distDirentData];
+    }
     return this;
   }
 
-  async prepare(
-    isConfigModified,
-    distPath,
-    reportDirectory = undefined,
-    additionalDirectories = undefined,
-  ) {
-    getLogger().log(
-      7,
-      `Preparing file ${this.src.rel} [isConfigModified=${isConfigModified}, distPath=${distPath}, reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
-    );
-
-    await this.prepareForProcessing(
-      distPath,
-      reportDirectory,
-      additionalDirectories,
-    );
-    this.checkForModifications(
-      isConfigModified,
-      reportDirectory,
-      isInObject(additionalDirectories, "oldDist") &&
-        additionalDirectories.oldDist,
-    );
-
-    getLogger().log(
-      7,
-      `File ${this.src.rel} prepared (modified: ${this.#modified}, shouldBeProcessed: ${this.shouldBeProcessed()}, dist length: ${this.#dist.length})`,
-    );
-    return this;
-  }
-
-  async prepareForProcessing(distPath, reportDirectory, additionalDirectories) {
-    getLogger().log(
-      7,
-      `Preparing file ${this.src.rel} for processing [distPath=${distPath}. reportDirectory=${reportDirectory}, additionalDirectories=${additionalDirectories}]`,
-    );
-
-    const distDirentData = this.src.clone();
-    distDirentData.absDir =
-      distDirentData.relDir === path.sep
-        ? distPath
-        : path.join(distPath, distDirentData.relDir);
-    this.#dist.push(distDirentData);
-
-    getLogger().log(
-      7,
-      `File ${this.src.rel} prepared for processing (dist length: ${this.#dist.length})`,
-    );
-    return this;
-  }
-
-  checkForModifications(isConfigModified, reportDirectory, oldDistDirectory) {
-    getLogger().log(
-      7,
-      `Checking file ${this.src.rel} for modifications [isConfigModified=${isConfigModified}, reportDirectory=${reportDirectory}, oldDistDirectory=${oldDistDirectory}]`,
-    );
-
-    this.#foundInReport = this.isInReport(reportDirectory);
-
-    const oldDistFiles = this.findInOldDist(oldDistDirectory);
-    for (let distFile of oldDistFiles) {
-      distFile.modified = false;
-    }
-
-    this.#foundInOldDist = oldDistFiles.length > 0;
-    this.#modified =
-      isConfigModified || !this.#foundInReport || !this.#foundInOldDist;
-
-    getLogger().log(
-      7,
-      `File ${this.src.rel} checked for modifications (modified=${this.#modified})`,
-    );
-    return this;
-  }
-
-  isInReport(report) {
-    if (
-      report &&
-      isInArray(report.allFiles, (element) => element.isEqual(this))
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  findInOldDist(oldDist) {
-    let distFiles = [];
-    if (oldDist) {
-      for (let dist of this.dist) {
-        const distFile = findInArray(oldDist.allFiles, (element) =>
-          element.src.isEqual(dist),
-        );
-        if (distFile) {
-          distFiles.push(distFile);
-        } else {
-          distFiles = [];
-          break;
-        }
-      }
-    }
-    return distFiles;
-  }
-
-  shouldBeProcessed() {
-    return this.#modified;
-  }
-
-  async process(rootDirectory) {
-    getLogger().log(7, `Processing file ${this.src.rel}`);
-
-    const executing = [];
-    for (let distIndex in this.dist) {
-      const dist = this.dist[distIndex];
-      executing.push(this.execute(dist, distIndex, rootDirectory));
-    }
-    const content = await Promise.all(executing);
+  save() {
     const saving = [];
-    for (let distIndex in this.dist) {
-      const dist = this.dist[distIndex];
-      saving.push(this.save(dist, distIndex, content[distIndex]));
+    for (let dist of this.#dists) {
+      saving.push(saveFile(dist.abs, dist.content));
     }
-    await Promise.all(saving);
-
-    getLogger().log(7, `File ${this.src.rel} processed`);
-    return this;
+    return saving;
   }
 
-  async execute(dist, index) {
-    return this.content;
-  }
-
-  async save(dist, distIndex, content) {
-    await saveFile(dist.abs, content);
+  delete() {
+    return deleteFile(this.src.abs);
   }
 
   isEqual(file, withDist = true) {
     if (super.isEqual(file)) {
       if (withDist) {
-        for (let dist of file.dist) {
-          if (!isInArray(this.#dist, (element) => element.isEqual(dist))) {
+        for (let dist of file.dists) {
+          if (!isInArray(this.#dists, (element) => element.isEqual(dist))) {
             return false;
           }
         }
@@ -218,29 +92,24 @@ export class File extends Dirent {
     return false;
   }
 
-  serialize(src = true, dist = true, content = false) {
+  serialize(src = true, dists = true) {
     const obj = super.serialize(src);
 
-    if (dist) {
-      obj.dist = this.#dist.map((dist) => dist.serialize());
-    }
-
-    if (content) {
-      obj.content = this.#content;
+    if (dists) {
+      obj.dist = this.#dists.map((dist) => dist.serialize());
     }
 
     return obj;
   }
 
-  deserialize({ src = {}, dist = [], content }) {
+  deserialize({ src = {}, dists = [] }) {
     super.deserialize({ src });
 
-    this.#dist = [];
-    for (let item of dist) {
-      this.#dist.push(new DirentData().deserialize(item));
+    this.#dists = [];
+    for (let dist of dists) {
+      this.#dists.push(new DirentData().deserialize(dist));
     }
 
-    this.#content = content;
     return this;
   }
 }
