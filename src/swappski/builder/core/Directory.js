@@ -1,9 +1,13 @@
 import path from "path";
+import File from "./File.js";
 import Dirent from "./Dirent.js";
 import { deleteDir, isInObject, loadDir } from "../../helpers/index.js";
 
 export class Directory extends Dirent {
   #dirents = [];
+  get dirents() {
+    return this.#dirents;
+  }
 
   constructor(absPath, relDir) {
     super(absPath, relDir);

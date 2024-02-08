@@ -1,14 +1,32 @@
+import path from "path";
+import {
+  CssMinifier,
+  CssPartialInjector,
+  HtmlMinifier,
+  HtmlPartialInjector,
+  ImgProcessor,
+  JsMinifier,
+  TemplateProcessor,
+} from "./builder/processors/index.js";
+
 export const config = {
   force: false,
-  verbosity: 3,
-  logFile: "",
+  verbosity: 8,
+  logFile: path.resolve("report.json"),
   reportFile: "",
 
-  src: "",
-  dist: "",
+  hash: true,
+  hashOptions: {
+    separator: "+",
+    algorithm: "shake256",
+    algorithmOptions: { outputLength: 8 },
+  },
+
+  src: path.resolve("src"),
+  dist: path.resolve("dist"),
 
   processors: [
-    new TemplatesProcessor(),
+    new TemplateProcessor(),
     new HtmlPartialInjector(),
     new CssPartialInjector(),
     new HtmlMinifier(),

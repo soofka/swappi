@@ -1,4 +1,4 @@
-import { deepMerge } from "../../utils/index.js";
+import { deepMerge } from "../../helpers/index.js";
 
 class Processor {
   #options;
@@ -19,32 +19,10 @@ class Processor {
     return this.#options.test(direntData);
   }
 
-  prepareFiles(files) {
-    const preparing = [];
-    for (let file of files) {
-      if (this.test(file.src)) {
-        preparing.push(() => (file = this.prepareFile(file)));
-      }
-    }
-    return preparing;
-  }
+  prepareFiles(files) {}
 
   async prepareFile(file) {
     return file;
-  }
-
-  processFiles(files) {
-    const processing = [];
-    for (let file of files) {
-      if (getConfig().force || file.isModified) {
-        for (let dist of file.dists) {
-          if (this.test(file.src) || this.test(dist)) {
-            processing.push(() => (dist = this.process(dist)));
-          }
-        }
-      }
-    }
-    return processing;
   }
 
   async process(dist) {

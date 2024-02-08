@@ -1,12 +1,14 @@
 import { Directory } from "./core/index.js";
 import {
+  isDeepEqual,
   isInArray,
   isInObject,
   isObject,
   findInArray,
+  loadJson,
   saveFile,
 } from "../helpers/index.js";
-import { getConfig } from "../utils/index.js";
+import { getConfig, getLogger } from "../utils/index.js";
 
 export class Builder {
   #src;
@@ -15,8 +17,8 @@ export class Builder {
   #processors;
   #isNewConfig = true;
 
-  constructor(processors = []) {
-    this.#processors = processors; //+fileprocessor?
+  constructor(processors) {
+    this.#processors = processors || getConfig().processors;
   }
 
   async build() {
@@ -26,41 +28,73 @@ export class Builder {
     await this.#load();
 
     await this.#prepare();
+    await this.#deduplicate();
+
+    await this.#delete();
     await this.#process();
+    await this.save();
 
     await this.#saveReport();
   }
 
   async #loadReport() {
-    const report = loadJson(getConfig().paths.report);
+    getLogger().log("Loading build report").logLevelUp();
+
+    const report = loadJson(getConfig().reportFile);
     if (report) {
       if (isInObject(report, "config") && isObject(report.config)) {
-        this.#isNewConfig = isDeepEqual(getConfig(), this.#report.config);
+        this.#isNewConfig = !isDeepEqual(getConfig(), this.#report.config);
       }
       if (isInObject(report, "src") && isObject(report.src)) {
         this.#report = new Directory().deserialize(report.src);
       }
     }
+
+    getLogger().logLevelDown().log("Build report loaded");
   }
 
-  #init() {
-    this.#src = new Directory(getConfig().src).init();
-    this.#dist = new Directory(getConfig().dist).init();
-    return Promise.all([this.#src, this.#dist]);
+  async #init() {
+    getLogger().log("Initializing directories").logLevelUp();
+
+    // can be redone to promis all
+    this.#src = await new Directory(getConfig().src).init();
+    this.#dist = await new Directory(getConfig().dist).init();
+
+    getLogger().logLevelDown().log("Directories initialized");
   }
 
-  #load() {
-    return Promise.all(this.#src.load());
+  async #load() {
+    getLogger().log("Loading files").logLevelUp();
+
+    await Promise.all(this.#src.load());
+
+    getLogger().logLevelDown().log("Files loaded");
   }
 
   async #prepare() {
+    getLogger().log("Preparing files").logLevelUp();
+
     for (let processor of this.#processors) {
-      await Promise.all(processor.prepareFiles(this.#src.files));
+      getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
+      const preparing = [];
+      for (let file of this.#src.files) {
+        getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
+        if (processor.test(file.src)) {
+          getLogger().log(`Preparing file ${file.src.rel}`);
+          preparing.push(async () => (file = await this.prepareFile(file)));
+        }
+        getLogger().logLevelDown();
+      }
+      getLogger().logLevelDown();
+      await Promise.all(preparing);
     }
-    this.#deduplicate();
+
+    getLogger().logLevelDown().log("Files prepared");
   }
 
   #deduplicate() {
+    getLogger().log("Deduplicating files").logLevelUp();
+
     if (this.#isNewConfig) {
       for (let file of this.#src.files) {
         if (isInArray(this.#report.files, (element) => element.isEqual(file))) {
@@ -77,34 +111,85 @@ export class Builder {
             }
           }
           for (let oldDistFile of oldDistFiles) {
+            getLogger().log(`File not modified: ${oldDistFile.src.rel}`);
             oldDistFile.isModified = false;
           }
           if (newDists.length === 0) {
+            getLogger().log(`File not modified: ${file.src.rel}`);
             file.isModified = false;
           }
           file.dists = newDists;
         }
       }
     }
+
+    getLogger().logLevelDown().log("Files deduplicated");
+  }
+
+  async #delete() {
+    getLogger().log("Deleting files").logLevelUp();
+
+    await Promise.all(this.#dist.delete());
+
+    getLogger().logLevelDown().log("Files deleted");
   }
 
   async #process() {
-    await Promise.all(this.#dist.delete());
+    getLogger().log("Processing files").logLevelUp();
 
     for (let processor of this.#processors) {
-      await Promise.all(processor.processFiles(this.#src.files));
+      getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
+      const processing = [];
+      for (let file of this.#src.files) {
+        if (getConfig().force || file.isModified) {
+          getLogger().log(`File ${file.src.rel} is modified`).logLevelUp();
+          for (let dist of file.dists) {
+            getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
+            if (this.test(file.src) || this.test(dist)) {
+              getLogger().log(`Dist: ${dist.rel}`);
+              processing.push(() => (dist = this.process(dist)));
+            }
+            getLogger().logLevelDown();
+          }
+          getLogger().logLevelDown();
+        }
+      }
+      getLogger().logLevelDown();
+      await Promise.all(processing);
     }
 
-    return Promise.all(this.#src.save());
+    getLogger().logLevelDown().log("Files processed");
+  }
+
+  async save() {
+    getLogger().log("Saving files").logLevelUp();
+
+    await Promise.all(this.#src.save());
+
+    getLogger().logLevelDown().log("Files saved");
   }
 
   async #saveReport() {
-    return saveFile(
+    getLogger().log("Saving report").logLevelUp();
+
+    await saveFile(
       getConfig().reportFile,
       JSON.stringify({
         config: getConfig(),
         src: this.#src.serialize(),
       }),
     );
+
+    getLogger().logLevelDown().log("Report saved");
+
+    if (getConfig().logFile && getConfig.logFile !== "") {
+      getLogger().log("Saving log file").logLevelUp();
+
+      await saveFile(getConfig().reportFile, getLogger().logs.join("\r\n"));
+
+      getLogger().logLevelDown().log("Log file saved");
+    }
   }
 }
+
+export default Builder;

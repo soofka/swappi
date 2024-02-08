@@ -76,7 +76,6 @@ export function swappskiCli() {
 }
 
 async function cli(argsOptions) {
-  const startTime = performance.now();
   const { args, positionals } = getArgs(argsOptions);
   const packageJson = await loadJson(path.resolve("package.json"));
 
@@ -114,12 +113,6 @@ async function cli(argsOptions) {
         operations.push(swappski.watch(config));
       }
       await Promise.all(operations);
-
-      const endTime = performance.now();
-      if (config.options.verbosity !== 0) {
-        console.log(`Done in ${Math.round(endTime - startTime)}ms`);
-        console.log("---");
-      }
     } else {
       throw ("Invalid config", config);
     }
@@ -177,4 +170,4 @@ function printHeader(packageJson) {
   }
 }
 
-export default swappCli;
+export default swappskiCli;

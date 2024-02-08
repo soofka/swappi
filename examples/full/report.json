@@ -1,0 +1,37 @@
+1707428424528: LOG	-Swappski initialized
+1707428424528: LOG	--Swappski builder starting
+1707428424528: LOG	---Loading build report
+1707428424528: LOG	---Build report loaded
+1707428424529: LOG	---Initializing directories
+1707428424530: WARN	8
+1707428424530: WARN	8
+1707428424530: LOG	---Directories initialized
+1707428424530: LOG	---Loading files
+1707428424531: LOG	---Files loaded
+1707428424531: LOG	---Preparing files
+1707428424531: LOG	----Processor: TemplateProcessor
+1707428424531: LOG	----Processor: HtmlPartialInjector
+1707428424531: LOG	----Processor: CssPartialInjector
+1707428424531: LOG	----Processor: HtmlMinifier
+1707428424531: LOG	----Processor: CssMinifier
+1707428424531: LOG	----Processor: JsMinifier
+1707428424532: LOG	----Processor: ImgProcessor
+1707428424532: LOG	---Files prepared
+1707428424532: LOG	---Deduplicating files
+1707428424532: LOG	---Files deduplicated
+1707428424532: LOG	---Deleting files
+1707428424533: LOG	---Files deleted
+1707428424533: LOG	---Processing files
+1707428424533: LOG	----Processor: TemplateProcessor
+1707428424533: LOG	----Processor: HtmlPartialInjector
+1707428424533: LOG	----Processor: CssPartialInjector
+1707428424533: LOG	----Processor: HtmlMinifier
+1707428424534: LOG	----Processor: CssMinifier
+1707428424534: LOG	----Processor: JsMinifier
+1707428424534: LOG	----Processor: ImgProcessor
+1707428424534: LOG	---Files processed
+1707428424534: LOG	---Saving files
+1707428424534: LOG	---Files saved
+1707428424534: LOG	---Saving report
+1707428424535: LOG	---Report saved
+1707428424535: LOG	---Saving log file

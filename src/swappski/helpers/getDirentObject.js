@@ -10,7 +10,7 @@ export function getDirentObject(...absPathElements) {
 
   obj.contentHash = "";
   const hashSeparatorIndex = obj.name.lastIndexOf(
-    getConfig().constants.hashSeparator,
+    getConfig().hashOptions.separator,
   );
   if (hashSeparatorIndex >= 0) {
     obj.contentHash = obj.name.substring(hashSeparatorIndex + 1);

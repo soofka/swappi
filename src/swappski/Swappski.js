@@ -39,7 +39,7 @@ export class Swappski {
   }
   init(config) {
     initConfigProvider(config);
-    initLoggerProvider(getConfig().options.verbosity);
+    initLoggerProvider(getConfig().verbosity, getConfig().logFile);
     getLogger().log("Swappski initialized").logLevelUp();
     return this;
   }
@@ -59,7 +59,7 @@ export class Swappski {
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
-      .log(`Swappski builder finished in ${startTime - endTime}ms`);
+      .log(`Swappski builder finished in ${Math.round(endTime - startTime)}ms`);
 
     return result;
   }
@@ -79,7 +79,9 @@ export class Swappski {
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
-      .log(`Swappski generator finished in ${startTime - endTime}ms`);
+      .log(
+        `Swappski generator finished in ${Math.round(endTime - startTime)}ms`,
+      );
 
     return result;
   }
@@ -99,7 +101,9 @@ export class Swappski {
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
-      .log(`Swappski server finished after ${startTime - endTime}ms`);
+      .log(
+        `Swappski server finished after ${Math.round(endTime - startTime)}ms`,
+      );
 
     return result;
   }
@@ -119,7 +123,7 @@ export class Swappski {
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
-      .log(`Swappski tester finished in ${startTime - endTime}ms`);
+      .log(`Swappski tester finished in ${Math.round(endTime - startTime)}ms`);
 
     return result;
   }
@@ -139,17 +143,10 @@ export class Swappski {
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
-      .log(`Swappski watcher finished after ${startTime - endTime}ms`);
+      .log(
+        `Swappski watcher finished after ${Math.round(endTime - startTime)}ms`,
+      );
   }
-  // async run(config) {
-  //   if (!this.#server) {
-  //     this.#server = express();
-  //     this.#server.use(express.static(config.paths.public.dist));
-  //     this.#server.listen(config.options.port, () =>
-  //       console.log(`Swapp served on port ${config.options.port}`),
-  //     );
-  //   }
-  // }
 }
 
 export default Swappski;

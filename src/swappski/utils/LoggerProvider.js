@@ -1,12 +1,19 @@
 import decorateWithSingleton from "./decorateWithSingleton.js";
 
 class LoggerProvider {
-  #verbosity;
+  #verbosity = 3;
+  #logFile = "";
   #logLevel = 1;
   #prefix = "-";
 
-  constructor(verbosity) {
+  #logs = [];
+  get logs() {
+    return this.#logs;
+  }
+
+  constructor(verbosity = 3, logFile = "") {
     this.#verbosity = verbosity;
+    this.#logFile = logFile;
   }
 
   log(message, logLevel) {
@@ -35,18 +42,17 @@ class LoggerProvider {
   }
 
   #console(method, text, logLevel = this.#logLevel, withPrefix = true) {
+    const isMegaLog = logLevel === 10 && withPrefix;
+    const standardText = `${method.toUpperCase()}\t${this.#prefix.repeat(logLevel)}${text}`;
+    let fullText = "";
+    fullText += isMegaLog ? `${this.#prefix.repeat(10)}\r\n` : "";
+    fullText += isMegaLog ? text : standardText;
+    fullText += isMegaLog ? `\r\n${this.#prefix.repeat(10)}` : "";
     if (logLevel <= this.#verbosity) {
-      if (logLevel === 10 && withPrefix) {
-        console[method](this.#prefix.repeat(10));
-      }
-      console[method](
-        logLevel < 10 && withPrefix
-          ? `${method.toUpperCase()}\t${this.#prefix.repeat(verbosity)}${text}`
-          : text,
-      );
-      if (logLevel === 10 && withPrefix) {
-        console[method](this.#prefix.repeat(10));
-      }
+      console[method](fullText);
+    }
+    if (this.#logFile !== "") {
+      this.#logs.push(`${Date.now()}: ${standardText}`);
     }
   }
 }

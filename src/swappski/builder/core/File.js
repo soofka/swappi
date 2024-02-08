@@ -24,20 +24,6 @@ export class File extends Dirent {
   set isModified(value) {
     this.#isModified = value;
   }
-  #isInReport = false;
-  get isInReport() {
-    return this.#isInReport;
-  }
-  set isInReport(value) {
-    this.#isInReport = value;
-  }
-  #existingDists = [];
-  get existingDists() {
-    return this.#existingDists;
-  }
-  set existingDists(value) {
-    this.#existingDists = value;
-  }
 
   constructor(srcAbsPath, relDir) {
     super(srcAbsPath, relDir);
@@ -49,8 +35,8 @@ export class File extends Dirent {
     if (!this.src.contentHash || this.src.contentHash === "") {
       this.src.contentHash = crypto
         .createHash(
-          getConfig().constants.hashAlgorithm,
-          getConfig().constants.hashAlgorithmOptions,
+          getConfig().hashOptions.algorithm,
+          getConfig().hashOptions.algorithmOptions,
         )
         .update(this.src.content)
         .digest("hex");

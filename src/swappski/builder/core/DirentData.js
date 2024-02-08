@@ -141,7 +141,7 @@ export class DirentData {
   }
 
   get full() {
-    return `${this.#name}${this.#contentHash && this.#contentHash !== "" ? `${getConfig().constants.hashSeparator}${this.#contentHash}` : ""}${this.#ext}`;
+    return `${this.#name}${this.#contentHash && this.#contentHash !== "" ? `${getConfig().hashOptions.separator}${this.#contentHash}` : ""}${this.#ext}`;
   }
   get abs() {
     return path.join(this.#absDir, this.full);
