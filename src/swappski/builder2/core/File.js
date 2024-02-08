@@ -1,7 +1,12 @@
 import crypto from "crypto";
 import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
-import { isInArray, loadFile, saveFile } from "../../helpers/index.js";
+import {
+  deleteFile,
+  isInArray,
+  loadFile,
+  saveFile,
+} from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class File extends Dirent {
@@ -56,9 +61,21 @@ export class File extends Dirent {
         distDirentData.relDir === path.sep
           ? distPath
           : path.join(distPath, distDirentData.relDir);
-      this.#dists.push(distDirentData);
+      this.#dists = [distDirentData];
     }
     return this;
+  }
+
+  save() {
+    const saving = [];
+    for (let dist of this.#dists) {
+      saving.push(saveFile(dist.abs, dist.content));
+    }
+    return saving;
+  }
+
+  delete() {
+    return deleteFile(this.src.abs);
   }
 
   isEqual(file, withDist = true) {

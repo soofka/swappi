@@ -1,6 +1,6 @@
 import path from "path";
 import Dirent from "./Dirent.js";
-import { isInObject, loadDir } from "../helpers/index.js";
+import { deleteDir, isInObject, loadDir } from "../../helpers/index.js";
 
 export class Directory extends Dirent {
   #dirents = [];
@@ -30,6 +30,34 @@ export class Directory extends Dirent {
       loading.push(dirent.load());
     }
     return loading;
+  }
+
+  save() {
+    const saving = [];
+    for (let dirent of this.#dirents) {
+      saving.push(...dirent.save());
+    }
+    return saving;
+  }
+
+  delete() {
+    const deleting = [];
+    let deleteThis = true;
+    for (let dirent of this.#dirents) {
+      if (dirent.isDir) {
+        deleting.push(...dirent.delete());
+      } else {
+        if (dirent.modified) {
+          deleting.push(dirent.delete());
+        } else {
+          deleteThis = false;
+        }
+      }
+    }
+    if (deleteThis) {
+      deleting.push(deleteDir(this.src.abs));
+    }
+    return deleting;
   }
 
   isEqual(directory, deep = false) {

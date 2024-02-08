@@ -1,4 +1,13 @@
 class Processor {
+  #options;
+  get options() {
+    return this.#options;
+  }
+
+  constructor(options = {}) {
+    this.#options = options;
+  }
+
   test() {
     return true;
   }
@@ -6,7 +15,7 @@ class Processor {
   prepareFiles(files) {
     const preparing = [];
     for (let file of files) {
-      if (this.test(file)) {
+      if (this.test(file.src)) {
         preparing.push(() => (file = this.prepareFile(file)));
       }
     }
@@ -20,15 +29,17 @@ class Processor {
   processFiles(files) {
     const processing = [];
     for (let file of files) {
-      if (this.test(file)) {
-        processing.push(() => (file = this.processFile(file, files)));
+      for (let dist of file.dists) {
+        if (this.test(file.src) || this.test(dist)) {
+          processing.push(() => (dist.content = this.process(dist.content)));
+        }
       }
     }
     return processing;
   }
 
-  async processFile(file) {
-    return file;
+  async process(content) {
+    return content;
   }
 }
 

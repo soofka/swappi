@@ -1,11 +1,17 @@
 import ModuleProcessor from "./ModuleProcessor.js";
+import { getConfig } from "../../utils/index.js";
 
 export class TemplateProcessor extends ModuleProcessor {
-  test(file) {
-    return isInArray(file.name.split("."), "template");
+  test(direntData) {
+    return (
+      direntData.name.split(".").includes("template") &&
+      direntData.ext === ".js"
+    );
   }
 
-  async processFile(file) {}
+  async process(content) {
+    return content(getConfig().data);
+  }
 }
 
 export default TemplateProcessor;

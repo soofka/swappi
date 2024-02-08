@@ -4,8 +4,8 @@ export class Builder {
   #report;
   #processors;
 
-  constructor(processors) {
-    this.#processors = processors || []; //+fileprocessor?
+  constructor(processors = []) {
+    this.#processors = processors; //+fileprocessor?
   }
 
   async build() {
@@ -50,18 +50,13 @@ export class Builder {
   }
 
   async #process() {
-    await this.#dist.reset();
+    await Promise.all(this.#dist.delete());
 
     for (let processor of this.#processors) {
       await Promise.all(processor.processFiles(this.#src.files));
     }
 
-    const saving = [];
-    for (let file of this.#src.files) {
-      saving.push(file.save());
-    }
-
-    return Promise.all(saving);
+    return Promise.all(this.#src.save());
   }
 
   async #saveReport() {}

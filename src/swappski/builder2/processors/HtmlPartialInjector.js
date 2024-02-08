@@ -1,39 +1,28 @@
+import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
+import { getConfig } from "../../utils.js";
 
 export class HtmlPartialInjector extends PartialInjector {
-  test(file) {
-    return this.testIfPartial(file) || this.testIfFileWithPartial(file);
+  constructor(options) {
+    super(options, ".html");
   }
 
-  testIfPartial(file) {
-    return file.full.endsWith(".partial.html.js");
-  }
+  async processPartials(content) {
+    const htmlParser = cheerio.load(content);
+    for (let element of htmlParser(`[${this.options.attribute}]`)) {
+      const elementParsed = htmlParser(element);
+      const partialName = elementParsed.attr(this.options.attribute);
 
-  testIfFileWithPartial(file) {
-    return file.ext === ".html";
-  }
-
-  async prepare(file) {
-    super.prepare(file);
-    if (this.testIfFileWithPartial(file)) {
-      const htmlParser = cheerio.load(this.content);
-
-      for (let element of htmlParser(
-        `[${getConfig().constants.htmlPartialAttribute}]`,
-      )) {
-        const elementParsed = htmlParser(element);
-        const partialName = elementParsed.attr(
-          getConfig().constants.htmlPartialAttribute,
+      if (isInObject(this.partials, partialName)) {
+        const partial = this.partials[partialName];
+        elementParsed.replaceWith(
+          isFunction(partial)
+            ? partial(getConfig().data, elementParsed)
+            : partial.render(getConfig().data, elementParsed),
         );
-
-        if (isInObject(this.partials, partialName)) {
-          this.partials[partialName].elements.push(elementParsed);
-        } else {
-          this.partials[partialName] = { elements: [elementParsed] };
-        }
       }
     }
-    return file;
+    return htmlParser.html();
   }
 }
 

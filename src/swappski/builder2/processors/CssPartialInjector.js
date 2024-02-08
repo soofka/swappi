@@ -1,16 +1,31 @@
+import css from "css";
 import PartialInjector from "./PartialInjector.js";
 
 export class CssPartialInjector extends PartialInjector {
-  test(file) {
-    return this.testIfPartial(file) || this.testIfFileWithPartial(file);
+  constructor(options) {
+    super(options, ".css");
   }
 
-  testIfPartial(file) {
-    return file.full.endsWith(".partial.css.js");
-  }
-
-  testIfFileWithPartial(file) {
-    return file.ext === ".css";
+  async processPartials(content) {
+    const cssParser = css.parse(content);
+    for (let rule of cssParser.stylesheet.rules.filter(
+      (rule) => rule.type === "rule",
+    )) {
+      for (let declaration of rule.declarations.filter(
+        (declaration) =>
+          declaration.type === "declaration" &&
+          declaration.property === this.options.declaration,
+      )) {
+        const declarationArray = declaration.value.substring(1).split(":");
+        if (isInObject(this.partials, declarationArray[0])) {
+          const partial = this.partials[declarationArray[0]];
+          declaration = isFunction(partial)
+            ? partial(getConfig().data, declarationArray[1])
+            : partial.render(getConfig().data, declarationArray[1]);
+        }
+      }
+    }
+    return css.stringify(cssParser);
   }
 }
 

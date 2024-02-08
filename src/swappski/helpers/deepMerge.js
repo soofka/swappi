@@ -1,36 +1,33 @@
 import isObject from "./isObject.js";
 
-export function deepMerge(target, source) {
+export const ArrayStrategies = {
+  OVERWRITE: "overwrite",
+  CONCAT: "concat",
+  MERGE: "merge",
+};
+
+export function deepMerge(
+  target,
+  source,
+  arrayStrategy = ArrayStrategies.OVERWRITE,
+) {
   if (Array.isArray(target) && Array.isArray(source)) {
-    for (let index in source) {
-      target[index] = deepMerge(target[index], source[index]);
+    if (arrayStrategy === ArrayStrategies.CONCAT) {
+      return [...target, ...source];
+    } else if (arrayStrategy === ArrayStrategies.MERGE) {
+      for (let index in source) {
+        target[index] = deepMerge(target[index], source[index], arrayStrategy);
+      }
+      return target;
     }
-    return target;
+    return source;
   } else if (isObject(target) && isObject(source)) {
     for (let key of Object.keys(source)) {
-      target[key] = deepMerge(target[key], source[key]);
+      target[key] = deepMerge(target[key], source[key], arrayStrategy);
     }
     return target;
   }
   return source;
 }
-
-// export function deepMerge(target, source) {
-//   if (!isObject(target) || !isObject(source)) {
-//     return source;
-//   }
-
-//   for (let key of Object.keys(source)) {
-//     const targetValue = target[key];
-//     const sourceValue = source[key];
-
-//     target[key] =
-//       isObject(targetValue) && isObject(sourceValue)
-//         ? deepMerge(Object.assign({}, targetValue), sourceValue)
-//         : sourceValue;
-//   }
-
-//   return target;
-// }
 
 export default deepMerge;
