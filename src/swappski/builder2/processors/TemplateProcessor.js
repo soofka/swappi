@@ -1,3 +1,5 @@
+import ModuleProcessor from "./ModuleProcessor.js";
+
 export class TemplateProcessor extends ModuleProcessor {
   test(file) {
     return isInArray(file.name.split("."), "template");
@@ -5,3 +7,5 @@ export class TemplateProcessor extends ModuleProcessor {
 
   async processFile(file) {}
 }
+
+export default TemplateProcessor;

@@ -1,21 +1,21 @@
-export class HtmlPartialInjector extends ModuleProcessor {
-  #partials = {};
+import PartialInjector from "./PartialInjector.js";
 
+export class HtmlPartialInjector extends PartialInjector {
   test(file) {
-    return file.full.endsWith(".partial.html.js") || file.ext === ".html";
+    return this.testIfPartial(file) || this.testIfFileWithPartial(file);
+  }
+
+  testIfPartial(file) {
+    return file.full.endsWith(".partial.html.js");
+  }
+
+  testIfFileWithPartial(file) {
+    return file.ext === ".html";
   }
 
   async prepare(file) {
-    if (file.full.endsWith("partial.html.js")) {
-      file = super.prepare(file);
-
-      const partialName = file.name.substring(file.name.length - 9);
-      if (isInObject(this.#partials, partialName)) {
-        this.partials[partialName].file = file;
-      } else {
-        this.partials[partialName] = { file };
-      }
-    } else {
+    super.prepare(file);
+    if (this.testIfFileWithPartial(file)) {
       const htmlParser = cheerio.load(this.content);
 
       for (let element of htmlParser(
@@ -26,7 +26,7 @@ export class HtmlPartialInjector extends ModuleProcessor {
           getConfig().constants.htmlPartialAttribute,
         );
 
-        if (isInObject(this.#partials, partialName)) {
+        if (isInObject(this.partials, partialName)) {
           this.partials[partialName].elements.push(elementParsed);
         } else {
           this.partials[partialName] = { elements: [elementParsed] };
@@ -35,18 +35,6 @@ export class HtmlPartialInjector extends ModuleProcessor {
     }
     return file;
   }
-
-  async process(file) {
-    // if
-    // else
-    const executing = [];
-    for (let partialName of Object.keys(this.#partials)) {
-      for (let element of this.#partials[partialName].elements) {
-      }
-    }
-
-    return await Promise.all(executing);
-  }
-
-  replacePartial() {}
 }
+
+export default HtmlPartialInjector;

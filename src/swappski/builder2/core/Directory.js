@@ -1,7 +1,6 @@
 import path from "path";
 import Dirent from "./Dirent.js";
-import { deleteFile, isInObject, loadDir } from "../helpers/index.js";
-import { getLogger } from "../utils/index.js";
+import { isInObject, loadDir } from "../helpers/index.js";
 
 export class Directory extends Dirent {
   #dirents = [];
@@ -25,12 +24,12 @@ export class Directory extends Dirent {
     return this;
   }
 
-  async load() {
+  load() {
     const loading = [];
     for (let dirent of this.#dirents) {
       loading.push(dirent.load());
     }
-    return Promise.all(loading);
+    return loading;
   }
 
   isEqual(directory, deep = false) {
@@ -49,13 +48,13 @@ export class Directory extends Dirent {
     return false;
   }
 
-  serialize(src = true, dist = true, content = false) {
+  serialize(src = true, dist = true) {
     const obj = super.serialize(src);
 
     if (this.#dirents.length > 0) {
       obj.dirents = [];
       for (let dirent of this.#dirents) {
-        obj.dirents.push(dirent.serialize(src, dist, content));
+        obj.dirents.push(dirent.serialize(src, dist));
       }
     }
 

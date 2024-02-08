@@ -1,3 +1,5 @@
+import Processor from "./Processor.js";
+
 export class ModuleProcessor extends Processor {
   async prepareFile(file) {
     const nameArray = file.src.name.split(".");
@@ -35,3 +37,5 @@ export class ModuleProcessor extends Processor {
     return file;
   }
 }
+
+export default ModuleProcessor;

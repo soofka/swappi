@@ -1,3 +1,5 @@
+import Processor from "./Processor.js";
+
 export class HtmlMinifier extends Processor {
   test(file) {
     return file.ext === ".html";
@@ -8,3 +10,5 @@ export class HtmlMinifier extends Processor {
     return file;
   }
 }
+
+export default HtmlMinifier;

@@ -5,14 +5,13 @@ export class Builder {
   #processors;
 
   constructor(processors) {
-    this.#processors = [new BaseProcessor(), ...processors];
+    this.#processors = processors || []; //+fileprocessor?
   }
 
   async build() {
-    await this.#loadReport();
-
-    await this.#init();
-    await this.#load(); // load just before saving to not store in memory for a long time maybe?
+    await Promise.all(this.#loadReport());
+    await Promise.all(this.#init());
+    await Promise.all(this.#load());
 
     await this.#prepare();
     await this.#process();
@@ -29,16 +28,12 @@ export class Builder {
   }
 
   #load() {
-    return this.#src.load();
+    return Promise.all(this.#src.load());
   }
 
-  #prepare() {
+  async #prepare() {
     for (let processor of this.#processors) {
-      for (let file of this.#src.files) {
-        if (processor.test(file)) {
-          file = processor.prepareFile(file);
-        }
-      }
+      await Promise.all(processor.prepareFiles(this.#src.files));
     }
     this.#deduplicate();
   }
@@ -55,21 +50,11 @@ export class Builder {
   }
 
   async #process() {
-    const deleting = [];
-    for (let file of this.#dist.files) {
-      if (file.isModified) {
-        deleting.push(file.delete());
-      }
-    }
+    await this.#dist.reset();
 
-    const processing = [];
     for (let processor of this.#processors) {
-      for (let file of this.#src.files) {
-        processing.push(this.#processFile(processor, file));
-      }
+      await Promise.all(processor.processFiles(this.#src.files));
     }
-
-    await Promise.all([...deleting, ...processing]);
 
     const saving = [];
     for (let file of this.#src.files) {
@@ -77,13 +62,6 @@ export class Builder {
     }
 
     return Promise.all(saving);
-  }
-
-  async #processFile(processor, file) {
-    if (file.shouldBeProcessed()) {
-      file = await processor.processFile(file, this.#src);
-    }
-    return file.save();
   }
 
   async #saveReport() {}

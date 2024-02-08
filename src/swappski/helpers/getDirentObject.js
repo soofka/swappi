@@ -7,13 +7,16 @@ export function getDirentObject(...absPathElements) {
       ...absPathElements.filter((element) => typeof element === "string"),
     ),
   );
-  obj.dupatest = obj.name.lastIndexOf(getConfig().constants.hashSeparator);
-  if (obj.dupatest >= 0) {
-    obj.hash = obj.name.substring(obj.dupatest + 1);
-    obj.name = obj.name.substring(0, obj.dupatest);
-  } else {
-    obj.hash = "";
+
+  obj.contentHash = "";
+  const hashSeparatorIndex = obj.name.lastIndexOf(
+    getConfig().constants.hashSeparator,
+  );
+  if (hashSeparatorIndex >= 0) {
+    obj.contentHash = obj.name.substring(hashSeparatorIndex + 1);
+    obj.name = obj.name.substring(0, hashSeparatorIndex);
   }
+
   return obj;
 }
 
