@@ -149,7 +149,7 @@ export class Builder {
             getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
             if (processor.test(file.src) || processor.test(dist)) {
               getLogger().log(`Dist: ${dist.rel}`);
-              processing.push(() => (dist = this.process(dist)));
+              processing.push((dist = processor.process(dist)));
             }
             getLogger().logLevelDown();
           }
@@ -166,7 +166,7 @@ export class Builder {
   async save() {
     getLogger().log("Saving files").logLevelUp();
 
-    await Promise.all(saved);
+    await Promise.all(this.#src.save());
 
     getLogger().logLevelDown().log("Files saved");
   }

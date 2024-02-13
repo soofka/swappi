@@ -1,21 +1,16 @@
 import fs from "fs/promises";
 import createDir from "./createDir.js";
-import tryCatch from "./tryCatch.js";
-import { getLogger } from "../utils/index.js";
 
-export function loadDir(absPath, options = { withFileTypes: true }) {
-  const loadDirFunction = async () => await fs.readdir(absPath, options);
-  return tryCatch(
-    loadDirFunction,
-    async (e) => {
-      getLogger().warn(
-        `Failed to load dir ${absPath}, attempting to create missing directories and load again (${e.name}: ${e.message})`,
-      );
-      await createDir(absPath);
-      return await loadDirFunction();
-    },
-    (e) => e.code !== "ENOENT",
-  );
+export async function loadDir(absPath, options = { withFileTypes: true }) {
+  try {
+    return await fs.readdir(absPath, options);
+  } catch (e) {
+    if (e.code !== "ENOENT") {
+      throw e;
+    }
+    await createDir(absPath);
+    return await fs.readdir(absPath, options);
+  }
 }
 
 export default loadDir;

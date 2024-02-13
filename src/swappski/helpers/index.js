@@ -16,7 +16,6 @@ import loadJson from "./loadJson.js";
 import loadModule from "./loadModule.js";
 import parseJson from "./parseJson.js";
 import saveFile from "./saveFile.js";
-import tryCatch from "./tryCatch.js";
 
 export {
   createDir,
@@ -37,5 +36,4 @@ export {
   loadModule,
   parseJson,
   saveFile,
-  tryCatch,
 };

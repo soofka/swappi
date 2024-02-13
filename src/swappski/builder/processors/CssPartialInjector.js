@@ -1,5 +1,7 @@
 import css from "css";
 import PartialInjector from "./PartialInjector.js";
+import { isInObject } from "../../helpers/index.js";
+import { getConfig } from "../../utils/index.js";
 
 export class CssPartialInjector extends PartialInjector {
   constructor(options) {
@@ -13,8 +15,8 @@ export class CssPartialInjector extends PartialInjector {
     );
   }
 
-  async processPartials(dist) {
-    const cssParser = css.parse(dist.content);
+  async processPartials(content) {
+    const cssParser = css.parse(content);
     for (let rule of cssParser.stylesheet.rules.filter(
       (rule) => rule.type === "rule",
     )) {
@@ -32,8 +34,7 @@ export class CssPartialInjector extends PartialInjector {
         }
       }
     }
-    dist.content = css.stringify(cssParser);
-    return dist;
+    return css.stringify(cssParser);
   }
 }
 

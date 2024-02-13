@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
+import { isInObject } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class HtmlPartialInjector extends PartialInjector {
