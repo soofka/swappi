@@ -7,7 +7,6 @@ export function loadFile(absPath, options = "utf8") {
     async () => await fs.readFile(absPath, options),
     (e) =>
       getLogger().warn(
-        8,
         `Failed to load file ${absPath} (${e.name}: ${e.message})`,
       ),
     (e) => e.code !== "ENOENT",

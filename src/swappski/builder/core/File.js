@@ -1,3 +1,4 @@
+import path from "path";
 import crypto from "crypto";
 import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
@@ -30,7 +31,7 @@ export class File extends Dirent {
     this.isDir = false;
   }
 
-  async load() {
+  async load(distAbsPath) {
     this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
     if (!this.src.contentHash || this.src.contentHash === "") {
       this.src.contentHash = crypto
@@ -42,12 +43,12 @@ export class File extends Dirent {
         .digest("hex");
     }
     if (this.#dists.length === 0) {
-      const distDirentData = this.src.clone();
-      distDirentData.absDir =
-        distDirentData.relDir === path.sep
-          ? distPath
-          : path.join(distPath, distDirentData.relDir);
-      this.#dists = [distDirentData];
+      const dist = this.src.clone();
+      dist.absDir =
+        dist.relDir === path.sep
+          ? distAbsPath
+          : path.join(distAbsPath, dist.relDir);
+      this.#dists = [dist];
     }
     return this;
   }
@@ -82,7 +83,7 @@ export class File extends Dirent {
     const obj = super.serialize(src);
 
     if (dists) {
-      obj.dist = this.#dists.map((dist) => dist.serialize());
+      obj.dists = this.#dists.map((dist) => dist.serialize());
     }
 
     return obj;

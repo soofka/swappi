@@ -20,12 +20,12 @@ export class ImgProcessor extends Processor {
   async prepareFile(file) {
     const newDists = [];
     if (this.options.keepOriginal) {
-      newDists.push(file.dist[0]);
+      newDists.push(file.dists[0]);
       this.#variants.push({});
     }
     for (let width of this.options.resizeWidths) {
       for (let type of this.options.convertTypes) {
-        const newDist = file.dist[0].clone();
+        const newDist = file.dists[0].clone();
         newDist.name = `${newDist.name}-${width}`;
         newDist.ext = `.${type}`;
         newDists.push(newDist);

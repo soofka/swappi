@@ -66,7 +66,7 @@ export class Builder {
   async #load() {
     getLogger().log("Loading files").logLevelUp();
 
-    await Promise.all(this.#src.load());
+    await Promise.all(this.#src.load(getConfig().dist));
 
     getLogger().logLevelDown().log("Files loaded");
   }
@@ -95,9 +95,9 @@ export class Builder {
   #deduplicate() {
     getLogger().log("Deduplicating files").logLevelUp();
 
-    if (this.#isNewConfig) {
+    if (!this.#isNewConfig && this.#report) {
       for (let file of this.#src.files) {
-        if (isInArray(this.#report.files, (element) => element.isEqual(file))) {
+        if (isInArray(this.#report, (element) => element.isEqual(file))) {
           const newDists = [];
           const oldDistFiles = [];
           for (let dist of file.dists) {
@@ -142,10 +142,12 @@ export class Builder {
       const processing = [];
       for (let file of this.#src.files) {
         if (getConfig().force || file.isModified) {
-          getLogger().log(`File ${file.src.rel} is modified`).logLevelUp();
+          getLogger()
+            .log(`Processing dists of file ${file.src.rel}`)
+            .logLevelUp();
           for (let dist of file.dists) {
             getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
-            if (this.test(file.src) || this.test(dist)) {
+            if (processor.test(file.src) || processor.test(dist)) {
               getLogger().log(`Dist: ${dist.rel}`);
               processing.push(() => (dist = this.process(dist)));
             }
@@ -164,7 +166,7 @@ export class Builder {
   async save() {
     getLogger().log("Saving files").logLevelUp();
 
-    await Promise.all(this.#src.save());
+    await Promise.all(saved);
 
     getLogger().logLevelDown().log("Files saved");
   }
@@ -185,7 +187,7 @@ export class Builder {
     if (getConfig().logFile && getConfig.logFile !== "") {
       getLogger().log("Saving log file").logLevelUp();
 
-      await saveFile(getConfig().reportFile, getLogger().logs.join("\r\n"));
+      await saveFile(getConfig().logFile, getLogger().logs.join("\r\n"));
 
       getLogger().logLevelDown().log("Log file saved");
     }

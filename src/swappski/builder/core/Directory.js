@@ -15,23 +15,27 @@ export class Directory extends Dirent {
   }
 
   async init() {
+    const relDir = this.src.relDir === "" ? path.sep : this.src.rel;
     for (let nodeDirent of await loadDir(this.src.abs)) {
       const srcPath = path.join(this.src.abs, nodeDirent.name);
-      const relDir = this.src.relDir === "" ? path.sep : this.src.rel;
 
       if (nodeDirent.isFile()) {
         this.#dirents.push(new File(srcPath, relDir));
       } else if (nodeDirent.isDirectory()) {
-        this.#dirents.push(new Directory(srcPath, relDir));
+        this.#dirents.push(await new Directory(srcPath, relDir).init());
       }
     }
     return this;
   }
 
-  load() {
+  load(distAbsPath) {
     const loading = [];
     for (let dirent of this.#dirents) {
-      loading.push(dirent.load());
+      if (dirent.isDir) {
+        loading.push(...dirent.load(distAbsPath));
+      } else {
+        loading.push(dirent.load(distAbsPath));
+      }
     }
     return loading;
   }

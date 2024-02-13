@@ -11,8 +11,8 @@ const backgroundImage = (cssDeclaration, data, rootDirectory) => {
   );
 
   if (imgFile) {
-    for (let distIndex in file.dist) {
-      const dist = file.dist[distIndex];
+    for (let distIndex in file.dists) {
+      const dist = file.dists[distIndex];
       // figure out values for x
       valueArray.push(
         `url("${dist.full}") type("image/${dist.ext.substring(1)}") ${parseInt(distIndex) + 1}x`,

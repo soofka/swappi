@@ -12,8 +12,8 @@ import {
 export const config = {
   force: false,
   verbosity: 8,
-  logFile: path.resolve("report.json"),
-  reportFile: "",
+  logFile: "",
+  reportFile: path.resolve("report.json"),
 
   hash: true,
   hashOptions: {

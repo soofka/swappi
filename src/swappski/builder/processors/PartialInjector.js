@@ -40,14 +40,14 @@ export class PartialInjector extends ModuleProcessor {
   async prepareFile(file) {
     if (this.#testIfPartial(file)) {
       file = await super.prepare(file);
-      this.addPartial(file.dist[0].name, file);
+      this.addPartial(file.dists[0].name, file);
 
       const shouldBeRendered = isInObject(file.src.content, "renderToFile")
         ? file.src.content.renderToFile
         : this.options.renderToFile;
 
       if (!shouldBeRendered) {
-        file.dist = [];
+        file.dists = [];
       }
     }
     return file;

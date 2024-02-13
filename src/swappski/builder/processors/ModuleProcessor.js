@@ -9,20 +9,20 @@ export class ModuleProcessor extends Processor {
 
     const nameArray = file.src.name.split(".");
     if (nameArray.length > 3) {
-      file.dist[0].name = nameArray.slice(0, nameArray.length - 3).join(".");
-      file.dist[0].ext = `.${nameArray[nameArray.length - 2]}`;
+      file.dists[0].name = nameArray.slice(0, nameArray.length - 3).join(".");
+      file.dists[0].ext = `.${nameArray[nameArray.length - 2]}`;
     }
 
     if (isFunction(file.src.content)) {
-      file.dist[0].content = file.src.content;
+      file.dists[0].content = file.src.content;
     } else if (isObject(file.src.content)) {
       if (isInObject(file.src.content, "generate")) {
-        file.dist = file.src.content.generate(getConfig().data);
+        file.dists = file.src.content.generate(getConfig().data);
       } else {
-        file.dist = Object.keys(file.src.content)
+        file.dists = Object.keys(file.src.content)
           .filter((key) => isFunction(file.src.content[key]))
           .map((key) => {
-            const newDist = file.dist[0].clone();
+            const newDist = file.dists[0].clone();
             newDist.name = `${newDist.name}${key}`;
             newDist.content = file.src.content[key];
             return newDist;

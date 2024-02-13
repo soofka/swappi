@@ -17,7 +17,7 @@ const img = (htmlElement, data, rootDirectory) => {
   );
 
   if (imgFile) {
-    for (let dist of imgFile.dist) {
+    for (let dist of imgFile.dists) {
       // figure out values for w
       // figure out types???
       valueArray.push(`${dist.full} 400w`);
