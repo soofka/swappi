@@ -6,7 +6,7 @@ import {
   isObject,
   isInObject,
   loadJson,
-  loadModule,
+  loadModuleFromFile,
 } from "./swappski/helpers/index.js";
 
 export function swappskiCli() {
@@ -128,7 +128,7 @@ function getArgs(argsOptions) {
 }
 
 async function processArgs(args) {
-  let config = await loadModule(path.resolve(args.config));
+  let config = await loadModuleFromFile(path.resolve(args.config));
   if (!isObject(config)) {
     config = {};
   }

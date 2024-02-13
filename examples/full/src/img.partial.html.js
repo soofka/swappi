@@ -1,5 +1,3 @@
-import { helpers } from "../../../dist/index.js"; //fix this
-
 const img = (htmlElement, data, rootDirectory) => {
   let picture = "<picture";
   // for (let key of Object.keys(htmlElement.attribs)) {
@@ -10,10 +8,11 @@ const img = (htmlElement, data, rootDirectory) => {
   picture += ">";
 
   const valueArray = [];
-  const { name, ext } = helpers.getDirentObject(htmlElement.attr("src"));
-  const imgFile = helpers.findInArray(
-    rootDirectory.allFiles,
-    (element) => element.src.name === name && element.src.ext === ext,
+  const srcArray = htmlElement.attr("src").split(".");
+  const imgName = srcArray[0];
+  const imgExt = srcArray[1];
+  const imgFile = rootDirectory.allFiles.find(
+    (element) => element.src.name === imgName && element.src.ext === imgExt,
   );
 
   if (imgFile) {

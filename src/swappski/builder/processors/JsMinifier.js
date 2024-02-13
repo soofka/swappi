@@ -4,7 +4,9 @@ import Processor from "./Processor.js";
 export class JsMinifier extends Processor {
   constructor(options) {
     super(options, {
-      test: (direntData) => direntData.ext === ".js",
+      test: (direntData) =>
+        direntData.ext === ".js" &&
+        !direntData.full.split(".").includes("template"),
       minifierOptions: {},
     });
   }

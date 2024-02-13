@@ -1,11 +1,21 @@
+import path from "path";
 import Processor from "./Processor.js";
-import { isFunction, isInObject, isObject } from "../../helpers/index.js";
+import {
+  isFunction,
+  isInObject,
+  isObject,
+  loadModuleFromFile,
+  loadModuleFromJsString,
+} from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class ModuleProcessor extends Processor {
   async prepareFile(file) {
-    // make it load from memory
-    file.src.content = await loadModule(file.src.abs);
+    file.src.content = await loadModuleFromFile(
+      path.join(file.src.absDir, `${file.src.name}${file.src.ext}`),
+    );
+    // SyntaxError: Unexpected end of input
+    // file.src.content = await loadModuleFromJsString(file.src.content);
 
     const nameArray = file.src.name.split(".");
     if (nameArray.length > 3) {

@@ -28,9 +28,8 @@ export class Builder {
     await this.#load();
 
     await this.#prepare();
-    await this.#deduplicate();
-
     await this.#delete();
+
     await this.#process();
     await this.save();
 
@@ -40,7 +39,15 @@ export class Builder {
   async #loadReport() {
     getLogger().log("Loading build report").logLevelUp();
 
-    const report = await loadJson(getConfig().reportFile);
+    let report;
+    try {
+      report = await loadJson(getConfig().reportFile);
+    } catch (e) {
+      if (e.code !== "ENOENT") {
+        throw e;
+      }
+      getLogger().logLevelDown().log("Failed to load build report");
+    }
     if (report) {
       getLogger().log("Report JSON loaded").logLevelUp();
       if (isInObject(report, "config") && isObject(report.config)) {
@@ -53,10 +60,8 @@ export class Builder {
         this.#report = new Directory().deserialize(report.src);
         getLogger().log("Report files loaded");
       }
-      getLogger().logLevelDown();
+      getLogger().logLevelDown().logLevelDown().log("Build report loaded");
     }
-
-    getLogger().logLevelDown().log("Build report loaded");
   }
 
   async #init() {
@@ -96,46 +101,47 @@ export class Builder {
       await Promise.all(preparing);
     }
 
+    this.#markForProcessing();
+
     getLogger().logLevelDown().log("Files prepared");
   }
 
-  #deduplicate() {
-    getLogger().log("Deduplicating files").logLevelUp();
-    // console.log(!this.#isNewConfig, this.#report);
+  #markForProcessing() {
+    getLogger().log("Marking files for processing").logLevelUp();
 
-    if (!this.#isNewConfig && this.#report) {
-      // console.log(this.#src.files.map((d) => d.serialize()));
-      // console.log(this.#report.files.map((d) => d.serialize()));
-      for (let file of this.#src.files) {
-        if (isInArray(this.#report.files, (element) => element.isEqual(file))) {
-          const distsToProcess = [];
-          const oldDistFiles = [];
-          for (let dist of file.dists) {
-            const oldDistFile = findInArray(this.#dist.files, (element) =>
-              element.src.isEqual(dist),
-            );
-            if (oldDistFile) {
-              oldDistFiles.push(oldDistFile);
-            } else {
-              distsToProcess.push(dist);
-            }
+    for (let file of this.#src.files) {
+      if (
+        !this.#isNewConfig &&
+        this.#report &&
+        isInArray(this.#report.files, (element) => element.isEqual(file))
+      ) {
+        const distsToProcess = [];
+        const oldDistFiles = [];
+        for (let dist of file.dists) {
+          const oldDistFile = findInArray(this.#dist.files, (element) =>
+            element.src.isEqual(dist),
+          );
+          if (oldDistFile) {
+            oldDistFiles.push(oldDistFile);
+          } else {
+            distsToProcess.push(dist);
           }
-          for (let oldDistFile of oldDistFiles) {
-            getLogger().log(`File not modified: ${oldDistFile.src.rel}`);
-            oldDistFile.isModified = false;
-          }
-          if (distsToProcess.length === 0) {
-            getLogger().log(`File not modified: ${file.src.rel}`);
-            file.isModified = false;
-          }
-          file.distsToProcess = distsToProcess;
-        } else {
-          file.distsToProcess = file.dists;
         }
+        for (let oldDistFile of oldDistFiles) {
+          getLogger().log(`File not modified: ${oldDistFile.src.rel}`);
+          oldDistFile.isModified = false;
+        }
+        if (distsToProcess.length === 0) {
+          getLogger().log(`File not modified: ${file.src.rel}`);
+          file.isModified = false;
+        }
+        file.distsToProcess = distsToProcess;
+      } else {
+        file.distsToProcess = file.dists;
       }
     }
 
-    getLogger().logLevelDown().log("Files deduplicated");
+    getLogger().logLevelDown().log("Files marked for processing");
   }
 
   async #delete() {

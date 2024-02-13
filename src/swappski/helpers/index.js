@@ -14,7 +14,8 @@ import isObject from "./isObject.js";
 import loadDir from "./loadDir.js";
 import loadFile from "./loadFile.js";
 import loadJson from "./loadJson.js";
-import loadModule from "./loadModule.js";
+import loadModuleFromFile from "./loadModuleFromFile.js";
+import loadModuleFromJsString from "./loadModuleFromJsString.js";
 import parseJson from "./parseJson.js";
 import saveFile from "./saveFile.js";
 
@@ -35,7 +36,8 @@ export {
   loadDir,
   loadFile,
   loadJson,
-  loadModule,
+  loadModuleFromFile,
+  loadModuleFromJsString,
   parseJson,
   saveFile,
 };

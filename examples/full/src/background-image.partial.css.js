@@ -1,13 +1,10 @@
-import { helpers } from "../../../dist/index.js"; //fix this
-
 const backgroundImage = (cssDeclaration, data, rootDirectory) => {
   const valueArray = [];
-  const { name, ext } = helpers.getDirentObject(
-    cssDeclaration.value.split(":")[1],
-  );
-  const imgFile = helpers.findInArray(
-    rootDirectory.allFiles,
-    (element) => element.src.name === name && element.src.ext === ext,
+  const fileArray = cssDeclaration.value.split(":")[1].split(".");
+  const fileName = fileArray[0];
+  const fileExt = fileArray[1];
+  const imgFile = rootDirectory.allFiles.find(
+    (element) => element.src.name === fileName && element.src.ext === fileExt,
   );
 
   if (imgFile) {
