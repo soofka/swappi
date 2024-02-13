@@ -38,7 +38,7 @@ export class DirentData {
   set content(value) {
     this.#content = value;
   }
-  #contentEncoding = "utf8";
+  #contentEncoding = "";
   get contentEncoding() {
     return this.#contentEncoding;
   }

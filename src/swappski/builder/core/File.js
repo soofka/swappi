@@ -4,6 +4,7 @@ import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
 import {
   deleteFile,
+  isImage,
   isInArray,
   loadFile,
   saveFile,
@@ -32,6 +33,7 @@ export class File extends Dirent {
   }
 
   async load(distAbsPath) {
+    this.src.contentEncoding = isImage(this.src) ? null : "utf8";
     this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
     if (!this.src.contentHash || this.src.contentHash === "") {
       this.src.contentHash = crypto

@@ -7,6 +7,7 @@ import findInArray from "./findInArray.js";
 import getDirentObject from "./getDirentObject.js";
 import isDeepEqual from "./isDeepEqual.js";
 import isFunction from "./isFunction.js";
+import isImage from "./isImage.js";
 import isInArray from "./isInArray.js";
 import isInObject from "./isInObject.js";
 import isObject from "./isObject.js";
@@ -27,6 +28,7 @@ export {
   getDirentObject,
   isDeepEqual,
   isFunction,
+  isImage,
   isInArray,
   isInObject,
   isObject,

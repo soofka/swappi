@@ -38,7 +38,7 @@ export class PartialInjector extends ModuleProcessor {
   }
 
   async prepareFile(file) {
-    if (this.#testIfPartial(file)) {
+    if (this.#testIfPartial(file.src)) {
       file = await super.prepare(file);
       this.addPartial(file.dists[0].name, file);
 

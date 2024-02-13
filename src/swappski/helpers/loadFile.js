@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 
-export async function loadFile(absPath, options = "utf8") {
+export async function loadFile(absPath, options = {}) {
   return await fs.readFile(absPath, options);
 }
 

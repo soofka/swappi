@@ -1,14 +1,13 @@
+import sharp from "sharp";
 import Processor from "./Processor.js";
+import { isFunction, isImage, isInObject } from "../../helpers/index.js";
 
 export class ImgProcessor extends Processor {
   #variants = [];
 
   constructor(options) {
     super(options, {
-      test: (direntData) =>
-        ["avif", "gif", "jpg", "jpeg", "png", "svg", "webp"].includes(
-          direntData.ext,
-        ),
+      test: (direntData) => isImage(direntData),
       resize: true,
       resizeWidths: [320, 640, 1280, 1920, 2560],
       convert: true,
@@ -33,27 +32,28 @@ export class ImgProcessor extends Processor {
       }
     }
     file.dists = newDists;
+    return file;
   }
 
   async process(dist) {
     let width;
     const widthArray = dist.name.split("-");
     if (widthArray.length > 0) {
-      width = widthArray[1];
+      width = parseInt(widthArray[1]);
     }
     const type = dist.ext.substring(1);
-    const isValidWidth = !!width;
-    const isValidType = isInObject(image, type) && isFunction(image[type]);
+    const isValidWidth = !isNaN(width);
+    const isValidType = isInObject(sharp, type) && isFunction(image[type]);
 
     if (isValidWidth || isValidType) {
-      let image = await sharp(content);
+      let image = sharp(Buffer.from(dist.content));
       if (isValidWidth) {
-        image = image.resize(width);
+        image = image.resize(parseInt(width));
       }
       if (isValidType) {
         image = image[type]();
       }
-      dist.content = image;
+      dist.content = await image.toBuffer();
     }
 
     return dist;

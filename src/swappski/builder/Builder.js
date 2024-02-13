@@ -81,7 +81,7 @@ export class Builder {
         getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
         if (processor.test(file.src)) {
           getLogger().log(`Preparing file ${file.src.rel}`);
-          preparing.push(async () => (file = await this.prepareFile(file)));
+          preparing.push((file = processor.prepareFile(file)));
         }
         getLogger().logLevelDown();
       }
