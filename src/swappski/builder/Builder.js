@@ -40,14 +40,20 @@ export class Builder {
   async #loadReport() {
     getLogger().log("Loading build report").logLevelUp();
 
-    const report = loadJson(getConfig().reportFile);
+    const report = await loadJson(getConfig().reportFile);
     if (report) {
+      getLogger().log("Report JSON loaded").logLevelUp();
       if (isInObject(report, "config") && isObject(report.config)) {
-        this.#isNewConfig = !isDeepEqual(getConfig(), this.#report.config);
+        this.#isNewConfig = !isDeepEqual(getConfig(), report.config);
+        getLogger().log(
+          `Report config loaded (${this.#isNewConfig ? "" : "not "}changed)`,
+        );
       }
       if (isInObject(report, "src") && isObject(report.src)) {
         this.#report = new Directory().deserialize(report.src);
+        getLogger().log("Report files loaded");
       }
+      getLogger().logLevelDown();
     }
 
     getLogger().logLevelDown().log("Build report loaded");
@@ -56,9 +62,10 @@ export class Builder {
   async #init() {
     getLogger().log("Initializing directories").logLevelUp();
 
-    // can be redone to promis all
-    this.#src = await new Directory(getConfig().src).init();
-    this.#dist = await new Directory(getConfig().dist).init();
+    [this.#src, this.#dist] = await Promise.all([
+      new Directory(getConfig().src).init(),
+      await new Directory(getConfig().dist).init(),
+    ]);
 
     getLogger().logLevelDown().log("Directories initialized");
   }
@@ -94,11 +101,14 @@ export class Builder {
 
   #deduplicate() {
     getLogger().log("Deduplicating files").logLevelUp();
+    // console.log(!this.#isNewConfig, this.#report);
 
     if (!this.#isNewConfig && this.#report) {
+      // console.log(this.#src.files.map((d) => d.serialize()));
+      // console.log(this.#report.files.map((d) => d.serialize()));
       for (let file of this.#src.files) {
-        if (isInArray(this.#report, (element) => element.isEqual(file))) {
-          const newDists = [];
+        if (isInArray(this.#report.files, (element) => element.isEqual(file))) {
+          const distsToProcess = [];
           const oldDistFiles = [];
           for (let dist of file.dists) {
             const oldDistFile = findInArray(this.#dist.files, (element) =>
@@ -107,18 +117,20 @@ export class Builder {
             if (oldDistFile) {
               oldDistFiles.push(oldDistFile);
             } else {
-              newDists.push(dist);
+              distsToProcess.push(dist);
             }
           }
           for (let oldDistFile of oldDistFiles) {
             getLogger().log(`File not modified: ${oldDistFile.src.rel}`);
             oldDistFile.isModified = false;
           }
-          if (newDists.length === 0) {
+          if (distsToProcess.length === 0) {
             getLogger().log(`File not modified: ${file.src.rel}`);
             file.isModified = false;
           }
-          file.dists = newDists;
+          file.distsToProcess = distsToProcess;
+        } else {
+          file.distsToProcess = file.dists;
         }
       }
     }
@@ -145,7 +157,7 @@ export class Builder {
           getLogger()
             .log(`Processing dists of file ${file.src.rel}`)
             .logLevelUp();
-          for (let dist of file.dists) {
+          for (let dist of file.distsToProcess) {
             getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
             if (processor.test(file.src) || processor.test(dist)) {
               getLogger().log(`Dist: ${dist.rel}`);

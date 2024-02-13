@@ -50,16 +50,14 @@ export class Directory extends Dirent {
 
   delete() {
     const deleting = [];
-    let deleteThis = true;
+    let deleteThis = this.#dirents.length === 0;
     for (let dirent of this.#dirents) {
       if (dirent.isDir) {
         deleting.push(...dirent.delete());
+      } else if (dirent.isModified) {
+        deleting.push(dirent.delete());
       } else {
-        if (dirent.modified) {
-          deleting.push(dirent.delete());
-        } else {
-          deleteThis = false;
-        }
+        deleteThis = false;
       }
     }
     if (deleteThis) {
@@ -84,13 +82,13 @@ export class Directory extends Dirent {
     return false;
   }
 
-  serialize(src = true, dist = true) {
+  serialize(src = true, dists = true) {
     const obj = super.serialize(src);
 
     if (this.#dirents.length > 0) {
       obj.dirents = [];
       for (let dirent of this.#dirents) {
-        obj.dirents.push(dirent.serialize(src, dist));
+        obj.dirents.push(dirent.serialize(src, dists));
       }
     }
 
