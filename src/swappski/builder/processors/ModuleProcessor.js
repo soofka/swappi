@@ -5,7 +5,7 @@ import {
   isInObject,
   isObject,
   loadModuleFromFile,
-  loadModuleFromJsString,
+  // loadModuleFromJsString,
 } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
@@ -18,9 +18,9 @@ export class ModuleProcessor extends Processor {
     // file.src.content = await loadModuleFromJsString(file.src.content);
 
     const nameArray = file.src.name.split(".");
-    if (nameArray.length > 3) {
-      file.dists[0].name = nameArray.slice(0, nameArray.length - 3).join(".");
-      file.dists[0].ext = `.${nameArray[nameArray.length - 2]}`;
+    if (nameArray.length > 2) {
+      file.dists[0].name = nameArray.slice(0, nameArray.length - 2).join(".");
+      file.dists[0].ext = `.${nameArray[nameArray.length - 1]}`;
     }
 
     if (isFunction(file.src.content)) {

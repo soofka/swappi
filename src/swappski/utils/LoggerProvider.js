@@ -42,8 +42,8 @@ class LoggerProvider {
   }
 
   #console(method, text, logLevel = this.#logLevel, withPrefix = true) {
-    const isMegaLog = logLevel === 10 && withPrefix;
-    const standardText = `${method.toUpperCase()}\t${this.#prefix.repeat(logLevel)}${text}`;
+    const isMegaLog = logLevel >= 10 && withPrefix;
+    const standardText = `${method.toUpperCase()}\t${this.#prefix.repeat(logLevel)}> ${text}`;
     let fullText = "";
     fullText += isMegaLog ? `${this.#prefix.repeat(10)}\r\n` : "";
     fullText += isMegaLog ? text : standardText;
