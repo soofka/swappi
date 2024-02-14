@@ -12,16 +12,15 @@
     "test": "node test.js",
     "build": "npm run test && node build.js",
     "start": "npm run build && node dist/index.js",
-    "basic": "npm run start -- -c examples/basic/config.js",
     "generate-basic": "npm run start -- -g examples/basic/templates",
-    "build-basic": "npm run basic -- -b",
-    "run-basic": "npm run basic -- -r",
-    "watch-basic": "npm run basic -w",
+    "build-basic": "npm run start -- -c examples/basic/config.js -b",
+    "run-basic": "npm run start -- -r examples/basic/dist",
+    "watch-basic": "npm run basic -c examples/basic/config.js -w",
     "full": "npm run start -- -c examples/full/config.js",
-    "generate-full": "npm run start -- -g examples/basic/templates",
-    "build-full": "npm run full -- -b",
-    "run-full": "npm run bulid-full -- -r",
-    "watch-full": "npm run build-full -w"
+    "generate-full": "npm run start -- -g examples/full/templates",
+    "build-full": "npm run start -- -c examples/full/config.js -b",
+    "run-full": "npm run start -- -r examples/full/dist",
+    "watch-full": "npm run basic -c examples/full/config.js -w"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

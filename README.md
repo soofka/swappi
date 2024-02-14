@@ -12,8 +12,7 @@
 - service worker
 - watcher
 - tester
-- server
-- generator
+- server: logging, killing, config?
 
 # swn.ski
 

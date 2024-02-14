@@ -4,7 +4,6 @@ import { parseArgs } from "node:util";
 import Swappski from "./swappski/index.js";
 import {
   isObject,
-  isInObject,
   loadJson,
   loadModuleFromFile,
 } from "./swappski/helpers/index.js";
@@ -25,10 +24,10 @@ export function swappskiCli() {
         'Generates application template at given path (basic by default, full if provided with option "full")',
     },
     run: {
-      type: "boolean",
+      type: "string",
       short: "r",
-      default: false,
-      description: "Serves application on localhost",
+      default: "",
+      description: "Serves application from given folder on localhost",
     },
     port: {
       type: "string",
@@ -93,26 +92,26 @@ async function cli(argsOptions) {
       printHeader(packageJson);
     }
 
-    const swappski = new Swappski(config);
+    Swappski.init(config);
 
     if (args.generate) {
-      await swappski.generate(
+      await Swappski.generator.generate(
         args.generate,
         positionals.length > 0 && positionals[0] === "full" ? "full" : "basic",
       );
     }
     const operations = [];
     if (args.build) {
-      operations.push(swappski.build());
+      operations.push(Swappski.builder.build());
     }
     if (args.run) {
-      operations.push(swappski.run());
+      operations.push(Swappski.server.serve(args.run, args.port));
     }
     if (args.test) {
-      operations.push(swappski.test());
+      operations.push(Swappski.tester.test());
     }
     if (args.watch) {
-      operations.push(swappski.watch());
+      operations.push(Swappski.watcher.watch());
     }
     await Promise.all(operations);
   }
@@ -123,6 +122,7 @@ function getArgs(argsOptions) {
     args: argv.slice(2),
     options: argsOptions,
   });
+  console.log("");
   return { args: obj.values, positionals: obj.positionals };
 }
 

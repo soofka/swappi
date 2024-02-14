@@ -1,9 +1,11 @@
 import path from "path";
+import { performance } from "perf_hooks";
 import { copyDir } from "../helpers/index.js";
 import { getLogger } from "../utils/index.js";
 
 export class Generator {
   async generate(distAbsPath, template) {
+    const startTime = performance.now();
     getLogger()
       .log(`Generating template ${template} to ${distAbsPath}`)
       .logLevelUp();
@@ -17,7 +19,12 @@ export class Generator {
       distAbsPath,
     );
 
-    getLogger().logLevelDown().log(`Template ${template} generated`);
+    const endTime = performance.now();
+    getLogger()
+      .logLevelDown()
+      .log(
+        `Template ${template} generated in ${Math.round(endTime - startTime)}ms`,
+      );
   }
 }
 

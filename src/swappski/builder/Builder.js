@@ -1,3 +1,4 @@
+import { performance } from "perf_hooks";
 import { Directory } from "./core/index.js";
 import {
   isDeepEqual,
@@ -22,6 +23,9 @@ export class Builder {
   }
 
   async build() {
+    const startTime = performance.now();
+    getLogger().log("Build started").logLevelUp();
+
     await this.#loadReport();
 
     await this.#init();
@@ -34,6 +38,11 @@ export class Builder {
     await this.save();
 
     await this.#saveReport();
+
+    const endTime = performance.now();
+    getLogger()
+      .logLevelDown()
+      .log(`Build finished in ${Math.round(endTime - startTime)}ms`);
   }
 
   async #loadReport() {
