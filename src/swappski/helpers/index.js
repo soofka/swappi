@@ -1,3 +1,5 @@
+import copyDir from "./copyDir.js";
+import copyFile from "./copyFile.js";
 import createDir from "./createDir.js";
 import deepClone from "./deepClone.js";
 import deepMerge from "./deepMerge.js";
@@ -20,6 +22,8 @@ import parseJson from "./parseJson.js";
 import saveFile from "./saveFile.js";
 
 export {
+  copyDir,
+  copyFile,
   createDir,
   deepClone,
   deepMerge,

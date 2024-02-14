@@ -63,18 +63,18 @@ export class Swappski {
 
     return result;
   }
-  async initGenerator(targetPath) {
-    this.#generator = new Generator(targetPath);
+  async initGenerator() {
+    this.#generator = new Generator();
     return this.#generator;
   }
   async generate(targetPath, template = "basic") {
     const startTime = performance.now();
     getLogger().log("Swappski generator starting").logLevelUp();
 
-    if (targetPath && !this.#builder) {
-      this.initGenerator(targetPath);
+    if (!this.#generator) {
+      this.initGenerator();
     }
-    const result = await this.#builder.generate(template);
+    const result = await this.#generator.generate(targetPath, template);
 
     const endTime = performance.now();
     getLogger()

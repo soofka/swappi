@@ -17,6 +17,13 @@ export function swappskiCli() {
       default: true,
       description: "Builds application",
     },
+    generate: {
+      type: "string",
+      short: "g",
+      default: "",
+      description:
+        'Generates application template at given path (basic by default, full if provided with option "full")',
+    },
     run: {
       type: "boolean",
       short: "r",
@@ -29,18 +36,17 @@ export function swappskiCli() {
       default: "3000",
       description: "Port for application server",
     },
+    test: {
+      type: "boolean",
+      short: "t",
+      default: false,
+      description: "Runs application tests",
+    },
     watch: {
       type: "boolean",
       short: "w",
       default: false,
       description: "Continuously builds application whenever a change occurs",
-    },
-    generate: {
-      type: "string",
-      short: "g",
-      default: "",
-      description:
-        'Generates application template at given path (basic by default, full if provided with option "full")',
     },
     config: {
       type: "string",
@@ -92,11 +98,12 @@ async function cli(argsOptions) {
       const swappski = new Swappski(config);
       const operations = [];
       if (args.build) {
-        operations.push(swappski.build(config));
+        operations.push(swappski.build());
       }
       if (args.generate) {
         operations.push(
           swappski.generate(
+            args.generate === "" ? getConfig().dist : args.generate,
             positionals.length > 0 && positionals[0] === "full"
               ? "full"
               : "basic",
@@ -104,13 +111,13 @@ async function cli(argsOptions) {
         );
       }
       if (args.run) {
-        operations.push(swappski.run(config));
+        operations.push(swappski.run());
       }
       if (args.test) {
-        operations.push(swappski.test(config));
+        operations.push(swappski.test());
       }
       if (args.watch) {
-        operations.push(swappski.watch(config));
+        operations.push(swappski.watch());
       }
       await Promise.all(operations);
     } else {
@@ -142,7 +149,7 @@ async function processArgs(args) {
     config.options.verbosity = 0;
   }
   if (args.logfile !== "") {
-    config.options.logfile = path.resolve(args.logfile);
+    config.options.logFile = path.resolve(args.logfile);
   }
   return config;
 }

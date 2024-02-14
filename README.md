@@ -5,18 +5,15 @@
 - write unit tests
 - static partials
 - support for ts files
-- work dirs can be removed
 - client script
-
 - browser support transpilation
 - honor config options and cli arguments
 - figure out image width vs pixel density
 - service worker
-- --watch --build --test --generate + node api
-
-### bugs
-
-- /templates dir is probably not created properly on first run
+- watcher
+- tester
+- server
+- generator
 
 # swn.ski
 
