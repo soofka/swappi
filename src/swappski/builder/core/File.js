@@ -64,7 +64,7 @@ export class File extends Dirent {
 
   save() {
     const saving = [];
-    for (let dist of this.#dists) {
+    for (let dist of this.#distsToProcess) {
       saving.push(saveFile(dist.abs, dist.content));
     }
     return saving;

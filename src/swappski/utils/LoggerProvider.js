@@ -3,7 +3,7 @@ import decorateWithSingleton from "./decorateWithSingleton.js";
 class LoggerProvider {
   #verbosity = 3;
   #logFile = "";
-  #logLevel = 1;
+  #logLevel = 0;
   #prefix = "-";
 
   #logs = [];

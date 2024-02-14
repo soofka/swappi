@@ -72,20 +72,26 @@ export class Builder {
       await new Directory(getConfig().dist).init(),
     ]);
 
-    getLogger().logLevelDown().log("Directories initialized");
+    getLogger()
+      .log(`src initialized (${this.#src.dirents.length} immediate dirents)`)
+      .log(`dist initialized (${this.#dist.dirents.length} immediate dirents)`)
+      .logLevelDown()
+      .log("Directories initialized");
   }
 
   async #load() {
-    getLogger().log("Loading files").logLevelUp();
+    getLogger().log("Loading dirents").logLevelUp();
 
-    await Promise.all(this.#src.load(getConfig().dist));
+    const loading = this.#src.load(getConfig().dist);
+    await Promise.all(loading);
 
-    getLogger().logLevelDown().log("Files loaded");
+    getLogger().logLevelDown().log(`${loading.length} dirents loaded`);
   }
 
   async #prepare() {
     getLogger().log("Preparing files").logLevelUp();
 
+    let preparingCount = 0;
     for (let processor of this.#processors) {
       getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
       const preparing = [];
@@ -98,12 +104,13 @@ export class Builder {
         getLogger().logLevelDown();
       }
       getLogger().logLevelDown();
+      preparingCount += preparing.length;
       await Promise.all(preparing);
     }
 
     this.#markForProcessing();
 
-    getLogger().logLevelDown().log("Files prepared");
+    getLogger().logLevelDown().log(`${preparingCount} files prepared`);
   }
 
   #markForProcessing() {
@@ -128,33 +135,36 @@ export class Builder {
           }
         }
         for (let oldDistFile of oldDistFiles) {
-          getLogger().log(`File not modified: ${oldDistFile.src.rel}`);
           oldDistFile.isModified = false;
         }
         if (distsToProcess.length === 0) {
-          getLogger().log(`File not modified: ${file.src.rel}`);
           file.isModified = false;
         }
         file.distsToProcess = distsToProcess;
       } else {
         file.distsToProcess = file.dists;
       }
+      getLogger().log(
+        `File ${file.src.rel} has ${file.distsToProcess.length} dists to process`,
+      );
     }
 
     getLogger().logLevelDown().log("Files marked for processing");
   }
 
   async #delete() {
-    getLogger().log("Deleting files").logLevelUp();
+    getLogger().log("Deleting dirents").logLevelUp();
 
-    await Promise.all(this.#dist.delete());
+    const deleting = this.#dist.delete();
+    await Promise.all(deleting);
 
-    getLogger().logLevelDown().log("Files deleted");
+    getLogger().logLevelDown().log(`${deleting.length} dirents deleted`);
   }
 
   async #process() {
     getLogger().log("Processing files").logLevelUp();
 
+    let processingCount = 0;
     for (let processor of this.#processors) {
       getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
       const processing = [];
@@ -175,18 +185,20 @@ export class Builder {
         }
       }
       getLogger().logLevelDown();
+      processingCount += processing.length;
       await Promise.all(processing);
     }
 
-    getLogger().logLevelDown().log("Files processed");
+    getLogger().logLevelDown().log(`${processingCount} files processed`);
   }
 
   async save() {
     getLogger().log("Saving files").logLevelUp();
 
-    await Promise.all(this.#src.save());
+    const saving = this.#src.save();
+    await Promise.all(saving);
 
-    getLogger().logLevelDown().log("Files saved");
+    getLogger().logLevelDown().log(`${saving.length} files saved`);
   }
 
   async #saveReport() {
