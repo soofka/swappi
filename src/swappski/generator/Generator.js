@@ -1,16 +1,14 @@
 import path from "path";
 import { copyDir } from "../helpers/index.js";
+import { getLogger } from "../utils/index.js";
 
 export class Generator {
-  generate(distAbsPath, template) {
-    console.log(
-      path.join(
-        path.dirname(import.meta.url.substring(8)),
-        "templates",
-        template,
-      ),
-    );
-    return copyDir(
+  async generate(distAbsPath, template) {
+    getLogger()
+      .log(`Generating template ${template} to ${distAbsPath}`)
+      .logLevelUp();
+
+    await copyDir(
       path.join(
         path.dirname(import.meta.url.substring(8)),
         "templates",
@@ -18,6 +16,8 @@ export class Generator {
       ),
       distAbsPath,
     );
+
+    getLogger().logLevelDown().log(`Template ${template} generated`);
   }
 }
 

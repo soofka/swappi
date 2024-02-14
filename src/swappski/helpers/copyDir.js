@@ -5,7 +5,6 @@ export async function copyDir(
   distAbsPath,
   options = { force: true, recursive: true },
 ) {
-  console.log("copyDir", srcAbsPath, distAbsPath, options);
   return await fs.cp(srcAbsPath, distAbsPath, options);
 }
 
