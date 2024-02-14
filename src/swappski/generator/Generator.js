@@ -2,14 +2,22 @@ import path from "path";
 import { copyDir } from "../helpers/index.js";
 
 export class Generator {
-  #srcAbsPath;
-
-  constructor() {
-    this.#srcAbsPath = path.resolve("../../templates");
-  }
-
   generate(distAbsPath, template) {
-    return copyDir(path.join(this.#srcAbsPath, template), distAbsPath);
+    console.log(
+      path.join(
+        path.dirname(import.meta.url.substring(8)),
+        "templates",
+        template,
+      ),
+    );
+    return copyDir(
+      path.join(
+        path.dirname(import.meta.url.substring(8)),
+        "templates",
+        template,
+      ),
+      distAbsPath,
+    );
   }
 }
 

@@ -14,7 +14,7 @@ export function swappskiCli() {
     build: {
       type: "boolean",
       short: "b",
-      default: true,
+      default: false,
       description: "Builds application",
     },
     generate: {
@@ -89,40 +89,32 @@ async function cli(argsOptions) {
     printHelp(argsOptions, packageJson);
   } else {
     const config = await processArgs(args, argsOptions, packageJson);
-
-    if (config) {
-      if (config.options.verbosity !== 0) {
-        printHeader(packageJson);
-      }
-
-      const swappski = new Swappski(config);
-      const operations = [];
-      if (args.build) {
-        operations.push(swappski.build());
-      }
-      if (args.generate) {
-        operations.push(
-          swappski.generate(
-            args.generate === "" ? getConfig().dist : args.generate,
-            positionals.length > 0 && positionals[0] === "full"
-              ? "full"
-              : "basic",
-          ),
-        );
-      }
-      if (args.run) {
-        operations.push(swappski.run());
-      }
-      if (args.test) {
-        operations.push(swappski.test());
-      }
-      if (args.watch) {
-        operations.push(swappski.watch());
-      }
-      await Promise.all(operations);
-    } else {
-      throw ("Invalid config", config);
+    if (config.verbosity > 0) {
+      printHeader(packageJson);
     }
+
+    const swappski = new Swappski(config);
+
+    if (args.generate) {
+      await swappski.generate(
+        args.generate,
+        positionals.length > 0 && positionals[0] === "full" ? "full" : "basic",
+      );
+    }
+    const operations = [];
+    if (args.build) {
+      operations.push(swappski.build());
+    }
+    if (args.run) {
+      operations.push(swappski.run());
+    }
+    if (args.test) {
+      operations.push(swappski.test());
+    }
+    if (args.watch) {
+      operations.push(swappski.watch());
+    }
+    await Promise.all(operations);
   }
 }
 
@@ -135,21 +127,26 @@ function getArgs(argsOptions) {
 }
 
 async function processArgs(args) {
-  let config = await loadModuleFromFile(path.resolve(args.config));
+  let config;
+  try {
+    config = await loadModuleFromFile(path.resolve(args.config));
+  } catch (e) {
+    if (e.code !== "ERR_MODULE_NOT_FOUND") {
+      throw e;
+    }
+    config = {};
+  }
   if (!isObject(config)) {
     config = {};
   }
-  if (!isInObject(config, "options")) {
-    config.options = {};
-  }
   if (args.force === true) {
-    config.options.force = true;
+    config.force = true;
   }
   if (args.silent === true) {
-    config.options.verbosity = 0;
+    config.verbosity = 0;
   }
   if (args.logfile !== "") {
-    config.options.logFile = path.resolve(args.logfile);
+    config.logFile = path.resolve(args.logfile);
   }
   return config;
 }

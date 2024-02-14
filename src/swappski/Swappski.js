@@ -69,7 +69,10 @@ export class Swappski {
   }
   async generate(targetPath, template = "basic") {
     const startTime = performance.now();
-    getLogger().log("Swappski generator starting").logLevelUp();
+    getLogger()
+      .log("Swappski generator starting")
+      .logLevelUp()
+      .log(`${targetPath} + ${template}`);
 
     if (!this.#generator) {
       this.initGenerator();
@@ -146,6 +149,8 @@ export class Swappski {
       .log(
         `Swappski watcher finished after ${Math.round(endTime - startTime)}ms`,
       );
+
+    return result;
   }
 }
 

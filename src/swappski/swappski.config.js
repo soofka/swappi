@@ -10,6 +10,9 @@ import {
 } from "./builder/processors/index.js";
 
 export const config = {
+  src: path.resolve("src"),
+  dist: path.resolve("dist"),
+
   force: false,
   verbosity: 8,
   logFile: "",
@@ -21,9 +24,6 @@ export const config = {
     algorithm: "shake256",
     algorithmOptions: { outputLength: 8 },
   },
-
-  src: path.resolve("src"),
-  dist: path.resolve("dist"),
 
   processors: [
     new TemplateProcessor(),

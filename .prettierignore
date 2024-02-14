@@ -1,4 +1,4 @@
-app/dist
-app/src/public/partials
-app/src/public/templates
+dist
+examples/**/dist
+examples/**/templates
 node_modules
