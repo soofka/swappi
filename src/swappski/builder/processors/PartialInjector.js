@@ -39,7 +39,7 @@ export class PartialInjector extends ModuleProcessor {
 
   async prepareFile(file) {
     if (this.#testIfPartial(file.src)) {
-      file = await super.prepare(file);
+      file = await super.prepareFile(file);
       this.addPartial(file.dists[0].name, file);
 
       const shouldBeRendered = isInObject(file.src.content, "renderToFile")
@@ -53,18 +53,18 @@ export class PartialInjector extends ModuleProcessor {
     return file;
   }
 
-  async process(dist) {
+  async process(dist, files) {
     if (this.#testIfPartial(dist)) {
       if (isFunction(dist.content)) {
-        dist.content = dist.content(getConfig().data);
+        dist.content = dist.content(getConfig().data, files);
       } else if (
         isInObject(dist.content, "render") &&
         isFunction(dist.content.render)
       ) {
-        dist.content = dist.content.render(getConfig().data);
+        dist.content = dist.content.render(getConfig().data, files);
       }
     } else {
-      dist.content = await this.processPartials(dist.content);
+      dist.content = await this.processPartials(dist.content, files);
     }
     return dist;
   }

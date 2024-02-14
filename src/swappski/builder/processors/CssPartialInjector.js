@@ -1,6 +1,6 @@
 import css from "css";
 import PartialInjector from "./PartialInjector.js";
-import { isInObject } from "../../helpers/index.js";
+import { isFunction, isInObject } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class CssPartialInjector extends PartialInjector {
@@ -8,14 +8,15 @@ export class CssPartialInjector extends PartialInjector {
     super(
       options,
       {
-        test: (direntData) => direntData.full.endsWith(".partial.css.js"),
+        test: (direntData) =>
+          direntData.name.endsWith(".partial.css") && direntData.ext === ".js",
         declaration: "-swapp-partial",
       },
       ".css",
     );
   }
 
-  async processPartials(content) {
+  async processPartials(content, files) {
     const cssParser = css.parse(content);
     for (let rule of cssParser.stylesheet.rules.filter(
       (rule) => rule.type === "rule",
@@ -28,9 +29,9 @@ export class CssPartialInjector extends PartialInjector {
         const declarationArray = declaration.value.substring(1).split(":");
         if (isInObject(this.partials, declarationArray[0])) {
           const partial = this.partials[declarationArray[0]];
-          declaration = isFunction(partial)
-            ? partial(getConfig().data, declarationArray[1])
-            : partial.render(getConfig().data, declarationArray[1]);
+          declaration = isFunction(partial.src.content)
+            ? partial.src.content(getConfig().data, files, declaration)
+            : partial.src.content.render(getConfig().data, files, declaration);
         }
       }
     }

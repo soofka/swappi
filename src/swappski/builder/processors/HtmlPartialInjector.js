@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
-import { isInObject } from "../../helpers/index.js";
+import { isFunction, isInObject } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class HtmlPartialInjector extends PartialInjector {
@@ -8,14 +8,15 @@ export class HtmlPartialInjector extends PartialInjector {
     super(
       options,
       {
-        test: (direntData) => direntData.full.endsWith(".partial.html.js"),
+        test: (direntData) =>
+          direntData.name.endsWith(".partial.html") && direntData.ext === ".js",
         attribute: "data-swapp-partial",
       },
       ".html",
     );
   }
 
-  async processPartials(content) {
+  async processPartials(content, files) {
     const htmlParser = cheerio.load(content);
     for (let element of htmlParser(`[${this.options.attribute}]`)) {
       const elementParsed = htmlParser(element);
@@ -24,9 +25,13 @@ export class HtmlPartialInjector extends PartialInjector {
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
         elementParsed.replaceWith(
-          isFunction(partial)
-            ? partial(getConfig().data, elementParsed)
-            : partial.render(getConfig().data, elementParsed),
+          isFunction(partial.src.content)
+            ? partial.src.content(getConfig().data, files, elementParsed)
+            : partial.src.content.render(
+                getConfig().data,
+                files,
+                elementParsed,
+              ),
         );
       }
     }

@@ -1,5 +1,5 @@
 // USE FILES FOR ICONS
-const head = (htmlElement, data, rootDirectory) => `
+const head = (data, files, htmlElement) => `
     <head>
         <meta charset="utf-8">
         <title>${data.labels[config.data.langs[0]].meta.title}</title>

@@ -177,7 +177,9 @@ export class Builder {
             getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
             if (processor.test(file.src) || processor.test(dist)) {
               getLogger().log(`Dist: ${dist.rel}`);
-              processing.push((dist = processor.process(dist)));
+              processing.push(
+                (dist = processor.process(dist, this.#src.files)),
+              );
             }
             getLogger().logLevelDown();
           }

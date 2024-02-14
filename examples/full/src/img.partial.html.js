@@ -1,4 +1,4 @@
-const img = (htmlElement, data, rootDirectory) => {
+const img = (data, files, htmlElement) => {
   let picture = "<picture";
   // for (let key of Object.keys(htmlElement.attribs)) {
   //   if (key !== "name" && key !== "src") {
@@ -11,7 +11,7 @@ const img = (htmlElement, data, rootDirectory) => {
   const srcArray = htmlElement.attr("src").split(".");
   const imgName = srcArray[0];
   const imgExt = srcArray[1];
-  const imgFile = rootDirectory.allFiles.find(
+  const imgFile = files.find(
     (element) => element.src.name === imgName && element.src.ext === imgExt,
   );
 
