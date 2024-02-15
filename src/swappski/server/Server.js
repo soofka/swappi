@@ -9,8 +9,6 @@ export class Server {
 
   constructor() {
     this.#app = express();
-    process.on("SIGTERM", () => this.close());
-    process.on("SIGINT", () => this.close());
   }
 
   serve(distAbsPath, port = 3000) {
@@ -36,10 +34,13 @@ export class Server {
       await open(`http://localhost:${port}`);
       getLogger().log(`Server running on port ${port}`);
     });
+
+    process.on("SIGTERM", () => this.close());
+    process.on("SIGINT", () => this.close());
   }
 
   close() {
-    getLogger().logLevelDown().log("Closing server");
+    getLogger().logLevelDown().log("Terminating server");
     this.#server.close();
   }
 }

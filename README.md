@@ -10,10 +10,11 @@
 - honor config options and cli arguments
 - figure out image width vs pixel density
 - service worker
-- watcher
 - tester
 - swappski elements as singletons?
 - swappski->swappi?
+- watcher + server
+- process events and pass changed files from watcher to server
 - dev and prod as presets in config
 
 # swn.ski

@@ -36,7 +36,7 @@ class Swappski {
     this.#generator = new Generator();
     this.#server = new Server();
     this.#tester = new Tester();
-    this.#watcher = new Watcher();
+    this.#watcher = new Watcher(this.#builder);
 
     return this;
   }

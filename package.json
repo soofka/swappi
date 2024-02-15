@@ -15,12 +15,12 @@
     "generate-basic": "npm run start -- -g examples/basic/templates",
     "build-basic": "npm run start -- -c examples/basic/config.js -b",
     "run-basic": "npm run start -- -r examples/basic/dist",
-    "watch-basic": "npm run basic -c examples/basic/config.js -w",
+    "watch-basic": "npm run start -- -c examples/basic/config.js -w",
     "full": "npm run start -- -c examples/full/config.js",
     "generate-full": "npm run start -- -g examples/full/templates",
     "build-full": "npm run start -- -c examples/full/config.js -b",
     "run-full": "npm run start -- -r examples/full/dist",
-    "watch-full": "npm run basic -c examples/full/config.js -w"
+    "watch-full": "npm run start -- -c examples/full/config.js -w"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
