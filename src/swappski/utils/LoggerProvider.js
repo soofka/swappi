@@ -37,7 +37,7 @@ class LoggerProvider {
   }
 
   logLevelDown() {
-    this.#logLevel--;
+    this.#logLevel = this.#logLevel > 0 ? this.#logLevel - 1 : this.#logLevel;
     return this;
   }
 

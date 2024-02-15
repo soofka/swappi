@@ -4,12 +4,12 @@ import { getLogger } from "../utils/index.js";
 
 export class Server {
   #app;
-  server;
+  #server;
 
   constructor() {
     this.#app = express();
-    // process.on("SIGTERM", this.close);
-    // process.on("SIGINT", this.close);
+    process.on("SIGTERM", () => this.close());
+    process.on("SIGINT", () => this.close());
   }
 
   serve(distAbsPath, port = 3000) {
@@ -19,18 +19,27 @@ export class Server {
       )
       .logLevelUp();
 
+    this.#app.use((req, res, next) => {
+      getLogger().log(
+        `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
+      );
+      res.on("finish", () =>
+        getLogger().log(
+          `Server responded to request ${req.method} ${req.url} with ${res.statusCode}`,
+        ),
+      );
+      next();
+    });
     this.#app.use(express.static(path.resolve(distAbsPath)));
-    // this.#app.get("*", (req) => getLogger().log(`Request: ${req}`));
-    this.server = this.#app.listen(port, () =>
+    this.#server = this.#app.listen(port, () =>
       getLogger().log(`Server running on port ${port}`),
     );
   }
 
-  // close() {
-  //   getLogger().logLevelDown().log("Closing server");
-
-  //   this.server.close();
-  // }
+  close() {
+    getLogger().logLevelDown().log("Closing server");
+    this.#server.close();
+  }
 }
 
 export default Server;
