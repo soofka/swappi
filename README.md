@@ -7,7 +7,6 @@
 - support for ts files
 - client script
 - browser support transpilation
-- honor config options and cli arguments
 - figure out image width vs pixel density
 - service worker
 - tester
@@ -19,6 +18,7 @@
 - process events and pass changed files from watcher to server
 - dev and prod as presets in config
 - js and css bundlers
+- monorepo with swappi and swappi processors separately
 
 # swn.ski
 

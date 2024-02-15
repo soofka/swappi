@@ -8,6 +8,11 @@ import {
   loadModuleFromFile,
 } from "./swappski/helpers/index.js";
 
+// MOVE 2 FUNCS TO HELPERS
+// CREATE HELP FUNC
+// USE CONSOLE TABLE FOR HELP
+// MAYBE USE LOGGER INSTEAD OF CONSOLE LOG?
+
 export function swappskiCli() {
   return cli({
     build: {
@@ -207,7 +212,7 @@ function processArgs(argsOptions) {
   return { args: values, params };
 }
 
-async function processConfig(args, params) {
+async function getConfigFromArgs(args, params) {
   let config;
 
   try {
