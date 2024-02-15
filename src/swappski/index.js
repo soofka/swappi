@@ -3,7 +3,7 @@ import {
   SwappskiBuilder,
   SwappskiGenerator,
   SwappskiServer,
-  SwappskiTester,
+  // SwappskiTester,
   SwappskiWatcher,
 } from "./Swappski.js";
 
@@ -12,7 +12,7 @@ export {
   SwappskiBuilder,
   SwappskiGenerator,
   SwappskiServer,
-  SwappskiTester,
+  // SwappskiTester,
   SwappskiWatcher,
 };
 

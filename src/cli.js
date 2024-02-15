@@ -14,38 +14,35 @@ export function swappskiCli() {
       type: "boolean",
       short: "b",
       default: false,
-      description: "Builds application",
+      description:
+        "Builds application. Accepts additional parameters in following order: first string represents src directory path, second string represents dist directory path. If ommitted, these options will be taken from config.",
     },
     generate: {
-      type: "string",
+      type: "boolean",
       short: "g",
-      default: "",
+      default: false,
       description:
-        'Generates application template at given path (basic by default, full if provided with option "full")',
+        'Generates application template. Accepts additional parameters in following order: first string represents target directory, second string represents template (default: "full")',
     },
     run: {
-      type: "string",
-      short: "r",
-      default: "",
-      description: "Serves application from given folder on localhost",
-    },
-    port: {
-      type: "string",
-      short: "p",
-      default: "3000",
-      description: "Port for application server",
-    },
-    test: {
       type: "boolean",
-      short: "t",
+      short: "r",
       default: false,
-      description: "Runs application tests",
+      description:
+        "Serves application on localhost. Accepts additional parameters: path of directory to serve and server port. If ommitted, these options will be taken from config.",
     },
+    // test: {
+    //   type: "boolean",
+    //   short: "t",
+    //   default: false,
+    //   description: "Runs application tests",
+    // },
     watch: {
       type: "boolean",
       short: "w",
       default: false,
-      description: "Continuously builds application whenever a change occurs",
+      description:
+        "Continuously builds application whenever a change occurs. Accepts additional parameters in following order: first string represents src directory path, second string represents dist directory path. If ommitted, these options will be taken from config.",
     },
     config: {
       type: "string",
@@ -81,13 +78,13 @@ export function swappskiCli() {
 }
 
 async function cli(argsOptions) {
-  const { args, positionals } = getArgs(argsOptions);
+  const { args, params } = processArgs(argsOptions);
   const packageJson = await loadJson(path.resolve("package.json"));
 
   if (args.help) {
     printHelp(argsOptions, packageJson);
   } else {
-    const config = await processArgs(args, argsOptions, packageJson);
+    const config = await processConfig(args, params);
     if (config.verbosity > 0) {
       printHeader(packageJson);
     }
@@ -96,38 +93,123 @@ async function cli(argsOptions) {
 
     if (args.generate) {
       await Swappski.generator.generate(
-        args.generate,
-        positionals.length > 0 && positionals[0] === "full" ? "full" : "basic",
+        params.generate.target,
+        params.generate.template,
       );
     }
-    const operations = [];
-    if (args.build) {
-      operations.push(Swappski.builder.build());
+
+    if (args.build || args.watch) {
+      if (args.watch) {
+        Swappski.watcher.watch();
+      } else {
+        await Swappski.builder.build();
+      }
     }
+
     if (args.run) {
-      operations.push(Swappski.server.serve(args.run, args.port));
+      Swappski.server.serve();
     }
-    if (args.test) {
-      operations.push(Swappski.tester.test());
-    }
-    if (args.watch) {
-      operations.push(Swappski.watcher.watch());
-    }
-    await Promise.all(operations);
   }
 }
 
-function getArgs(argsOptions) {
-  const obj = parseArgs({
+function processArgs(argsOptions) {
+  const { values, tokens } = parseArgs({
     args: argv.slice(2),
+    tokens: true,
+    allowPositionals: true,
     options: argsOptions,
   });
-  console.log("");
-  return { args: obj.values, positionals: obj.positionals };
+  const params = {};
+
+  let index = 0;
+  for (let i in tokens) {
+    if (parseInt(i, 10) < index) {
+      continue;
+    }
+    index = parseInt(i, 10);
+
+    const token = tokens[index];
+    if (token.kind === "option") {
+      if (token.name === "build" && values.build === true) {
+        let src;
+        let dist;
+        if (
+          index < tokens.length - 1 &&
+          tokens[index + 1].kind === "positional"
+        ) {
+          src = tokens[++index].value;
+          if (
+            index < tokens.length - 1 &&
+            tokens[index + 1].kind === "positional"
+          ) {
+            dist = tokens[++index].value;
+          }
+        }
+        params.build = { src, dist };
+      } else if (token.name === "generate" && values.generate === true) {
+        let target;
+        let template;
+        console.log("generate", index, tokens.length, tokens[index + 1]);
+        if (
+          index < tokens.length - 1 &&
+          tokens[index + 1].kind === "positional"
+        ) {
+          target = tokens[++index].value;
+          if (
+            index < tokens.length - 1 &&
+            tokens[index + 1].kind === "positional"
+          ) {
+            template = tokens[++index].value;
+          }
+        }
+        params.generate = { target, template };
+      } else if (token.name === "run" && values.run === true) {
+        let dist;
+        let port;
+        if (
+          index < tokens.length - 1 &&
+          tokens[index + 1].kind === "positional"
+        ) {
+          if (!isNaN(tokens[index + 1].value)) {
+            port = tokens[++index].value;
+          } else {
+            dist = tokens[++index].value;
+            if (
+              index < tokens.length - 1 &&
+              tokens[index + 1].kind === "positional" &&
+              !isNaN(tokens[index + 1].value)
+            ) {
+              port = tokens[++index].value;
+            }
+          }
+        }
+        params.run = { dist, port };
+      } else if (token.name === "watch" && values.watch === true) {
+        let src;
+        let dist;
+        if (
+          index < tokens.length - 1 &&
+          tokens[index + 1].kind === "positional"
+        ) {
+          src = tokens[++index].value;
+          if (
+            index < tokens.length - 1 &&
+            tokens[index + 1].kind === "positional"
+          ) {
+            dist = tokens[++index].value;
+          }
+        }
+        params.watch = { src, dist };
+      }
+    }
+  }
+
+  return { args: values, params };
 }
 
-async function processArgs(args) {
+async function processConfig(args, params) {
   let config;
+
   try {
     config = await loadModuleFromFile(path.resolve(args.config));
   } catch (e) {
@@ -148,6 +230,22 @@ async function processArgs(args) {
   if (args.logfile !== "") {
     config.logFile = path.resolve(args.logfile);
   }
+  if (params.watch && params.watch.src) {
+    config.src = params.watch.src;
+  } else if (params.build && params.build.src) {
+    config.src = params.build.src;
+  }
+  if (params.watch && params.watch.dist) {
+    config.dist = params.watch.dist;
+  } else if (params.build && params.build.dist) {
+    config.dist = params.build.dist;
+  } else if (params.run && params.run.dist) {
+    config.dist = params.run.dist;
+  }
+  if (params.run && params.run.port) {
+    config.port = params.run.port;
+  }
+
   return config;
 }
 

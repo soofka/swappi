@@ -25,6 +25,8 @@ export const config = {
     algorithmOptions: { outputLength: 8 },
   },
 
+  port: 3000,
+
   processors: [
     new TemplateProcessor(),
     new HtmlPartialInjector(),

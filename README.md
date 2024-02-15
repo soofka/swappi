@@ -13,9 +13,12 @@
 - tester
 - swappski elements as singletons?
 - swappski->swappi?
-- watcher + server
+- close server + watcher bug
+- unhash index
+- logfile handling to other operations
 - process events and pass changed files from watcher to server
 - dev and prod as presets in config
+- js and css bundlers
 
 # swn.ski
 

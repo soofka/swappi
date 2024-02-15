@@ -1,7 +1,6 @@
-import path from "path";
 import express from "express";
 import open from "open";
-import { getLogger } from "../utils/index.js";
+import { getConfig, getLogger } from "../utils/index.js";
 
 export class Server {
   #app;
@@ -11,10 +10,10 @@ export class Server {
     this.#app = express();
   }
 
-  serve(distAbsPath, port = 3000) {
+  serve() {
     getLogger()
       .log(
-        `Starting server on port ${port} with content of ${path.resolve(distAbsPath)}`,
+        `Starting server on port ${getConfig().port} with content of ${getConfig().dist}`,
       )
       .logLevelUp();
 
@@ -29,10 +28,10 @@ export class Server {
       );
       next();
     });
-    this.#app.use(express.static(path.resolve(distAbsPath)));
-    this.#server = this.#app.listen(port, async () => {
-      await open(`http://localhost:${port}`);
-      getLogger().log(`Server running on port ${port}`);
+    this.#app.use(express.static(getConfig().dist));
+    this.#server = this.#app.listen(getConfig().port, async () => {
+      await open(`http://localhost:${getConfig().port}`);
+      getLogger().log(`Server running on port ${getConfig().port}`);
     });
 
     process.on("SIGTERM", () => this.close());
