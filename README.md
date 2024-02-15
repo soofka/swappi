@@ -12,7 +12,9 @@
 - service worker
 - watcher
 - tester
-- server: logging, killing, config?
+- swappski elements as singletons?
+- swappski->swappi?
+- dev and prod as presets in config
 
 # swn.ski
 

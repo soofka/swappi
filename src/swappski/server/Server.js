@@ -1,5 +1,6 @@
 import path from "path";
 import express from "express";
+import open from "open";
 import { getLogger } from "../utils/index.js";
 
 export class Server {
@@ -31,9 +32,10 @@ export class Server {
       next();
     });
     this.#app.use(express.static(path.resolve(distAbsPath)));
-    this.#server = this.#app.listen(port, () =>
-      getLogger().log(`Server running on port ${port}`),
-    );
+    this.#server = this.#app.listen(port, async () => {
+      await open(`http://localhost:${port}`);
+      getLogger().log(`Server running on port ${port}`);
+    });
   }
 
   close() {
