@@ -22,27 +22,43 @@ export class Builder {
     this.#processors = processors || getConfig().processors;
   }
 
+  async init() {
+    getLogger().log("Initializing builder").logLevelUp();
+
+    await this.#loadReport();
+    await this.#initDirs();
+    await this.#load();
+
+    getLogger().logLevelDown().log("Builder initialized");
+    return this;
+  }
+
   async build() {
     const startTime = performance.now();
     getLogger().log("Build started").logLevelUp();
-
-    await this.#loadReport();
-
-    await this.#init();
-    await this.#load();
 
     await this.#prepare();
     await this.#delete();
 
     await this.#process();
-    await this.save();
-
+    await this.#save();
     await this.#saveReport();
 
     const endTime = performance.now();
     getLogger()
       .logLevelDown()
       .log(`Build finished in ${Math.round(endTime - startTime)}ms`);
+
+    return this;
+  }
+
+  async close() {
+    getLogger().log("Closing builder").logLevelUp();
+
+    await this.#saveReportToFile();
+
+    getLogger().logLevelDown().log("Builder closed");
+    return this;
   }
 
   async #loadReport() {
@@ -73,7 +89,7 @@ export class Builder {
     }
   }
 
-  async #init() {
+  async #initDirs() {
     getLogger().log("Initializing directories").logLevelUp();
 
     [this.#src, this.#dist] = await Promise.all([
@@ -203,7 +219,7 @@ export class Builder {
     getLogger().logLevelDown().log(`${processingCount} files processed`);
   }
 
-  async save() {
+  async #save() {
     getLogger().log("Saving files").logLevelUp();
 
     const saving = this.#src.save();
@@ -213,7 +229,11 @@ export class Builder {
   }
 
   async #saveReport() {
-    getLogger().log("Saving report").logLevelUp();
+    this.#report = this.#src.clone();
+  }
+
+  async #saveReportToFile() {
+    getLogger().log("Saving report to file").logLevelUp();
 
     await saveFile(
       getConfig().reportFile,
@@ -223,14 +243,18 @@ export class Builder {
       }),
     );
 
-    getLogger().logLevelDown().log("Report saved");
+    getLogger()
+      .logLevelDown()
+      .log(`Report saved to file ${getConfig().reportFile}`);
 
-    if (getConfig().logFile && getConfig.logFile !== "") {
+    if (getConfig().logFile) {
       getLogger().log("Saving log file").logLevelUp();
 
       await saveFile(getConfig().logFile, getLogger().logs.join("\r\n"));
 
-      getLogger().logLevelDown().log("Log file saved");
+      getLogger()
+        .logLevelDown()
+        .log(`Log file saved to ${getConfig().logFile}`);
     }
   }
 }

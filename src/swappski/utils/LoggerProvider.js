@@ -31,6 +31,11 @@ class LoggerProvider {
     return this;
   }
 
+  table(data, columns) {
+    console.table(data, columns);
+    return this;
+  }
+
   logLevelUp() {
     this.#logLevel++;
     return this;

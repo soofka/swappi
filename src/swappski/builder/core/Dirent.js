@@ -5,6 +5,9 @@ export class Dirent {
   get src() {
     return this.#src;
   }
+  set src(value) {
+    this.#src = value;
+  }
   #isDir;
   get isDir() {
     return this.#isDir;
@@ -15,6 +18,12 @@ export class Dirent {
 
   constructor(absPath, relDir) {
     this.#src = new DirentData(absPath, relDir);
+  }
+
+  clone() {
+    const clone = new Dirent();
+    clone.src = this.#src.clone();
+    return clone;
   }
 
   isEqual(dirent) {

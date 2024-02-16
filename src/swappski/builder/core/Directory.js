@@ -66,6 +66,15 @@ export class Directory extends Dirent {
     return deleting;
   }
 
+  clone() {
+    const clone = new Directory();
+    clone.src = super.clone().src;
+    for (let dirent of this.#dirents) {
+      clone.dirents.push(dirent.clone());
+    }
+    return clone;
+  }
+
   isEqual(directory, deep = false) {
     if (super.isEqual(directory)) {
       if (deep) {

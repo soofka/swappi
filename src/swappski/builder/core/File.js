@@ -74,6 +74,15 @@ export class File extends Dirent {
     return deleteFile(this.src.abs);
   }
 
+  clone() {
+    const clone = new File();
+    clone.src = super.clone().src;
+    for (let dist of this.#dists) {
+      clone.dists.push(dist.clone());
+    }
+    clone.isModified = this.#isModified;
+  }
+
   isEqual(file, withDist = true) {
     if (super.isEqual(file)) {
       if (withDist) {
