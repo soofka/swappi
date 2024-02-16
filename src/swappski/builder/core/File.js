@@ -39,7 +39,7 @@ export class File extends Dirent {
     this.isDir = false;
   }
 
-  async load(distAbsPath) {
+  async load() {
     this.src.contentEncoding = isImage(this.src) ? null : "utf8";
     this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
     if (!this.src.contentHash || this.src.contentHash === "") {
@@ -51,6 +51,10 @@ export class File extends Dirent {
         .update(this.src.content)
         .digest("hex");
     }
+    return this;
+  }
+
+  prepare(distAbsPath) {
     if (this.#dists.length === 0) {
       const dist = this.src.clone();
       dist.absDir =
@@ -81,6 +85,7 @@ export class File extends Dirent {
       clone.dists.push(dist.clone());
     }
     clone.isModified = this.#isModified;
+    return clone;
   }
 
   isEqual(file, withDist = true) {

@@ -37,6 +37,7 @@ export class Builder {
     const startTime = performance.now();
     getLogger().log("Build started").logLevelUp();
 
+    await this.#prepareBase();
     await this.#prepare();
     await this.#delete();
 
@@ -107,10 +108,16 @@ export class Builder {
   async #load() {
     getLogger().log("Loading dirents").logLevelUp();
 
-    const loading = this.#src.load(getConfig().dist);
+    const loading = this.#src.load();
     await Promise.all(loading);
 
     getLogger().logLevelDown().log(`${loading.length} dirents loaded`);
+  }
+
+  async #prepareBase() {
+    getLogger().log("Preparing files base").logLevelUp();
+    this.#src.prepare(getConfig().dist);
+    getLogger().logLevelDown().log("Files base prepared");
   }
 
   async #prepare() {

@@ -28,16 +28,22 @@ export class Directory extends Dirent {
     return this;
   }
 
-  load(distAbsPath) {
+  load() {
     const loading = [];
     for (let dirent of this.#dirents) {
       if (dirent.isDir) {
-        loading.push(...dirent.load(distAbsPath));
+        loading.push(...dirent.load());
       } else {
-        loading.push(dirent.load(distAbsPath));
+        loading.push(dirent.load());
       }
     }
     return loading;
+  }
+
+  prepare(distAbsPath) {
+    for (let dirent of this.#dirents) {
+      dirent.prepare(distAbsPath);
+    }
   }
 
   save() {
