@@ -34,8 +34,8 @@ export class Server {
       getLogger().log(`Server running on port ${getConfig().port}`);
     });
 
-    process.on("SIGTERM", () => this.close());
-    process.on("SIGINT", () => this.close());
+    process.addListener("SIGTERM", () => this.close());
+    process.addListener("SIGINT", () => this.close());
   }
 
   close() {

@@ -23,6 +23,7 @@ export const config = {
     separator: "+",
     algorithm: "shake256",
     algorithmOptions: { outputLength: 8 },
+    exclude: ["index.html"],
   },
 
   port: 3000,

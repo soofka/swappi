@@ -1,5 +1,5 @@
 import path from "path";
-import { getDirentObject } from "../../helpers/index.js";
+import { getDirentObject, isInArray } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class DirentData {
@@ -141,7 +141,15 @@ export class DirentData {
   }
 
   get full() {
-    return `${this.#name}${this.#contentHash && this.#contentHash !== "" ? `${getConfig().hashOptions.separator}${this.#contentHash}` : ""}${this.#ext}`;
+    const hash =
+      this.#contentHash &&
+      getConfig().hash === true &&
+      !isInArray(getConfig().hashOptions.exclude, (element) =>
+        path.join(this.#absDir, `${this.#name}${this.#ext}`).endsWith(element),
+      )
+        ? `${getConfig().hashOptions.separator}${this.#contentHash}`
+        : "";
+    return `${this.#name}${hash}${this.#ext}`;
   }
   get abs() {
     return path.join(this.#absDir, this.full);
