@@ -1,4 +1,3 @@
-import { performance } from "perf_hooks";
 import Builder from "./builder/index.js";
 import Generator from "./generator/index.js";
 import Server from "./server/index.js";
@@ -30,7 +29,7 @@ class Swappski {
 
   init(config = {}) {
     initConfigProvider(config);
-    initLoggerProvider(config.verbosity, config.logFile);
+    initLoggerProvider();
 
     this.#builder = new Builder();
     this.#generator = new Generator();

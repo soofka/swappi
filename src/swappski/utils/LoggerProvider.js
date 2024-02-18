@@ -1,4 +1,5 @@
 import decorateWithSingleton from "./decorateWithSingleton.js";
+import { getConfig } from "./ConfigProvider.js";
 
 class LoggerProvider {
   #verbosity = 3;
@@ -11,9 +12,9 @@ class LoggerProvider {
     return this.#logs;
   }
 
-  constructor(verbosity = 3, logFile = "") {
-    this.#verbosity = verbosity;
-    this.#logFile = logFile;
+  constructor() {
+    this.#verbosity = getConfig().verbosity || 3;
+    this.#logFile = getConfig().logFile || "";
   }
 
   log(message, logLevel) {

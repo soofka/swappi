@@ -20,15 +20,15 @@ export class Builder {
 
   constructor(processors) {
     this.#processors =
-      processors[getConfig().mode] || getConfig().processors[getConfig().mode];
+      (isInObject(processors, getConfig().mode) &&
+        processors[getConfig().mode]) ||
+      getConfig().processors[getConfig().mode];
   }
 
   async init() {
     getLogger().log("Initializing builder").logLevelUp();
 
     await this.#loadReport();
-    await this.#initDirs();
-    await this.#load();
 
     getLogger().logLevelDown().log("Builder initialized");
     return this;
@@ -37,6 +37,9 @@ export class Builder {
   async build() {
     const startTime = performance.now();
     getLogger().log("Build started").logLevelUp();
+
+    await this.#initDirs();
+    await this.#load();
 
     await this.#prepareBase();
     await this.#prepare();
@@ -177,7 +180,7 @@ export class Builder {
         file.distsToProcess = file.dists;
       }
       getLogger().log(
-        `File ${file.src.rel} has ${file.distsToProcess.length} dists to process`,
+        `File ${file.src.rel} has ${file.distsToProcess.length}/${file.dists.length} dists to process`,
       );
     }
 
