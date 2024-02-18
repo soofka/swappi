@@ -1,7 +1,6 @@
 import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
-import { isFunction, isInObject } from "../../helpers/index.js";
-import { getConfig } from "../../utils/index.js";
+import { isInObject } from "../../helpers/index.js";
 
 export class HtmlPartialInjector extends PartialInjector {
   constructor(options) {
@@ -25,13 +24,7 @@ export class HtmlPartialInjector extends PartialInjector {
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
         elementParsed.replaceWith(
-          isFunction(partial.src.content)
-            ? partial.src.content(getConfig().data, files, elementParsed)
-            : partial.src.content.render(
-                getConfig().data,
-                files,
-                elementParsed,
-              ),
+          this.executePartial(partial, elementParsed, files),
         );
       }
     }

@@ -1,5 +1,6 @@
 import ModuleProcessor from "./ModuleProcessor.js";
 import { deepMerge, isFunction, isInObject } from "../../helpers/index.js";
+import { getConfig } from "../../utils/index.js";
 
 export class PartialInjector extends ModuleProcessor {
   #ext;
@@ -12,7 +13,10 @@ export class PartialInjector extends ModuleProcessor {
   }
 
   constructor(options, defaultOptions, ext) {
-    super(options, deepMerge(defaultOptions, { renderToFile: false }));
+    super(
+      options,
+      deepMerge(defaultOptions, { shouldFileBeRendered: () => false }),
+    );
     this.#ext = ext;
   }
 
@@ -44,8 +48,7 @@ export class PartialInjector extends ModuleProcessor {
 
       const shouldBeRendered = isInObject(file.src.content, "renderToFile")
         ? file.src.content.renderToFile
-        : this.options.renderToFile;
-
+        : this.options.shouldFileBeRendered(file);
       if (!shouldBeRendered) {
         file.dists = [];
       }
@@ -67,6 +70,15 @@ export class PartialInjector extends ModuleProcessor {
       dist.content = await this.processPartials(dist.content, files);
     }
     return dist;
+  }
+
+  executePartial(partial, element, files) {
+    return isFunction(partial.src.content)
+      ? partial.src.content(getConfig().data, files, element)
+      : isInObject(partial.src.content, "render") &&
+          isFunction(partial.src.content.render)
+        ? partial.src.content.render(getConfig().data, files, element)
+        : partial.src.content;
   }
 }
 

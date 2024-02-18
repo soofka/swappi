@@ -4,9 +4,7 @@
 
 - write unit tests
 - static partials
-- support for ts files
 - client script
-- browser support transpilation
 - figure out image width vs pixel density
 - service worker
 - tester
@@ -15,9 +13,13 @@
 - bug with updated while watching
 - logfile handling to other operations
 - process events and pass changed files from watcher to server - controversial for change event (changing file might impact many other files, not obvious relation between file changed and what to recompile), to be implemented for all others i guess?
-- dev and prod as presets in config
-- js and css bundlers
 - monorepo with swappi and swappi processors separately
+- add processors:
+  - ts
+  - jsx
+  - js bundler
+  - css bundler
+  - babel transpiler
 
 # swn.ski
 

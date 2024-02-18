@@ -1,7 +1,6 @@
 import css from "css";
 import PartialInjector from "./PartialInjector.js";
-import { isFunction, isInObject } from "../../helpers/index.js";
-import { getConfig } from "../../utils/index.js";
+import { isInObject } from "../../helpers/index.js";
 
 export class CssPartialInjector extends PartialInjector {
   constructor(options) {
@@ -29,9 +28,7 @@ export class CssPartialInjector extends PartialInjector {
         const declarationArray = declaration.value.substring(1).split(":");
         if (isInObject(this.partials, declarationArray[0])) {
           const partial = this.partials[declarationArray[0]];
-          declaration = isFunction(partial.src.content)
-            ? partial.src.content(getConfig().data, files, declaration)
-            : partial.src.content.render(getConfig().data, files, declaration);
+          declaration = this.executePartial(partial, declaration, files);
         }
       }
     }
