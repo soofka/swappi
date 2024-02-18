@@ -15,6 +15,11 @@ export async function getConfigFromArgs(args, params) {
   if (!isObject(config)) {
     config = {};
   }
+  if (args.mode === "dev") {
+    config.mode = "dev";
+  } else {
+    config.mode = "prod";
+  }
   if (args.force === true) {
     config.force = true;
   }

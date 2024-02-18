@@ -39,6 +39,12 @@ export const argsOptions = {
     default: "swappski.config.js",
     description: "Config file path",
   },
+  mode: {
+    type: "string",
+    short: "m",
+    default: "prod",
+    description: 'Build mode ("dev" or "prod")',
+  },
   force: {
     type: "boolean",
     short: "f",

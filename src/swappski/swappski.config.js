@@ -28,15 +28,23 @@ export const config = {
 
   port: 3000,
 
-  processors: [
-    new TemplateProcessor(),
-    new HtmlPartialInjector(),
-    new CssPartialInjector(),
-    new HtmlMinifier(),
-    new CssMinifier(),
-    new JsMinifier(),
-    new ImgProcessor(),
-  ],
+  mode: "prod",
+  processors: {
+    dev: [
+      new TemplateProcessor(),
+      new HtmlPartialInjector(),
+      new CssPartialInjector(),
+    ],
+    prod: [
+      new TemplateProcessor(),
+      new HtmlPartialInjector(),
+      new CssPartialInjector(),
+      new HtmlMinifier(),
+      new CssMinifier(),
+      new JsMinifier(),
+      new ImgProcessor(),
+    ],
+  },
 
   data: {},
 };

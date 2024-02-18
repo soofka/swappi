@@ -19,7 +19,8 @@ export class Builder {
   #isNewConfig = true;
 
   constructor(processors) {
-    this.#processors = processors || getConfig().processors;
+    this.#processors =
+      processors[getConfig().mode] || getConfig().processors[getConfig().mode];
   }
 
   async init() {
