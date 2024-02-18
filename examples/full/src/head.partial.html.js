@@ -2,13 +2,13 @@
 const head = (data, files, htmlElement) => `
     <head>
         <meta charset="utf-8">
-        <title>${data.labels[config.data.langs[0]].meta.title}</title>
+        <title>${data.labels[data.langs[0]].meta.title}</title>
         <meta name="author" content="${data.author}">"
-        <meta name="description" content="${data.labels[config.data.langs[0]].meta.description}">
-        <meta property="og:title" content="${data.labels[config.data.langs[0]].meta.title}">
+        <meta name="description" content="${data.labels[data.langs[0]].meta.description}">
+        <meta property="og:title" content="${data.labels[data.langs[0]].meta.title}">
         <meta property="og:type" content="${data.type}">
         <meta property="og:url" content="${data.url}">
-        <meta property="og:description" content="${data.labels[config.data.langs[0]].meta.description}">
+        <meta property="og:description" content="${data.labels[data.langs[0]].meta.description}">
         <meta property="og:image" content="me.jpg">
         <meta property="og:image:alt" content="me">
         
@@ -27,7 +27,7 @@ const head = (data, files, htmlElement) => `
           .join("")}
         <meta name="color-scheme" content="${data.themes.map((theme) => theme.name).join(" ")}">
 
-        ${config.data.langs
+        ${data.langs
           .map(
             (lang) => `
             <link rel="alternate" href="${data.url}?lang=${lang}" hreflang="${lang}" />
@@ -37,7 +37,7 @@ const head = (data, files, htmlElement) => `
         <link rel="canonical" href="${data.url}" />
 
         <link rel="stylesheet" id="theme" href="style-${data.themes[0].name}.css" />
-        <link rel="stylesheet" href="style.css" />
+        $${JSON.stringify(files)}
     </head>
 `;
 

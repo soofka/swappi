@@ -9,7 +9,7 @@ import { getConfig, getLogger } from "../utils/index.js";
 export class Server {
   #server;
 
-  async serve() {
+  serve() {
     const hostname = process.env.HOST || "127.0.0.1";
     const port = process.env.PORT || getConfig().port || 3000;
     const url = `http://${hostname}:${port}/`;
@@ -66,7 +66,7 @@ export class Server {
       .listen(port);
 
     getLogger().log(`Server running at ${url}`);
-    await open(url);
+    open(url);
   }
 
   close() {

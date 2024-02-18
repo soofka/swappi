@@ -12,6 +12,12 @@ export class Watcher {
     this.#abortController = new AbortController();
   }
 
+  async init() {
+    await this.#builder.init();
+    await this.#build();
+    return this;
+  }
+
   async watch() {
     getLogger()
       .log(`Starting watcher on directory ${getConfig().src}`)
@@ -28,7 +34,7 @@ export class Watcher {
 
         clearTimeout(this.#processEventsTimeout);
         this.#processEventsTimeout = setTimeout(
-          () => this.#processEvents(),
+          async () => await this.#processEvents(),
           200,
         );
       }
@@ -39,12 +45,6 @@ export class Watcher {
     }
   }
 
-  #processEvents() {
-    getLogger().log("Processing watcher events");
-    this.#builder.build();
-    this.#events = [];
-  }
-
   close() {
     getLogger().logLevelDown().log("Terminating watcher");
 
@@ -52,6 +52,20 @@ export class Watcher {
     this.#abortController.abort();
 
     getLogger().log("Watcher terminated");
+  }
+
+  async #build() {
+    try {
+      await this.#builder.build();
+    } catch (e) {
+      getLogger().error(e);
+    }
+  }
+
+  async #processEvents() {
+    getLogger().log("Processing watcher events");
+    await this.#build();
+    this.#events = [];
   }
 }
 

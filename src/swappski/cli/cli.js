@@ -37,10 +37,11 @@ async function cli(argsOptions) {
     }
 
     if (args.build || args.watch) {
-      await (await Swappski.builder.init()).build();
       if (args.watch) {
-        Swappski.watcher.watch(Swappski.builder);
+        (await Swappski.watcher.init()).watch();
       } else {
+        await Swappski.builder.init();
+        await Swappski.builder.build();
         await Swappski.builder.close();
       }
 

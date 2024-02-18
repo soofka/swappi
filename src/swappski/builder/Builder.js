@@ -245,26 +245,30 @@ export class Builder {
   async #saveReportToFile() {
     getLogger().log("Saving report to file").logLevelUp();
 
-    await saveFile(
-      getConfig().reportFile,
-      JSON.stringify({
-        config: getConfig(),
-        src: this.#src.serialize(),
-      }),
-    );
-
-    getLogger()
-      .logLevelDown()
-      .log(`Report saved to file ${getConfig().reportFile}`);
-
-    if (getConfig().logFile) {
-      getLogger().log("Saving log file").logLevelUp();
-
-      await saveFile(getConfig().logFile, getLogger().logs.join("\r\n"));
+    if (this.#src) {
+      await saveFile(
+        getConfig().reportFile,
+        JSON.stringify({
+          config: getConfig(),
+          src: this.#src.serialize(),
+        }),
+      );
 
       getLogger()
         .logLevelDown()
-        .log(`Log file saved to ${getConfig().logFile}`);
+        .log(`Report saved to file ${getConfig().reportFile}`);
+
+      if (getConfig().logFile) {
+        getLogger().log("Saving log file").logLevelUp();
+
+        await saveFile(getConfig().logFile, getLogger().logs.join("\r\n"));
+
+        getLogger()
+          .logLevelDown()
+          .log(`Log file saved to ${getConfig().logFile}`);
+      }
+    } else {
+      getLogger().logLevelDown().log("Failed to save report to file");
     }
   }
 }
