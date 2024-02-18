@@ -1,41 +1,75 @@
-import express from "express";
+import fs from "fs/promises";
+import path from "path";
+import http from "http";
 import open from "open";
+import mimeTypes from "mime-db";
+import { loadFile } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class Server {
-  #app;
   #server;
 
-  constructor() {
-    this.#app = express();
-  }
+  async serve() {
+    const hostname = process.env.HOST || "127.0.0.1";
+    const port = process.env.PORT || getConfig().port || 3000;
+    const url = `http://${hostname}:${port}/`;
 
-  serve() {
     getLogger()
-      .log(
-        `Starting server on port ${getConfig().port} with content of ${getConfig().dist}`,
-      )
+      .log(`Starting server at ${url} with content of ${getConfig().dist}`)
       .logLevelUp();
 
-    this.#app.use((req, res, next) => {
-      getLogger().log(
-        `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
-      );
-      res.on("finish", () =>
+    this.#server = http
+      .createServer(async (req, res) => {
         getLogger().log(
-          `Server responded to request ${req.method} ${req.url} with ${res.statusCode}`,
-        ),
-      );
-      next();
-    });
-    this.#app.use(express.static(getConfig().dist));
-    this.#server = this.#app.listen(getConfig().port, async () => {
-      await open(`http://localhost:${getConfig().port}`);
-      getLogger().log(`Server running on port ${getConfig().port}`);
-    });
+          `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
+        );
 
-    process.addListener("SIGTERM", () => this.close());
-    process.addListener("SIGINT", () => this.close());
+        let filePath = path.join(
+          getConfig().dist,
+          req.url === "/" ? "index.html" : req.url,
+        );
+        const mimeType = Object.keys(mimeTypes).find(
+          (key) =>
+            Object.hasOwn(mimeTypes[key], "extensions") &&
+            mimeTypes[key].extensions.includes(
+              path.extname(filePath).substring(1).toLowerCase(),
+            ),
+        );
+
+        let status;
+        let headers;
+        let content;
+        let encoding;
+        try {
+          status = 200;
+          headers = { "Content-Type": mimeType };
+          content = await loadFile(filePath);
+          encoding = "utf-8";
+        } catch (e) {
+          headers = { "Content-Type": "text/html" };
+          if (e.code === "ENOENT") {
+            status = 404;
+            content = "404 Not found";
+          } else {
+            status = 500;
+            content = "500 Internal server error";
+          }
+        }
+
+        res.writeHead(status, headers);
+        res.end(content, encoding);
+
+        getLogger().log(
+          `Server responded to request ${req.method} ${req.url} with ${status}`,
+        );
+      })
+      .listen(port);
+
+    getLogger().log(`Server running at ${url}`);
+    await open(url);
+
+    process.on("SIGTERM", () => this.close());
+    process.on("SIGINT", () => this.close());
   }
 
   close() {

@@ -236,7 +236,7 @@ export class Builder {
   }
 
   async #saveReport() {
-    this.#report = this.#src.clone();
+    // this.#report = this.#src.clone();
   }
 
   async #saveReportToFile() {

@@ -52,6 +52,7 @@ export class Watcher {
 
   close() {
     getLogger().logLevelDown().log("Terminating watcher");
+    clearTimeout(this.#processEventsTimeout);
     this.#abortController.abort();
     this.#builder.close();
     this.#server.close();
