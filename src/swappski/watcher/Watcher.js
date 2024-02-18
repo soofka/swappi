@@ -3,14 +3,12 @@ import { getConfig, getLogger } from "../utils/index.js";
 
 export class Watcher {
   #builder;
-  #server;
   #abortController;
   #events = [];
   #processEventsTimeout;
 
-  constructor(builder, server) {
+  constructor(builder) {
     this.#builder = builder;
-    this.#server = server;
     this.#abortController = new AbortController();
   }
 
@@ -39,9 +37,6 @@ export class Watcher {
         throw e;
       }
     }
-
-    process.on("SIGTERM", () => this.close());
-    process.on("SIGINT", () => this.close());
   }
 
   #processEvents() {
@@ -52,10 +47,11 @@ export class Watcher {
 
   close() {
     getLogger().logLevelDown().log("Terminating watcher");
+
     clearTimeout(this.#processEventsTimeout);
     this.#abortController.abort();
-    this.#builder.close();
-    this.#server.close();
+
+    getLogger().log("Watcher terminated");
   }
 }
 

@@ -39,10 +39,18 @@ async function cli(argsOptions) {
     if (args.build || args.watch) {
       await (await Swappski.builder.init()).build();
       if (args.watch) {
-        Swappski.watcher.watch(Swappski.builder, Swappski.server);
+        Swappski.watcher.watch(Swappski.builder);
       } else {
         await Swappski.builder.close();
       }
+
+      const closeFunction = () => {
+        Swappski.builder.close();
+        Swappski.server.close();
+        Swappski.watcher.close();
+      };
+      process.on("SIGINT", closeFunction);
+      process.on("SIGTERM", closeFunction);
     }
   }
 }

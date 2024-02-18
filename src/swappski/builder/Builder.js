@@ -54,12 +54,11 @@ export class Builder {
   }
 
   async close() {
-    getLogger().log("Closing builder").logLevelUp();
+    getLogger().log("Terminating builder").logLevelUp();
 
     await this.#saveReportToFile();
 
-    getLogger().logLevelDown().log("Builder closed");
-    return this;
+    getLogger().logLevelDown().log("Builder terminated");
   }
 
   async #loadReport() {
@@ -236,7 +235,7 @@ export class Builder {
   }
 
   async #saveReport() {
-    // this.#report = this.#src.clone();
+    this.#report = this.#src.clone();
   }
 
   async #saveReportToFile() {

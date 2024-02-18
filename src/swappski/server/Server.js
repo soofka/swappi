@@ -67,14 +67,16 @@ export class Server {
 
     getLogger().log(`Server running at ${url}`);
     await open(url);
-
-    process.on("SIGTERM", () => this.close());
-    process.on("SIGINT", () => this.close());
   }
 
   close() {
     getLogger().logLevelDown().log("Terminating server");
-    this.#server.close();
+
+    if (this.#server) {
+      this.#server.close();
+    }
+
+    getLogger().log("Server terminated");
   }
 }
 
