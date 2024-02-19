@@ -21,7 +21,7 @@ export class CssPartialInjector extends PartialInjector {
     return this.#getElements(css.parse(file.src.content)).length > 0;
   }
 
-  async processPartials(content, files) {
+  async processPartials(content, dists) {
     const cssParser = css.parse(content);
     const elements = this.#getElements(cssParser);
     for (let rule of elements) {
@@ -29,7 +29,7 @@ export class CssPartialInjector extends PartialInjector {
         const declarationArray = declaration.value.substring(1).split(":");
         if (isInObject(this.partials, declarationArray[0])) {
           const partial = this.partials[declarationArray[0]];
-          declaration = this.executePartial(partial, files, declaration);
+          declaration = this.executePartial(partial, dists, declaration);
         }
       }
     }

@@ -217,7 +217,7 @@ export class Builder {
                 `${processor.constructor.name} processing dist ${dist.rel}`,
               );
               processing.push(
-                (dist = processor.process(dist, this.#src.files)),
+                (dist = processor.process(dist, this.#src.dists)),
               );
             }
             getLogger().logLevelDown();

@@ -10,8 +10,8 @@ export class TemplateProcessor extends ModuleProcessor {
     });
   }
 
-  async process(dist) {
-    dist.content = dist.content(getConfig().data);
+  async process(dist, dists) {
+    dist.content = dist.content(getConfig().data, dists);
     return dist;
   }
 }

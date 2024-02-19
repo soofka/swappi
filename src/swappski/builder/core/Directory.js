@@ -137,6 +137,14 @@ export class Directory extends Dirent {
     }
     return files;
   }
+
+  get dists() {
+    let dists = [];
+    for (let dirent of this.#dirents) {
+      dists.push(...dirent.dists);
+    }
+    return dists;
+  }
 }
 
 export default Directory;

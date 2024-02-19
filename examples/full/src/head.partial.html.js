@@ -1,5 +1,5 @@
 // USE FILES FOR ICONS
-const head = (data, files, htmlElement) => `
+const head = (data, dists, htmlElement) => `
   <head>
       <meta charset="utf-8">
       <title>${data.labels[data.langs[0]].meta.title}</title>
@@ -21,7 +21,7 @@ const head = (data, files, htmlElement) => `
             index > 0 ? `media="(prefers-color-scheme: ${theme.name})"` : "";
           return `
               <meta name="theme-color" content="${theme.color}" ${media}></meta>
-              <link rel="manifest" href="manifest-${data.langs[0]}-${theme.name}.webmanifest" ${media}/>
+              <link rel="manifest" href="${dists.find((dist) => dist.name === `manifest-${data.langs[0]}-${theme.name}` && dist.ext === ".webmanifest").rel}" ${media}>
           `;
         })
         .join("")}
@@ -29,15 +29,20 @@ const head = (data, files, htmlElement) => `
 
       ${data.langs
         .map(
-          (lang) => `
-          <link rel="alternate" href="${data.url}?lang=${lang}" hreflang="${lang}" />
-      `,
+          (lang) =>
+            `<link rel="alternate" href="${data.url}?lang=${lang}" hreflang="${lang}" />`,
         )
         .join("")}
       <link rel="canonical" href="${data.url}" />
 
-      <link rel="stylesheet" id="theme" href="style-${data.themes[0].name}.css" />
-      ${files.map((file) => `elo ${file.src.rel}`)}
+      <link rel="stylesheet" href="${dists.find((dist) => dist.name === "style" && dist.ext === ".css").rel}" />
+      ${dists
+        .filter((dist) => dist.name.startsWith("style-") && dist.ext === ".css")
+        .map(
+          (style) =>
+            `<link rel="stylesheet" href="${style.rel}" ${style.name === `style-${data.themes[0].name}` ? "" : `media="(prefers-color-scheme: ${data.themes[1].name})"`} />`,
+        )
+        .join("")}
   </head>
 `;
 

@@ -1,4 +1,4 @@
-const label = (data, files, htmlElement) => {
+const label = (data, dists, htmlElement) => {
   let tempLabel = data.labels.en;
   let value = htmlElement.attr("label-id");
   const keys = value.split(".");

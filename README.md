@@ -6,7 +6,6 @@
 
 - write unit tests
 - client script
-- fix bug where partials are not refreshing
 
 #### next
 
