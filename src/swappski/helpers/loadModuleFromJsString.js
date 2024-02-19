@@ -1,7 +1,7 @@
-import path from "path";
-
 export async function loadModuleFromJsString(content) {
-  const { default: module } = await import(`data:text/javascript,${content}`);
+  const { default: module } = await import(
+    `data:text/javascript,${encodeURIComponent(content)}`
+  );
   return module;
 }
 
