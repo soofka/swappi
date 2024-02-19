@@ -18,36 +18,43 @@ export class CssPartialInjector extends PartialInjector {
   }
 
   testIfHasPartials(file) {
-    return this.#getElements(css.parse(file.src.content)).length > 0;
+    return (
+      css
+        .parse(file.src.content)
+        .stylesheet.rules.filter((rule) => rule.type === "rule")
+        .map((rule) => {
+          rule.declarations = rule.declarations.filter(
+            (declaration) =>
+              declaration.type === "declaration" &&
+              declaration.property === this.options.declaration,
+          );
+          return rule;
+        })
+        .filter((rule) => rule.declarations.length > 0).length > 0
+    );
   }
 
   async processPartials(content, dists) {
     const cssParser = css.parse(content);
-    const elements = this.#getElements(cssParser);
-    for (let rule of elements) {
-      for (let declaration of rule.declarations) {
-        const declarationArray = declaration.value.substring(1).split(":");
-        if (isInObject(this.partials, declarationArray[0])) {
-          const partial = this.partials[declarationArray[0]];
-          declaration = this.executePartial(partial, dists, declaration);
-        }
-      }
-    }
-    return css.stringify(cssParser);
-  }
-
-  #getElements(cssParser) {
-    return cssParser.stylesheet.rules
-      .filter((rule) => rule.type === "rule")
-      .map((rule) => {
-        rule.declarations = rule.declarations.filter(
-          (declaration) =>
+    cssParser.stylesheet.rules = cssParser.stylesheet.rules.map((rule) => {
+      if (rule.type === "rule") {
+        rule.declarations = rule.declarations.map((declaration) => {
+          if (
             declaration.type === "declaration" &&
-            declaration.property === this.options.declaration,
-        );
-        return rule;
-      })
-      .filter((rule) => rule.declarations.length > 0);
+            declaration.property === this.options.declaration
+          ) {
+            const declarationArray = declaration.value.substring(1).split(":");
+            if (isInObject(this.partials, declarationArray[0])) {
+              const partial = this.partials[declarationArray[0]];
+              declaration = this.executePartial(partial, dists, declaration);
+            }
+          }
+          return declaration;
+        });
+      }
+      return rule;
+    });
+    return css.stringify(cssParser);
   }
 }
 

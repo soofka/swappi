@@ -1,5 +1,5 @@
 const backgroundImage = (data, dists, cssDeclaration) => {
-  // const valueArray = [];
+  const valueArray = [];
   // const fileArray = cssDeclaration.value.substring(1).split(":")[1].split(".");
   // const fileName = fileArray[0];
   // const fileExt = fileArray[1];
@@ -17,8 +17,8 @@ const backgroundImage = (data, dists, cssDeclaration) => {
   //   }
   // }
 
-  // cssDeclaration.property = "background-image";
-  // cssDeclaration.value = `image-set(${valueArray.join(",")})`;
+  cssDeclaration.property = "background-image";
+  cssDeclaration.value = `image-set(${valueArray.join(",")})`;
   return cssDeclaration;
 };
 

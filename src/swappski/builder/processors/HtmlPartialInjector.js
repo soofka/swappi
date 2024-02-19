@@ -19,27 +19,23 @@ export class HtmlPartialInjector extends PartialInjector {
   }
 
   testIfHasPartials(file) {
-    return this.#getElements(cheerio.load(file.src.content)).length > 0;
+    return (
+      cheerio.load(file.src.content)(`[${this.options.attribute}]`).length > 0
+    );
   }
 
-  async processPartials(content, files) {
+  async processPartials(content, dists) {
     const htmlParser = cheerio.load(content);
-    for (let element of this.#getElements(htmlParser)) {
+    for (let element of htmlParser(`[${this.options.attribute}]`)) {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr(this.options.attribute);
 
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
-        elementParsed.replaceWith(
-          this.executePartial(partial, files, elementParsed),
-        );
+        elementParsed.html(this.executePartial(partial, dists, elementParsed));
       }
     }
     return htmlParser.html();
-  }
-
-  #getElements(htmlParser) {
-    return htmlParser(`[${this.options.attribute}]`);
   }
 }
 

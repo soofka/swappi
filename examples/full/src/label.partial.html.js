@@ -19,8 +19,7 @@ const label = (data, dists, htmlElement) => {
     value = value.join("");
   }
 
-  htmlElement.html(value);
-  return htmlElement;
+  return value;
 };
 
 export default label;
