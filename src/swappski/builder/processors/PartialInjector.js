@@ -22,8 +22,7 @@ export class PartialInjector extends ModuleProcessor {
 
   test(direntData) {
     return (
-      this.#testIfPartial(direntData) ||
-      this.#testIfFileWithPartials(direntData)
+      this.#testIfPartial(direntData) || this.#testIfCanHavePartials(direntData)
     );
   }
 
@@ -31,7 +30,7 @@ export class PartialInjector extends ModuleProcessor {
     return this.options.test(direntData);
   }
 
-  #testIfFileWithPartials(direntData) {
+  #testIfCanHavePartials(direntData) {
     return direntData.ext === this.#ext;
   }
 
@@ -52,6 +51,8 @@ export class PartialInjector extends ModuleProcessor {
       if (!shouldBeRendered) {
         file.dists = [];
       }
+    } else if (this.testIfHasPartials(file)) {
+      file.isStatic = false;
     }
     return file;
   }

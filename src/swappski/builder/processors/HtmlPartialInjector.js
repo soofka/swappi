@@ -8,16 +8,23 @@ export class HtmlPartialInjector extends PartialInjector {
       options,
       {
         test: (direntData) =>
-          direntData.name.endsWith(".partial.html") && direntData.ext === ".js",
+          (direntData.name.endsWith(".partial") &&
+            direntData.ext === ".html") ||
+          (direntData.name.endsWith(".partial.html") &&
+            direntData.ext === ".js"),
         attribute: "data-swapp-partial",
       },
       ".html",
     );
   }
 
+  testIfHasPartials(file) {
+    return this.#getElements(cheerio.load(file.src.content)).length > 0;
+  }
+
   async processPartials(content, files) {
     const htmlParser = cheerio.load(content);
-    for (let element of htmlParser(`[${this.options.attribute}]`)) {
+    for (let element of this.#getElements(htmlParser)) {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr(this.options.attribute);
 
@@ -29,6 +36,10 @@ export class HtmlPartialInjector extends PartialInjector {
       }
     }
     return htmlParser.html();
+  }
+
+  #getElements(htmlParser) {
+    return htmlParser(`[${this.options.attribute}]`);
   }
 }
 

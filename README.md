@@ -10,6 +10,8 @@
 
 #### next
 
+- do i really always have to reprocess files that rely on other files?
+- improve error logging
 - tester
 - swappski elements as singletons?
 - swappski->swappi?

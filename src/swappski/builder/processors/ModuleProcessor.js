@@ -16,6 +16,9 @@ export class ModuleProcessor extends Processor {
     );
     // SyntaxError: Unexpected end of input
     // file.src.content = await loadModuleFromJsString(file.src.content);
+    if (isFunction(file.src.content) || isObject(file.src.content)) {
+      file.isStatic = false;
+    }
 
     const nameArray = file.src.name.split(".");
     if (nameArray.length > 2) {

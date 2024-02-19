@@ -26,6 +26,13 @@ export class File extends Dirent {
   set distsToProcess(value) {
     this.#distsToProcess = value;
   }
+  #isStatic = true;
+  get isStatic() {
+    return this.#isStatic;
+  }
+  set isStatic(value) {
+    this.#isStatic = value;
+  }
   #isModified = true;
   get isModified() {
     return this.#isModified;

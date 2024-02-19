@@ -128,17 +128,19 @@ export class Builder {
 
     let preparingCount = 0;
     for (let processor of this.#processors) {
-      getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
       const preparing = [];
       for (let file of this.#src.files) {
-        getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
+        getLogger()
+          .log(`${processor.constructor.name} testing file ${file.src.rel}`)
+          .logLevelUp();
         if (processor.test(file.src)) {
-          getLogger().log(`Preparing file ${file.src.rel}`);
+          getLogger().log(
+            `${processor.constructor.name} preparing file ${file.src.rel}`,
+          );
           preparing.push((file = processor.prepareFile(file)));
         }
         getLogger().logLevelDown();
       }
-      getLogger().logLevelDown();
       preparingCount += preparing.length;
       await Promise.all(preparing);
     }
@@ -153,6 +155,7 @@ export class Builder {
 
     for (let file of this.#src.files) {
       if (
+        file.isStatic &&
         !this.#isNewConfig &&
         this.#report &&
         isInArray(this.#report.files, (element) => element.isEqual(file))
@@ -179,8 +182,9 @@ export class Builder {
       } else {
         file.distsToProcess = file.dists;
       }
+
       getLogger().log(
-        `File ${file.src.rel} has ${file.distsToProcess.length}/${file.dists.length} dists to process`,
+        `File ${file.src.rel} is ${file.isStatic ? "" : "not "}static, is ${file.isModified ? "" : "not "}modified, and has ${file.distsToProcess.length}/${file.dists.length} dists to process`,
       );
     }
 
@@ -197,36 +201,34 @@ export class Builder {
   }
 
   async #process() {
-    getLogger().log("Processing files").logLevelUp();
+    getLogger().log("Processing dists").logLevelUp();
 
     let processingCount = 0;
     for (let processor of this.#processors) {
-      getLogger().log(`Processor: ${processor.constructor.name}`).logLevelUp();
       const processing = [];
       for (let file of this.#src.files) {
         if (getConfig().force || file.isModified) {
-          getLogger()
-            .log(`Processing dists of file ${file.src.rel}`)
-            .logLevelUp();
           for (let dist of file.distsToProcess) {
-            getLogger().log(`Testing file ${file.src.rel}`).logLevelUp();
+            getLogger()
+              .log(`${processor.constructor.name} testing file ${file.src.rel}`)
+              .logLevelUp();
             if (processor.test(file.src) || processor.test(dist)) {
-              getLogger().log(`Dist: ${dist.rel}`);
+              getLogger().log(
+                `${processor.constructor.name} processing dist ${dist.rel}`,
+              );
               processing.push(
                 (dist = processor.process(dist, this.#src.files)),
               );
             }
             getLogger().logLevelDown();
           }
-          getLogger().logLevelDown();
         }
       }
-      getLogger().logLevelDown();
       processingCount += processing.length;
       await Promise.all(processing);
     }
 
-    getLogger().logLevelDown().log(`${processingCount} files processed`);
+    getLogger().logLevelDown().log(`Dists processed ${processingCount} times`);
   }
 
   async #save() {
