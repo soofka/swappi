@@ -29,7 +29,7 @@ export class CssPartialInjector extends PartialInjector {
         const declarationArray = declaration.value.substring(1).split(":");
         if (isInObject(this.partials, declarationArray[0])) {
           const partial = this.partials[declarationArray[0]];
-          declaration = this.executePartial(partial, declaration, files);
+          declaration = this.executePartial(partial, files, declaration);
         }
       }
     }

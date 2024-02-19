@@ -7,6 +7,7 @@ import deleteDir from "./deleteDir.js";
 import deleteFile from "./deleteFile.js";
 import findInArray from "./findInArray.js";
 import getDirentObject from "./getDirentObject.js";
+import isArray from "./isArray.js";
 import isDeepEqual from "./isDeepEqual.js";
 import isFunction from "./isFunction.js";
 import isImage from "./isImage.js";
@@ -31,6 +32,7 @@ export {
   deleteFile,
   findInArray,
   getDirentObject,
+  isArray,
   isDeepEqual,
   isFunction,
   isImage,

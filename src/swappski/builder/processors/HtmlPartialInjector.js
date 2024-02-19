@@ -31,7 +31,7 @@ export class HtmlPartialInjector extends PartialInjector {
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
         elementParsed.replaceWith(
-          this.executePartial(partial, elementParsed, files),
+          this.executePartial(partial, files, elementParsed),
         );
       }
     }

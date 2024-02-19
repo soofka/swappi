@@ -210,7 +210,7 @@ export class Builder {
         if (getConfig().force || file.isModified) {
           for (let dist of file.distsToProcess) {
             getLogger()
-              .log(`${processor.constructor.name} testing file ${file.src.rel}`)
+              .log(`${processor.constructor.name} testing dist ${dist.rel}`)
               .logLevelUp();
             if (processor.test(file.src) || processor.test(dist)) {
               getLogger().log(

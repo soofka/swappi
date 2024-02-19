@@ -34,16 +34,10 @@ export class PartialInjector extends ModuleProcessor {
     return direntData.ext === this.#ext;
   }
 
-  addPartial(name, file) {
-    if (!isInObject(this.#partials, name)) {
-      this.#partials[name] = file;
-    }
-  }
-
   async prepareFile(file) {
     if (this.#testIfPartial(file.src)) {
       file = await super.prepareFile(file);
-      this.addPartial(file.dists[0].name, file);
+      this.#partials[file.dists[0].name] = file;
 
       const shouldBeRendered = isInObject(file.src.content, "renderToFile")
         ? file.src.content.renderToFile
@@ -73,7 +67,7 @@ export class PartialInjector extends ModuleProcessor {
     return dist;
   }
 
-  executePartial(partial, element, files) {
+  executePartial(partial, files, element) {
     return isFunction(partial.src.content)
       ? partial.src.content(getConfig().data, files, element)
       : isInObject(partial.src.content, "render") &&

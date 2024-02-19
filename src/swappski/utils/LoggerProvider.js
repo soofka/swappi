@@ -1,4 +1,5 @@
 import decorateWithSingleton from "./decorateWithSingleton.js";
+import { isArray } from "../helpers/index.js";
 import { getConfig } from "./ConfigProvider.js";
 
 class LoggerProvider {
@@ -17,18 +18,22 @@ class LoggerProvider {
     this.#logFile = getConfig().logFile || "";
   }
 
-  log(message, logLevel) {
-    this.#console("log", message, logLevel);
+  log(log, logLevel) {
+    this.#console("log", log, logLevel);
     return this;
   }
 
-  warn(message, logLevel) {
-    this.#console("warn", message, logLevel);
+  warn(log, logLevel) {
+    this.#console("warn", log, logLevel);
     return this;
   }
 
-  error(message, logLevel) {
-    this.#console("error", message, logLevel);
+  error(log, logLevel) {
+    this.#console(
+      "error",
+      log.stack.split("\n").map((line) => line.trim()),
+      logLevel,
+    );
     return this;
   }
 
@@ -47,19 +52,30 @@ class LoggerProvider {
     return this;
   }
 
-  #console(method, text, logLevel = this.#logLevel, withPrefix = true) {
-    const isMegaLog = logLevel >= 10 && withPrefix;
-    const standardText = `${method.toUpperCase()}\t${this.#prefix.repeat(logLevel)}> ${text}`;
-    let fullText = "";
-    fullText += isMegaLog ? `${this.#prefix.repeat(10)}\r\n` : "";
-    fullText += isMegaLog ? text : standardText;
-    fullText += isMegaLog ? `\r\n${this.#prefix.repeat(10)}` : "";
+  #console(method, logText, logLevel = this.#logLevel) {
     if (logLevel <= this.#verbosity) {
-      console[method](fullText);
+      console[method](this.#getLog(method, logText, logLevel));
     }
     if (this.#logFile !== "") {
-      this.#logs.push(`${Date.now()}: ${standardText}`);
+      this.#logs.push(this.#getLog(method, logText, logLevel, true));
     }
+  }
+
+  #getLog(method, logText, logLevel, withDate = false) {
+    let lineStart = `${method.toUpperCase()}${" ".repeat(6 - method.length)}${this.#prefix.repeat(logLevel)}> `;
+    if (withDate) {
+      const now = new Date().toISOString();
+      lineStart = `${now} ${lineStart}`;
+    }
+    return `${lineStart}${
+      isArray(logText)
+        ? logText
+            .map((line, index) =>
+              index === 0 ? line : `${" ".repeat(lineStart.length)}${line}`,
+            )
+            .join("\r\n")
+        : logText
+    }`;
   }
 }
 

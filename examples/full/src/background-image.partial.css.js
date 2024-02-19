@@ -18,7 +18,7 @@ const backgroundImage = (data, files, cssDeclaration) => {
   }
 
   cssDeclaration.property = "background-image";
-  cssDeclaration.value = `image-set(${valueArray.join(",")})`;
+  cssDeclaration.value = `image-setasd(${valueArray.join(",")})`;
   return cssDeclaration;
 };
 
