@@ -1,3 +1,5 @@
+import elements from "./elements";
+
 export const index = (data, dists) => `
   <!doctype html>
   <html lang="en">
@@ -44,10 +46,10 @@ export const index = (data, dists) => `
               ></a>
             </ul>
             <ul>
-              <a id="lang-toggle"
+              <a id="${elements.langToggle}"
                 ><li><p></p></li
               ></a>
-              <a id="theme-toggle"
+              <a id="${elements.themeToggle}"
                 ><li><p></p></li
               ></a>
             </ul>

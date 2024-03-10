@@ -31,6 +31,7 @@ const app = {
   },
 
   initLang: function () {
+    console.log("initing lang", this);
     let lang = navigator.language.substring(0, 2);
 
     if (localStorage.getItem("lang")) {
@@ -52,14 +53,12 @@ const app = {
   },
 
   setLang: function (lang, force = false) {
+    console.log("setting lang", this.getElement);
     if ((lang === "en" || lang === "pl") && (lang !== this.lang || force)) {
       this.lang = lang;
       localStorage.setItem("lang", lang);
       document.documentElement.setAttribute("lang", lang);
-      this.getElement(
-        "meta-lang",
-        'meta[http-equiv="content-language"]',
-      ).setAttribute("content", lang);
+      console.log("setting lang3", this.getElement);
       this.getElement("lang-toggle-text", "#lang-toggle p").innerText =
         lang === "en" ? "pl" : "en";
       this.setLabels();
@@ -139,7 +138,7 @@ const app = {
 
     const themeStyleLink = this.getElement(
       "theme-style-link",
-      'link[id="theme"]',
+      "a#theme-toggle",
     );
     themeStyleLink.href =
       themeStyleLink.attributes[`data-href-${this.theme}`].value;
