@@ -7,8 +7,8 @@ import {
   ImgProcessor,
   JsMinifier,
   TemplateProcessor,
-  RoutingProvider,
 } from "./builder/processors/index.js";
+import { RoutingProvider } from "./builder/providers/index.js";
 
 export const config = {
   src: path.resolve("src"),
@@ -35,7 +35,6 @@ export const config = {
       new TemplateProcessor(),
       new HtmlPartialInjector(),
       new CssPartialInjector(),
-      new RoutingProvider(),
     ],
     prod: [
       new TemplateProcessor(),
@@ -45,9 +44,9 @@ export const config = {
       new CssMinifier(),
       new JsMinifier(),
       new ImgProcessor(),
-      new RoutingProvider(),
     ],
   },
+  providers: [new RoutingProvider()],
 
   data: {},
 };

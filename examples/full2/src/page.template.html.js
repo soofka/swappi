@@ -1,5 +1,5 @@
 const page = (data, dists, key) => {
-  const { type, meta, content } = data.routes[key];
+  const { type, meta, content } = data.pages[key];
   const metaData = encodeURI(JSON.stringify(meta));
   const mainData = encodeURI(JSON.stringify({ type, content }));
 
@@ -90,7 +90,7 @@ const page = (data, dists, key) => {
 export default {
   generate: (data) => {
     const dists = [];
-    for (let key of Object.keys(data.routes)) {
+    for (let key of Object.keys(data.pages)) {
       dists.push({
         name: key,
         content: (data, dists) => page(data, dists, key),

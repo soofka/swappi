@@ -16,13 +16,18 @@ export class Builder {
   #dist;
   #report;
   #processors;
+  #providers;
   #isNewConfig = true;
 
-  constructor(processors) {
+  constructor() {
     this.#processors =
-      (isInObject(processors, getConfig().mode) &&
-        processors[getConfig().mode]) ||
-      getConfig().processors[getConfig().mode];
+      (isInObject(getConfig().processors, getConfig().mode) &&
+        getConfig().processors[getConfig().mode]) ||
+      getConfig().processors;
+    this.#providers =
+      (isInObject(getConfig().providers, getConfig().mode) &&
+        getConfig().providers[getConfig().mode]) ||
+      getConfig().providers;
   }
 
   async init() {
@@ -145,6 +150,10 @@ export class Builder {
       await Promise.all(preparing);
     }
 
+    for (let provider of this.#providers) {
+      this.#src = provider.provide(this.#src);
+    }
+
     this.#markForProcessing();
 
     getLogger().logLevelDown().log(`${preparingCount} files prepared`);
@@ -228,19 +237,7 @@ export class Builder {
       await Promise.all(processing);
     }
 
-    this.#closeProcessing();
     getLogger().logLevelDown().log(`Dists processed ${processingCount} times`);
-  }
-
-  async #closeProcessing() {
-    getLogger().log("Closing processors").logLevelUp();
-
-    for (let processor of this.#processors) {
-      this.#src = processor.close(this.#src);
-      getLogger().log(`${processor.constructor.name} closed ${this.#src}`);
-    }
-
-    getLogger().logLevelDown().log("Processors closed");
   }
 
   async #save() {

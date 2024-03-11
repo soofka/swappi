@@ -2,7 +2,7 @@ import path from "path";
 import http from "http";
 import open from "open";
 import mimeTypes from "mime-db";
-import { isInObject, loadFile, loadJson } from "../helpers/index.js";
+import { isObject, isInObject, loadFile, loadJson } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class Server {
@@ -33,8 +33,9 @@ export class Server {
           `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
         );
 
-        const url = req.url.substring(1);
-        const filePath = isInObject(routing, url) ? routing[url] : url;
+        const filePath = isInObject(routing, req.url)
+          ? routing[req.url]
+          : req.url;
         const mimeType = Object.keys(mimeTypes).find(
           (key) =>
             Object.hasOwn(mimeTypes[key], "extensions") &&

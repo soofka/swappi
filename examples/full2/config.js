@@ -72,18 +72,22 @@ const themes = [
 
 const metaSeparator = " | ";
 const routes = {};
-const routesData = {};
-for (let lang of langs) {
-  routes[`index-${lang}`] = "page.template.html";
-  routesData[`index-${lang}`] = {
+const pages = {};
+for (let index in langs) {
+  const lang = langs[index];
+  routes[`/index-${lang}`] =
+    index == 0
+      ? { template: "page.template.html", alts: ["/"] }
+      : "page.template.html";
+  pages[`index-${lang}`] = {
     type: "cover",
     meta: {
       title: labels[lang].meta.title,
       description: labels[lang].meta.description,
     },
   };
-  routes[`articles-${lang}`] = "page.template.html";
-  routesData[`articles-${lang}`] = {
+  routes[`/articles-${lang}`] = "page.template.html";
+  pages[`articles-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -92,8 +96,8 @@ for (let lang of langs) {
     content: articles,
   };
   for (let article of articles) {
-    routes[`article/${article.id}`] = "page.template.html";
-    routesData[`article/${article.id}`] = {
+    routes[`/article/${article.id}`] = "page.template.html";
+    pages[`article/${article.id}`] = {
       type: "item",
       meta: {
         title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -101,8 +105,8 @@ for (let lang of langs) {
       },
     };
   }
-  routes[`blog-${lang}`] = "page.template.html";
-  routesData[`blog-${lang}`] = {
+  routes[`/blog-${lang}`] = "page.template.html";
+  pages[`blog-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -111,8 +115,8 @@ for (let lang of langs) {
     content: blog,
   };
   for (let post of blog) {
-    routes[`blog/${post.id}`] = "page.template.html";
-    routesData[`blog/${post.id}`] = {
+    routes[`/blog/${post.id}`] = "page.template.html";
+    pages[`blog/${post.id}`] = {
       type: "item",
       meta: {
         title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -120,8 +124,8 @@ for (let lang of langs) {
       },
     };
   }
-  routes[`courses-${lang}`] = "page.template.html";
-  routesData[`courses-${lang}`] = {
+  routes[`/courses-${lang}`] = "page.template.html";
+  pages[`courses-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -129,8 +133,8 @@ for (let lang of langs) {
     },
     content: courses,
   };
-  routes[`projects-${lang}`] = "page.template.html";
-  routesData[`projects-${lang}`] = {
+  routes[`/projects-${lang}`] = "page.template.html";
+  pages[`projects-${lang}`] = {
     template: "page.template.html",
     type: "list",
     meta: {
@@ -139,8 +143,8 @@ for (let lang of langs) {
     },
     content: projects,
   };
-  routes[`talks-${lang}`] = "page.template.html";
-  routesData[`talks-${lang}`] = {
+  routes[`/talks-${lang}`] = "page.template.html";
+  pages[`talks-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -165,7 +169,7 @@ export const config = {
     themes,
     colors,
     labels,
-    routes: routesData,
+    pages,
   },
 };
 

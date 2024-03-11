@@ -43,7 +43,7 @@ export class ImgProcessor extends Processor {
     }
     const type = dist.ext.substring(1);
     const isValidWidth = !isNaN(width);
-    const isValidType = isInObject(sharp, type) && isFunction(image[type]);
+    const isValidType = isInObject(sharp, type) && isFunction(sharp[type]);
 
     if (isValidWidth || isValidType) {
       let image = sharp(Buffer.from(dist.content));

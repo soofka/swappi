@@ -28,10 +28,6 @@ class Processor {
   async process(dist) {
     return dist;
   }
-
-  close(src) {
-    return src;
-  }
 }
 
 export default Processor;
