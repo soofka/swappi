@@ -4,8 +4,9 @@
 
 #### now
 
-- write unit tests
-- client script
+- proper data
+- routing to pages
+- articles and blog posts
 
 #### next
 

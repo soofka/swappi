@@ -1,5 +1,6 @@
 import path from "path";
 import Processor from "./Processor.js";
+import { DirentData } from "../core/index.js";
 import {
   isFunction,
   isInObject,
@@ -25,7 +26,12 @@ export class ModuleProcessor extends Processor {
       file.dists[0].content = file.src.content;
     } else if (isObject(file.src.content)) {
       if (isInObject(file.src.content, "generate")) {
-        file.dists = file.src.content.generate(getConfig().data);
+        file.dists = file.src.content.generate(getConfig().data).map((dist) => {
+          const newDist = file.dists[0].clone();
+          newDist.name = dist.name;
+          newDist.content = dist.content;
+          return newDist;
+        });
       } else {
         file.dists = Object.keys(file.src.content)
           .filter((key) => isFunction(file.src.content[key]))

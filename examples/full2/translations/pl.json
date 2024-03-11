@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "title": "swn.ski",
+    "description": "swn.ski description"
+  },
+  "navigation": {
+    "home": "home",
+    "about": "o mnie",
+    "contact": "kontakt"
+  },
+  "pages": {
+    "index": {},
+    "articles": {
+      "meta": {
+        "title": "Articles",
+        "description": "Articles"
+      }
+    },
+    "blog": {
+      "meta": {
+        "title": "Blog",
+        "description": "Blog"
+      }
+    },
+    "courses": {
+      "meta": {
+        "title": "Courses",
+        "description": "Courses"
+      }
+    },
+    "projects": {
+      "meta": {
+        "title": "Projects",
+        "description": "Projects"
+      }
+    },
+    "talks": {
+      "meta": {
+        "title": "Talks",
+        "description": "Talks"
+      }
+    }
+  }
+}

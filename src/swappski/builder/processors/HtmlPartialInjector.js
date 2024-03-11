@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
 import { isInObject } from "../../helpers/index.js";
+import { getLogger } from "../../utils/index.js";
 
 export class HtmlPartialInjector extends PartialInjector {
   constructor(options) {
@@ -12,27 +13,41 @@ export class HtmlPartialInjector extends PartialInjector {
             direntData.ext === ".html") ||
           (direntData.name.endsWith(".partial.html") &&
             direntData.ext === ".js"),
-        attribute: "data-swapp-partial",
+        selector: "partial",
       },
       ".html",
     );
   }
 
   testIfHasPartials(file) {
-    return (
-      cheerio.load(file.src.content)(`[${this.options.attribute}]`).length > 0
-    );
+    return cheerio.load(file.src.content)(this.options.selector).length > 0;
   }
 
   async processPartials(content, dists) {
     const htmlParser = cheerio.load(content);
-    for (let element of htmlParser(`[${this.options.attribute}]`)) {
+    for (let element of htmlParser(this.options.selector)) {
       const elementParsed = htmlParser(element);
-      const partialName = elementParsed.attr(this.options.attribute);
+      const partialName = elementParsed.attr("name");
+      let partialData = elementParsed.attr("dupa");
+      console.log(
+        "HtmlPartialInjector says",
+        element.attribs,
+        partialName,
+        partialData,
+      );
+
+      try {
+        partialData = JSON.parse(decodeURI(partialData));
+      } catch (e) {
+        getLogger().warn(`Cannot parse partial data: ${partialData}`);
+        partialData = {};
+      }
 
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
-        elementParsed.html(this.executePartial(partial, dists, elementParsed));
+        elementParsed.replaceWith(
+          this.executePartial(partial, dists, partialData),
+        );
       }
     }
     return htmlParser.html();

@@ -67,12 +67,12 @@ export class PartialInjector extends ModuleProcessor {
     return dist;
   }
 
-  executePartial(partial, dists, element) {
+  executePartial(partial, dists, partialData) {
     return isFunction(partial.src.content)
-      ? partial.src.content(getConfig().data, dists, element)
+      ? partial.src.content(getConfig().data, dists, partialData)
       : isInObject(partial.src.content, "render") &&
           isFunction(partial.src.content.render)
-        ? partial.src.content.render(getConfig().data, dists, element)
+        ? partial.src.content.render(getConfig().data, dists, partialData)
         : partial.src.content;
   }
 }

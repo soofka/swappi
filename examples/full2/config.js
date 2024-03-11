@@ -1,6 +1,44 @@
 import path from "path";
 
+const en = (
+  await import("./translations/en.json", {
+    assert: { type: "json" },
+  })
+).default;
+const pl = (
+  await import("./translations/pl.json", {
+    assert: { type: "json" },
+  })
+).default;
+const articles = (
+  await import("./data/articles.json", {
+    assert: { type: "json" },
+  })
+).default;
+const blog = (
+  await import("./data/blog.json", {
+    assert: { type: "json" },
+  })
+).default;
+const courses = (
+  await import("./data/courses.json", {
+    assert: { type: "json" },
+  })
+).default;
+const projects = (
+  await import("./data/projects.json", {
+    assert: { type: "json" },
+  })
+).default;
+const talks = (
+  await import("./data/talks.json", {
+    assert: { type: "json" },
+  })
+).default;
+
 const appPath = path.resolve(path.join("examples", "full2"));
+const langs = ["en", "pl"];
+const labels = { en, pl };
 const colors = {
   grayscale: [
     "#000000",
@@ -27,6 +65,80 @@ const colors = {
     },
   },
 };
+const themes = [
+  { name: "light", color: colors.grayscale[7] },
+  { name: "dark", color: colors.grayscale[0] },
+];
+
+const metaSeparator = " | ";
+const pages = {};
+for (let lang of langs) {
+  pages[`index-${lang}`] = {
+    type: "cover",
+    meta: {
+      title: labels[lang].meta.title,
+      description: labels[lang].meta.description,
+    },
+  };
+  pages[`articles-${lang}`] = {
+    type: "list",
+    meta: {
+      title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
+      description: `${labels[lang].pages.articles.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+    },
+    content: articles,
+  };
+  for (let article of articles) {
+    pages[`article/${article.id}`] = {
+      type: "item",
+      meta: {
+        title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
+        description: `${article.description}${metaSeparator}${labels[lang].meta.description}`,
+      },
+    };
+  }
+  pages[`blog-${lang}`] = {
+    type: "list",
+    meta: {
+      title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
+      description: `${labels[lang].pages.blog.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+    },
+    content: blog,
+  };
+  for (let post of blog) {
+    pages[`blog/${post.id}`] = {
+      type: "item",
+      meta: {
+        title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
+        description: `${post.description}${metaSeparator}${labels[lang].meta.description}`,
+      },
+    };
+  }
+  pages[`courses-${lang}`] = {
+    type: "list",
+    meta: {
+      title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
+      description: `${labels[lang].pages.courses.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+    },
+    content: courses,
+  };
+  pages[`projects-${lang}`] = {
+    type: "list",
+    meta: {
+      title: `${labels[lang].pages.projects.meta.title}${metaSeparator}${labels[lang].meta.title}`,
+      description: `${labels[lang].pages.projects.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+    },
+    content: projects,
+  };
+  pages[`talks-${lang}`] = {
+    type: "list",
+    meta: {
+      title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,
+      description: `${labels[lang].pages.talks.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+    },
+    content: talks,
+  };
+}
 
 export const config = {
   src: path.join(appPath, "src"),
@@ -38,104 +150,11 @@ export const config = {
     type: "website",
     url: "https://swn.ski",
     author: "Jakub Sowiński <j@swn.ski> (https://swn.ski)",
-
-    themes: [
-      { name: "light", color: colors.grayscale[7] },
-      { name: "dark", color: colors.grayscale[0] },
-    ],
-    langs: ["en", "pl"],
+    langs,
+    pages,
+    themes,
     colors,
-
-    labels: {
-      en: {
-        meta: {
-          title: "swn.ski",
-          description: "swn.ski description",
-        },
-        navigation: {
-          home: "home",
-          about: "o mnie",
-          contact: "kontakt",
-        },
-        about: {
-          intro: {
-            head: "Cześć!",
-            lead: "My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.",
-            text: [
-              "<p>I can help you, your developers, development teams, and your software itself become better.</p>",
-              "<p>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</p>",
-            ],
-          },
-          developer: {
-            head: "Developer",
-            lead: "I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.",
-            text: "Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.",
-          },
-          architect: {
-            head: "Architect",
-            lead: "I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.",
-            text: "Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.",
-          },
-          teacher: {
-            head: "Teacher",
-            lead: "I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for 'Software Architecture' classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.",
-            text: "Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.",
-          },
-          person: {
-            head: "Person",
-            lead: "I am human being.",
-            text: "I love music, so check out my last.fm profile!",
-          },
-        },
-        contact: {
-          head: "Contact me",
-        },
-      },
-      pl: {
-        meta: {
-          title: "swn.ski",
-          description: "swn.ski opis",
-        },
-        navigation: {
-          home: "home",
-          about: "about",
-          contact: "contact",
-        },
-        about: {
-          intro: {
-            head: "Hello!",
-            lead: "My name is Jakub, I am a software developer, architect, and teacher based in Warsaw, Poland.",
-            text: [
-              "<p>I can help you, your developers, development teams, and your software itself become better.</p>",
-              "<p>Scroll right &rarr; to read more about me, or scroll down &darr; to contact me.</p>",
-            ],
-          },
-          developer: {
-            head: "Developer",
-            lead: "I have over 10 years of experience as a full-stack web developer in various companies, projects, and programming languages.",
-            text: "Check out my LinkedIn to read more about my experience, or browse some of my projects on my GitHub.",
-          },
-          architect: {
-            head: "Architect",
-            lead: "I have over 5 years of experience as a software and solution architect for large, international corporation. As an only architect responsible for frontend development, it was my responsibility to define, document, and help implement architecture for product built by hundreds of developers.",
-            text: "Check out my Medium to read some of my articles, or click here to watch some of my talks on software architecture.",
-          },
-          teacher: {
-            head: "Teacher",
-            lead: "I have over 5 years of experience as a coach, mentor, trainer, and teacher in IT. I worked as a coach, mentor, and frontend chapter lead in my previous companies. I was an IT teacher in high school and am a lecturer for 'Software Architecture' classes at PJATK university in Warsaw. I work as a trainer with non-profit IT training organizations such as girls.js.",
-            text: "Click here to access some of my free courses, or click here to watch some of my talks from past IT conferences.",
-          },
-          person: {
-            head: "Person",
-            lead: "I am human being.",
-            text: "I love music, so check out my last.fm profile!",
-          },
-        },
-        contact: {
-          head: "Contact me",
-        },
-      },
-    },
+    labels,
   },
 };
 
