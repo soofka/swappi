@@ -163,7 +163,6 @@ const mainItem = () => `MAINITEM`;
 
 const main = (data, dists, partialData) => {
   const { type, content } = partialData;
-  console.log("robie strone", type, content);
   if (type === "cover") {
     return mainCover();
   } else {

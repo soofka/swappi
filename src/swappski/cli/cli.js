@@ -32,10 +32,6 @@ async function cli(argsOptions) {
       );
     }
 
-    if (args.run) {
-      Swappski.server.serve();
-    }
-
     if (args.build || args.watch) {
       if (args.watch) {
         (await Swappski.watcher.init()).watch();
@@ -44,15 +40,19 @@ async function cli(argsOptions) {
         await Swappski.builder.build();
         await Swappski.builder.close();
       }
-
-      const closeFunction = () => {
-        Swappski.builder.close();
-        Swappski.server.close();
-        Swappski.watcher.close();
-      };
-      process.on("SIGINT", closeFunction);
-      process.on("SIGTERM", closeFunction);
     }
+
+    if (args.run) {
+      Swappski.server.serve();
+    }
+
+    const closeFunction = () => {
+      Swappski.builder.close();
+      Swappski.server.close();
+      Swappski.watcher.close();
+    };
+    process.on("SIGINT", closeFunction);
+    process.on("SIGTERM", closeFunction);
   }
 }
 

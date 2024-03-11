@@ -28,13 +28,7 @@ export class HtmlPartialInjector extends PartialInjector {
     for (let element of htmlParser(this.options.selector)) {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr("name");
-      let partialData = elementParsed.attr("dupa");
-      console.log(
-        "HtmlPartialInjector says",
-        element.attribs,
-        partialName,
-        partialData,
-      );
+      let partialData = elementParsed.attr("data");
 
       try {
         partialData = JSON.parse(decodeURI(partialData));

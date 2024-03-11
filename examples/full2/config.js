@@ -71,16 +71,19 @@ const themes = [
 ];
 
 const metaSeparator = " | ";
-const pages = {};
+const routes = {};
+const routesData = {};
 for (let lang of langs) {
-  pages[`index-${lang}`] = {
+  routes[`index-${lang}`] = "page.template.html";
+  routesData[`index-${lang}`] = {
     type: "cover",
     meta: {
       title: labels[lang].meta.title,
       description: labels[lang].meta.description,
     },
   };
-  pages[`articles-${lang}`] = {
+  routes[`articles-${lang}`] = "page.template.html";
+  routesData[`articles-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -89,7 +92,8 @@ for (let lang of langs) {
     content: articles,
   };
   for (let article of articles) {
-    pages[`article/${article.id}`] = {
+    routes[`article/${article.id}`] = "page.template.html";
+    routesData[`article/${article.id}`] = {
       type: "item",
       meta: {
         title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -97,7 +101,8 @@ for (let lang of langs) {
       },
     };
   }
-  pages[`blog-${lang}`] = {
+  routes[`blog-${lang}`] = "page.template.html";
+  routesData[`blog-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -106,7 +111,8 @@ for (let lang of langs) {
     content: blog,
   };
   for (let post of blog) {
-    pages[`blog/${post.id}`] = {
+    routes[`blog/${post.id}`] = "page.template.html";
+    routesData[`blog/${post.id}`] = {
       type: "item",
       meta: {
         title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -114,7 +120,8 @@ for (let lang of langs) {
       },
     };
   }
-  pages[`courses-${lang}`] = {
+  routes[`courses-${lang}`] = "page.template.html";
+  routesData[`courses-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -122,7 +129,9 @@ for (let lang of langs) {
     },
     content: courses,
   };
-  pages[`projects-${lang}`] = {
+  routes[`projects-${lang}`] = "page.template.html";
+  routesData[`projects-${lang}`] = {
+    template: "page.template.html",
     type: "list",
     meta: {
       title: `${labels[lang].pages.projects.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -130,7 +139,8 @@ for (let lang of langs) {
     },
     content: projects,
   };
-  pages[`talks-${lang}`] = {
+  routes[`talks-${lang}`] = "page.template.html";
+  routesData[`talks-${lang}`] = {
     type: "list",
     meta: {
       title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -144,6 +154,7 @@ export const config = {
   src: path.join(appPath, "src"),
   dist: path.join(appPath, "dist"),
   reportFile: path.join(appPath, "report.json"),
+  routes,
 
   data: {
     name: "swn.ski",
@@ -151,10 +162,10 @@ export const config = {
     url: "https://swn.ski",
     author: "Jakub Sowiński <j@swn.ski> (https://swn.ski)",
     langs,
-    pages,
     themes,
     colors,
     labels,
+    routes: routesData,
   },
 };
 

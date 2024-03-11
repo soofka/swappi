@@ -7,6 +7,7 @@ import JsMinifier from "./JsMinifier.js";
 import ModuleProcessor from "./ModuleProcessor.js";
 import PartialInjector from "./PartialInjector.js";
 import Processor from "./Processor.js";
+import RoutingProvider from "./RoutingProvider.js";
 import TemplateProcessor from "./TemplateProcessor.js";
 
 export {
@@ -19,5 +20,6 @@ export {
   ModuleProcessor,
   PartialInjector,
   Processor,
+  RoutingProvider,
   TemplateProcessor,
 };

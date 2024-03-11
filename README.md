@@ -7,6 +7,8 @@
 - proper data
 - routing to pages
 - articles and blog posts
+- active in menu
+- client side
 
 #### next
 

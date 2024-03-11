@@ -1,5 +1,5 @@
 const page = (data, dists, key) => {
-  const { type, meta, content } = data.pages[key];
+  const { type, meta, content } = data.routes[key];
   const metaData = encodeURI(JSON.stringify(meta));
   const mainData = encodeURI(JSON.stringify({ type, content }));
 
@@ -7,7 +7,7 @@ const page = (data, dists, key) => {
     <!doctype html>
     <html lang="${data.lang}">
       <head>
-        <partial name="meta" dupa="${metaData}"></partial>
+        <partial name="meta" data="${metaData}"></partial>
         <meta name="robots" content="index,follow"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
       
@@ -65,7 +65,7 @@ const page = (data, dists, key) => {
             </nav>
           </div>
         </header>
-        <partial name="main" dupa="${mainData}"></partial>
+        <partial name="main" data="${mainData}"></partial>
         <footer>
           <div class="wrapper">
             <p>
@@ -90,7 +90,7 @@ const page = (data, dists, key) => {
 export default {
   generate: (data) => {
     const dists = [];
-    for (let key of Object.keys(data.pages)) {
+    for (let key of Object.keys(data.routes)) {
       dists.push({
         name: key,
         content: (data, dists) => page(data, dists, key),

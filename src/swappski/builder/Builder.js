@@ -228,7 +228,19 @@ export class Builder {
       await Promise.all(processing);
     }
 
+    this.#closeProcessing();
     getLogger().logLevelDown().log(`Dists processed ${processingCount} times`);
+  }
+
+  async #closeProcessing() {
+    getLogger().log("Closing processors").logLevelUp();
+
+    for (let processor of this.#processors) {
+      this.#src = processor.close(this.#src);
+      getLogger().log(`${processor.constructor.name} closed ${this.#src}`);
+    }
+
+    getLogger().logLevelDown().log("Processors closed");
   }
 
   async #save() {

@@ -8,6 +8,9 @@ export class Directory extends Dirent {
   get dirents() {
     return this.#dirents;
   }
+  set dirents(value) {
+    this.#dirents = value;
+  }
 
   constructor(absPath, relDir) {
     super(absPath, relDir);
