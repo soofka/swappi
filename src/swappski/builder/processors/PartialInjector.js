@@ -35,6 +35,9 @@ export class PartialInjector extends ModuleProcessor {
   }
 
   async prepareFile(file) {
+    if (this.testIfHasPartials(file.src.content)) {
+      file.isStatic = false;
+    }
     if (this.#testIfPartial(file.src)) {
       file = await super.prepareFile(file);
       this.#partials[file.dists[0].name] = file;
@@ -45,8 +48,6 @@ export class PartialInjector extends ModuleProcessor {
       if (!shouldBeRendered) {
         file.dists = [];
       }
-    } else if (this.testIfHasPartials(file)) {
-      file.isStatic = false;
     }
     return file;
   }
@@ -61,10 +62,16 @@ export class PartialInjector extends ModuleProcessor {
       ) {
         dist.content = dist.content.render(getConfig().data, files);
       }
-    } else {
-      dist.content = await this.processPartials(dist.content, files);
     }
+    dist.content = await this.#replacePartials(dist.content, files);
     return dist;
+  }
+
+  async #replacePartials(content, files) {
+    while (this.testIfHasPartials(content)) {
+      content = await this.processPartials(content, files);
+    }
+    return content;
   }
 
   executePartial(partial, dists, partialData) {

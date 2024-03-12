@@ -3,13 +3,44 @@
     "title": "swn.ski",
     "description": "swn.ski description"
   },
-  "navigation": {
+  "nav": {
     "home": "home",
-    "about": "o mnie",
-    "contact": "kontakt"
+    "articles": "artykuły",
+    "blog": "blog",
+    "courses": "szkolenia",
+    "project": "projekty",
+    "talks": "wystąpienia"
   },
   "pages": {
-    "index": {},
+    "home": {
+      "intro": {
+        "head": "lorem duporem",
+        "lead": "lorem duporem",
+        "text": "lorem duporem",
+        "info": "check out my work",
+        "contact": "contact me"
+      },
+      "architect": {
+        "head": "lorem duporem",
+        "lead": "lorem duporem",
+        "text": "lorem duporem"
+      },
+      "developer": {
+        "head": "lorem duporem",
+        "lead": "lorem duporem",
+        "text": "lorem duporem"
+      },
+      "leader": {
+        "head": "lorem duporem",
+        "lead": "lorem duporem",
+        "text": "lorem duporem"
+      },
+      "contact": {
+        "head": "lorem duporem",
+        "lead": "lorem duporem",
+        "text": "lorem duporem"
+      }
+    },
     "articles": {
       "meta": {
         "title": "Articles",

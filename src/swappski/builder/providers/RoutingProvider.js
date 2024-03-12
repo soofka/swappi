@@ -12,21 +12,10 @@ export class RoutingProvider extends Provider {
   provide(src) {
     const routing = {};
     for (let route of Object.keys(getConfig().routes)) {
-      const routeOptions = getConfig().routes[route];
-      let alts = [];
-      let template;
-      if (isObject(routeOptions)) {
-        template = routeOptions.template;
-        alts = routeOptions.alts;
-      } else {
-        template = routeOptions;
-      }
-
+      const { template, pageName, alts = [] } = getConfig().routes[route];
       const srcFile = src.files.find((file) => file.src.name === template);
       if (srcFile) {
-        const dist = srcFile.dists.find(
-          (dist) => dist.name === route.substring(1),
-        );
+        const dist = srcFile.dists.find((dist) => dist.name === pageName);
         if (dist) {
           routing[route] = dist.full;
           for (let alt of alts) {

@@ -1,11 +1,10 @@
-const page = (data, dists, key) => {
-  const { type, meta, content } = data.pages[key];
+const page = (data, dists, lang, type, meta, content) => {
   const metaData = encodeURI(JSON.stringify(meta));
-  const mainData = encodeURI(JSON.stringify({ type, content }));
+  const mainData = encodeURI(JSON.stringify({ lang, type, content }));
 
   return `
     <!doctype html>
-    <html lang="${data.lang}">
+    <html lang="${lang}">
       <head>
         <partial name="meta" data="${metaData}"></partial>
         <meta name="robots" content="index,follow"/>
@@ -50,13 +49,18 @@ const page = (data, dists, key) => {
           <div class="wrapper">
             <nav>
               <ul>
-                <a href="#" id="logo"
-                  ><li><h4>swn.ski</h4></li></a
-                ><a href="#"><li>projects</li></a
-                ><a href="#"><li>courses</li></a
-                ><a href="#"><li>talks</li></a
-                ><a href="#"><li>articles</li></a
-                ><a href="#"><li>blog</li></a>
+                <a href="#" id="logo"><li><h4>swn.ski</h4></li></a>
+                <a href="#"><li>
+                  <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.home", lang }))}"></partial>
+                </li></a><a href="#"><li>
+                  <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.courses", lang }))}"></partial>
+                </li></a><a href="#"><li>
+                  <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.talks", lang }))}"></partial>
+                </li></a><a href="#"><li>
+                  <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.articles", lang }))}"></partial>
+                </li></a><a href="#"><li>
+                  <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.blog", lang }))}"></partial>
+                </li></a>
               </ul>
               <ul>
                 <a href="#" id="lang-toggle"><li>pl</li></a
@@ -90,11 +94,15 @@ const page = (data, dists, key) => {
 export default {
   generate: (data) => {
     const dists = [];
-    for (let key of Object.keys(data.pages)) {
-      dists.push({
-        name: key,
-        content: (data, dists) => page(data, dists, key),
-      });
+    for (let lang of Object.keys(data.pages)) {
+      for (let pageName of Object.keys(data.pages[lang])) {
+        const { type, meta, content } = data.pages[lang][pageName];
+        dists.push({
+          name: pageName,
+          content: (data, dists) =>
+            page(data, dists, lang, type, meta, content),
+        });
+      }
     }
     return dists;
   },

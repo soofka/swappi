@@ -17,10 +17,10 @@ export class CssPartialInjector extends PartialInjector {
     );
   }
 
-  testIfHasPartials(file) {
+  testIfHasPartials(content) {
     return (
       css
-        .parse(file.src.content)
+        .parse(content)
         .stylesheet.rules.filter((rule) => rule.type === "rule")
         .map((rule) => {
           rule.declarations = rule.declarations.filter(

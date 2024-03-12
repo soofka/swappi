@@ -1,4 +1,4 @@
-const mainCover = () => `
+const mainCover = (lang) => `
   <main>
     <section id="hero">
       <div class="wrapper">
@@ -8,29 +8,17 @@ const mainCover = () => `
     <section id="intro">
       <div class="wrapper">
         <article>
-          <h1>ELO</h1>
+          <h1><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.head", lang }))}"></partial></h1>
           <div class="col-3-1">
             <div class="col col-3">
-              <h3>
-                My name is Jakub. I am a software enthusiast, who works as a
-                software and solution architect, software developer, as well
-                as tech leader and teacher. Welcome to my corner of the Web.
-              </h3>
-              <p>
-                If you're intereste in my work experience, please refer to my
-                <a href="#">resume</a>.
-              </p>
-              <p>
-                Otherwise, scroll down to check out some of my work. If you'll
-                find it interesting, feel free to contact me. I'm sure we
-                could do something great together!
-              </p>
+              <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.lead", lang }))}"></partial></h3>
+              <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button>Check out my work</button>
-                <button>Contact me</button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.info", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.contact", lang }))}"></partial></button>
               </div>
             </div>
-            <div class="col"><img src="me2.jpg" /></div>
+            <div class="col"><partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></partial></div>
           </div>
         </article>
       </div>
@@ -38,24 +26,15 @@ const mainCover = () => `
     <section id="architect">
       <div class="wrapper">
         <article>
-          <h2>Software architecture</h2>
+          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.head", lang }))}"></partial></h2>
           <div class="col-3-1">
-            <div class="col"><img src="me2.jpg" /></div>
+            <div class="col"><partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></div>
             <div class="col col-3">
-              <h3>
-                I have over 5 years of experience in software and solution
-                architecture roles, as well as over 3 years of experience as a
-                lecturer in software architecture at Polish-Japanese Academy
-                of Information Technology in Warsaw, Poland.
-              </h3>
-              <p>
-                I am giving talks, publishing articles, and creating courses
-                on software architecture. Let me invite you to check some of
-                them out below!
-              </p>
+              <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.lead", lang }))}"></partial></h3>
+              <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button>Talks</button>
-                <button>Articles</button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.talks", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.articles", lang }))}"></partial></button>
               </div>
             </div>
           </div>
@@ -65,26 +44,17 @@ const mainCover = () => `
     <section id="developer">
       <div class="wrapper">
         <article>
-          <h2>Software development</h2>
+          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.head", lang }))}"></partial></h2>
           <div class="col-3-1">
             <div class="col col-3">
-              <h3>
-                I have over 5 years of experience in software and solution
-                architecture roles, as well as over 3 years of experience as a
-                lecturer in software architecture at Polish-Japanese Academy
-                of Information Technology in Warsaw, Poland.
-              </h3>
-              <p>
-                I am giving talks, publishing articles, and creating courses
-                on software architecture. Let me invite you to check some of
-                them out below!
-              </p>
+              <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.lead", lang }))}"></partial></h3>
+              <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button>Projects</button>
-                <button>Blog</button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.project", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.blog", lang }))}"></partial></button>
               </div>
             </div>
-            <div class="col"><img src="me2.jpg" /></div>
+            <div class="col"><partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></div>
           </div>
         </article>
       </div>
@@ -92,23 +62,14 @@ const mainCover = () => `
     <section id="leader">
       <div class="wrapper">
         <article>
-          <h2>Tech leadership and teaching</h2>
+          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.head", lang }))}"></partial></h2>
           <div class="col-3-1">
-            <div class="col"><img src="me2.jpg" /></div>
+            <div class="col"><partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></div>
             <div class="col col-3">
-              <h3>
-                I have over 5 years of experience in software and solution
-                architecture roles, as well as over 3 years of experience as a
-                lecturer in software architecture at Polish-Japanese Academy
-                of Information Technology in Warsaw, Poland.
-              </h3>
-              <p>
-                I am giving talks, publishing articles, and creating courses
-                on software architecture. Let me invite you to check some of
-                them out below!
-              </p>
+              <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.lead", lang }))}"></partial></h3>
+              <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button>Courses</button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.courses", lang }))}"></partial></button>
               </div>
             </div>
           </div>
@@ -117,13 +78,15 @@ const mainCover = () => `
     </section>
     <section id="contact">
       <div class="wrapper">
-        <h2>Contact me</h2>
+        <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.head", lang }))}"></partial></h2>
+        <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.lead", lang }))}"></partial></h3>
+        <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.text", lang }))}"></partial></p>
       </div>
     </section>
   </main>
 `;
 
-const mainList = (content = []) => `
+const mainList = (lang, content = []) => `
   <main>
     <div class="wrapper">
       <section>
@@ -162,14 +125,14 @@ const mainList = (content = []) => `
 const mainItem = () => `MAINITEM`;
 
 const main = (data, dists, partialData) => {
-  const { type, content } = partialData;
+  const { lang, type, content } = partialData;
   if (type === "cover") {
-    return mainCover();
+    return mainCover(lang);
   } else {
     if (type === "list") {
-      return mainList(content);
+      return mainList(lang, content);
     } else if (type === "item") {
-      return mainItem(content);
+      return mainItem(lang, content);
     }
   }
 };

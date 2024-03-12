@@ -19,8 +19,8 @@ export class HtmlPartialInjector extends PartialInjector {
     );
   }
 
-  testIfHasPartials(file) {
-    return cheerio.load(file.src.content)(this.options.selector).length > 0;
+  testIfHasPartials(content) {
+    return cheerio.load(content)(this.options.selector).length > 0;
   }
 
   async processPartials(content, dists) {

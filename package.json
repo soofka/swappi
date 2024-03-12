@@ -22,10 +22,10 @@
     "run-full": "npm run start -- -r examples/full/dist",
     "watch-full": "npm run start -- -c examples/full/config.js -w",
     "watch-run-full": "npm run start -- -c examples/full/config.js -w -r",
-    "build-full2": "npm run start -- -c examples/full2/config.js -b",
+    "build-full2": "npm run start -- -c examples/full2/config/index.js -b",
     "run-full2": "npm run start -- -r examples/full2/dist",
-    "watch-full2": "npm run start -- -c examples/full2/config.js -w",
-    "watch-run-full2": "npm run start -- -c examples/full2/config.js -w -r"
+    "watch-full2": "npm run start -- -c examples/full2/config/index.js -w",
+    "watch-run-full2": "npm run start -- -c examples/full2/config/index.js -w -r"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
