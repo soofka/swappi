@@ -1,10 +1,7 @@
 const page = (data, dists, lang, url, type, meta, content) => `
   <!doctype html>
   <html lang="${lang}">
-    <head>
-      <title>CO JEST KURWA</title>
-      <partial name="head" data="${encodeURI(JSON.stringify({ url, meta }))}"></partial>
-    </head>
+    <partial name="head" data="${encodeURI(JSON.stringify({ url, meta }))}"></partial>
     <body class="${type === "cover" ? "cover" : ""}">
       <header>
         <div class="wrapper">

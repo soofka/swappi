@@ -14,6 +14,7 @@ export class HtmlPartialInjector extends PartialInjector {
           (direntData.name.endsWith(".partial.html") &&
             direntData.ext === ".js"),
         selector: "partial",
+        cheerioOptions: { xml: true },
       },
       ".html",
     );
@@ -24,7 +25,7 @@ export class HtmlPartialInjector extends PartialInjector {
   }
 
   async processPartials(content, dists) {
-    const htmlParser = cheerio.load(content);
+    const htmlParser = cheerio.load(content, this.options.cheerioOptions);
     for (let element of htmlParser(this.options.selector)) {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr("name");
