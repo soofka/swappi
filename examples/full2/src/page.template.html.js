@@ -2,23 +2,17 @@ const page = (data, dists, lang, url, type, meta, content) => `
   <!doctype html>
   <html lang="${lang}">
     <partial name="head" data="${encodeURI(JSON.stringify({ url, meta }))}"></partial>
-    <body class="${type === "cover" ? "cover" : ""}">
+    <body class="${type}">
       <header>
         <div class="wrapper">
           <nav>
             <ul>
               <a href="#" id="logo"><li><h4>swn.ski</h4></li></a>
-              <a href="#"><li>
-                <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.home", lang }))}"></partial>
-              </li></a><a href="#"><li>
-                <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.courses", lang }))}"></partial>
-              </li></a><a href="#"><li>
-                <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.talks", lang }))}"></partial>
-              </li></a><a href="#"><li>
-                <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.articles", lang }))}"></partial>
-              </li></a><a href="#"><li>
-                <partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.blog", lang }))}"></partial>
-              </li></a>
+              <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "index", label: "nav.home" }))}"></partial></li>
+              <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "courses", label: "nav.courses" }))}"></partial></li>
+              <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "talks", label: "nav.talks" }))}"></partial></li>
+              <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "articles", label: "nav.articles" }))}"></partial></li>
+              <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "blog", label: "nav.blog" }))}"></partial></li>
             </ul>
             <ul>
               <a href="#" id="lang-toggle"><li>pl</li></a
@@ -27,7 +21,7 @@ const page = (data, dists, lang, url, type, meta, content) => `
           </nav>
         </div>
       </header>
-      <partial name="main" data="${encodeURI(JSON.stringify({ lang, type, content }))}"></partial>
+      <partial name="main-${type}" data="${encodeURI(JSON.stringify({ lang, content }))}"></partial>
       <footer>
         <div class="wrapper">
           <p>
@@ -49,17 +43,16 @@ const page = (data, dists, lang, url, type, meta, content) => `
 export default {
   generate: (data) => {
     const dists = [];
-    for (let lang of Object.keys(data.pages)) {
-      for (let pageName of Object.keys(data.pages[lang])) {
-        const { url, type, meta, content } = data.pages[lang][pageName];
-        dists.push({
-          name: pageName,
-          content: (data, dists) =>
-            page(data, dists, lang, url, type, meta, content),
-          resetContentHash: true,
-          contentHashSalt: JSON.stringify({ lang, url, type, meta, content }),
-        });
-      }
+    for (let pageName of Object.keys(data.pages)) {
+      const { lang, url, type, meta, content } = data.pages[pageName];
+      console.log(pageName, data.pages[pageName]);
+      dists.push({
+        name: pageName,
+        content: (data, dists) =>
+          page(data, dists, lang, url, type, meta, content),
+        resetContentHash: true,
+        contentHashSalt: JSON.stringify({ lang, url, type, meta, content }),
+      });
     }
     return dists;
   },

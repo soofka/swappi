@@ -1,13 +1,13 @@
-const head = (data, dists, partialData) => `
+const head = (data, dists, { meta, url }) => `
   <head>
     <meta charset="utf-8">
-    <title>${partialData.meta.title}</title>
+    <title>${meta.title}</title>
     <meta name="author" content="${data.author}">
-    <meta name="description" content="${partialData.meta.description}">
-    <meta property="og:title" content="${partialData.meta.title}">
+    <meta name="description" content="${meta.description}">
+    <meta property="og:title" content="${meta.title}">
     <meta property="og:type" content="${data.type}">
-    <meta property="og:url" content="${partialData.url}">
-    <meta property="og:description" content="${partialData.meta.description}">
+    <meta property="og:url" content="${url}">
+    <meta property="og:description" content="${meta.description}">
     <meta property="og:image" content="me.jpg">
     <meta property="og:image:alt" content="me">
 
@@ -25,10 +25,10 @@ const head = (data, dists, partialData) => `
     ${data.langs
       .map(
         (lang) =>
-          `<link rel="alternate" href="${partialData.url.replace(new RegExp(`/${data.langs.join("|")}/`), `/${lang}`)}" hreflang="${lang}" />`,
+          `<link rel="alternate" href="${url.replace(new RegExp(`/${data.langs.join("|")}/`), `/${lang}`)}" hreflang="${lang}" />`,
       )
       .join("")}
-    <link rel="canonical" href="${partialData.url}" />
+    <link rel="canonical" href="${url}" />
 
     ${data.themes
       .map(

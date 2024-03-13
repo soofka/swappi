@@ -1,15 +1,17 @@
 import fs from "fs/promises";
+import readline from "readline/promises";
+import { stdin, stdout } from "process";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class Watcher {
   #builder;
+  #readline;
   #abortController;
   #events = [];
   #processEventsTimeout;
 
   constructor(builder) {
     this.#builder = builder;
-    this.#abortController = new AbortController();
   }
 
   async init() {
@@ -23,6 +25,29 @@ export class Watcher {
       .log(`Starting watcher on directory ${getConfig().src}`)
       .logLevelUp();
     try {
+      this.#readline = readline.createInterface({
+        input: stdin,
+        output: stdout,
+      });
+      this.#abortController = new AbortController();
+      this.#readline.on("line", (line) => {
+        switch (line.toLowerCase()) {
+          case "r":
+            getLogger().log("Rebuilding on demand");
+            this.#build();
+            break;
+
+          case "exit":
+            getLogger().log("Terminating");
+            process.exit(1);
+            break;
+
+          default:
+            getLogger().log(`Unrecognized command: ${line}`);
+            break;
+        }
+      });
+
       const watcher = fs.watch(getConfig().src, {
         signal: this.#abortController.signal,
       });
@@ -45,13 +70,10 @@ export class Watcher {
     }
   }
 
-  close() {
-    getLogger().logLevelDown().log("Terminating watcher");
-
-    clearTimeout(this.#processEventsTimeout);
-    this.#abortController.abort();
-
-    getLogger().log("Watcher terminated");
+  async #processEvents() {
+    getLogger().log("Processing watcher events");
+    await this.#build();
+    this.#events = [];
   }
 
   async #build() {
@@ -62,10 +84,18 @@ export class Watcher {
     }
   }
 
-  async #processEvents() {
-    getLogger().log("Processing watcher events");
-    await this.#build();
-    this.#events = [];
+  close() {
+    getLogger().logLevelDown().log("Terminating watcher");
+
+    clearTimeout(this.#processEventsTimeout);
+    if (this.#readline) {
+      this.#readline.close();
+    }
+    if (this.#abortController) {
+      this.#abortController.abort();
+    }
+
+    getLogger().log("Watcher terminated");
   }
 }
 

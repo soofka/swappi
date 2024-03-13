@@ -1,4 +1,4 @@
-const mainCover = (lang) => `
+const mainCover = (data, dists, { lang }) => `
   <main>
     <section id="hero">
       <div class="wrapper">
@@ -86,55 +86,4 @@ const mainCover = (lang) => `
   </main>
 `;
 
-const mainList = (lang, content = []) => `
-  <main>
-    <div class="wrapper">
-      <section>
-        ${content
-          .map(
-            (item) => `
-          <article>
-            <h2>${item.title}</h2>
-            ${
-              Object.hasOwn(item, "alt")
-                ? `
-                <div class="col-3-1">
-                  <div class="col">
-                    ${item.alt}
-                  </div>
-                  <div class="col col-3">
-                    <h4>${item.meta}</h4>
-                    ${item.description}
-                  </div>
-                </div>
-              `
-                : `
-                <h4>${item.meta}</h4>
-                ${item.description}
-              `
-            }
-          </article>
-        `,
-          )
-          .join("")}
-      </section>
-    </div>
-  </main>
-`;
-
-const mainItem = () => `MAINITEM`;
-
-const main = (data, dists, partialData) => {
-  const { lang, type, content } = partialData;
-  if (type === "cover") {
-    return mainCover(lang);
-  } else {
-    if (type === "list") {
-      return mainList(lang, content);
-    } else if (type === "item") {
-      return mainItem(lang, content);
-    }
-  }
-};
-
-export default main;
+export default mainCover;

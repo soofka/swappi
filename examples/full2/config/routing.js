@@ -1,4 +1,4 @@
-export const getRouting = (baseUrl, langs, labels, data) => {
+export const getRouting = (langs, labels, data) => {
   const routes = {};
   const pages = {};
   const template = "page.template.html";
@@ -6,9 +6,6 @@ export const getRouting = (baseUrl, langs, labels, data) => {
 
   for (let index in langs) {
     const lang = langs[index];
-    if (!Object.hasOwn(pages, lang)) {
-      pages[lang] = {};
-    }
 
     const indexPageUrl = `/${lang}/index`;
     const indexPageName = `index-${lang}`;
@@ -20,8 +17,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       indexPageObject.alts = ["/"];
     }
     routes[indexPageUrl] = indexPageObject;
-    pages[lang][indexPageName] = {
-      url: `${baseUrl}${indexPageUrl}`,
+    pages[indexPageName] = {
+      lang,
+      url: indexPageUrl,
       type: "cover",
       meta: {
         title: labels[lang].meta.title,
@@ -35,8 +33,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       template,
       pageName: articlesPageName,
     };
-    pages[lang][articlesPageName] = {
-      url: `${baseUrl}${articlesPageUrl}`,
+    pages[articlesPageName] = {
+      lang,
+      url: articlesPageUrl,
       type: "list",
       meta: {
         title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -52,8 +51,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
         template,
         pageName: articlePageName,
       };
-      pages[lang][articlePageName] = {
-        url: `${baseUrl}${articlePageUrl}`,
+      pages[articlePageName] = {
+        lang,
+        url: articlePageUrl,
         type: "item",
         meta: {
           title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -68,8 +68,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       template,
       pageName: blogPageName,
     };
-    pages[lang][blogPageName] = {
-      url: `${baseUrl}${blogPageUrl}`,
+    pages[blogPageName] = {
+      lang,
+      url: blogPageUrl,
       type: "list",
       meta: {
         title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -85,8 +86,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
         template,
         pageName: blogPostPageName,
       };
-      pages[lang][blogPostPageName] = {
-        url: `${baseUrl}${blogPostPageUrl}`,
+      pages[blogPostPageName] = {
+        lang,
+        url: blogPostPageUrl,
         type: "item",
         meta: {
           title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -101,8 +103,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       template,
       pageName: coursesPageName,
     };
-    pages[lang][coursesPageName] = {
-      url: `${baseUrl}${coursesPageUrl}`,
+    pages[coursesPageName] = {
+      lang,
+      url: coursesPageUrl,
       type: "list",
       meta: {
         title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -117,8 +120,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       template,
       pageName: projectsPageName,
     };
-    pages[lang][projectsPageName] = {
-      url: `${baseUrl}${projectsPageUrl}`,
+    pages[projectsPageName] = {
+      lang,
+      url: projectsPageUrl,
       type: "list",
       meta: {
         title: `${labels[lang].pages.projects.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -133,8 +137,9 @@ export const getRouting = (baseUrl, langs, labels, data) => {
       template,
       pageName: talksPageName,
     };
-    pages[lang][talksPageName] = {
-      url: `${baseUrl}${talksPageUrl}`,
+    pages[talksPageName] = {
+      lang,
+      url: talksPageUrl,
       type: "list",
       meta: {
         title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,

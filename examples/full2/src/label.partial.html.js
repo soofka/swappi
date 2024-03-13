@@ -1,25 +1,23 @@
-const label = (data, dists, partialData) => {
-  const lang = partialData.lang || data.langs[0];
-  let value = partialData.id;
-  const keys = value.split(".");
+const label = (data, dists, { id, lang }) => {
+  const keys = id.split(".");
+  let label = id;
   let tempLabel = data.labels[lang];
   for (let i = 0; i < keys.length; i++) {
     if (tempLabel && tempLabel.hasOwnProperty(keys[i])) {
       tempLabel = tempLabel[keys[i]];
-
       if (i === keys.length - 1) {
-        value = tempLabel;
+        label = tempLabel;
       }
     } else {
       break;
     }
   }
 
-  if (Array.isArray(value)) {
-    value = value.join("");
+  if (Array.isArray(label)) {
+    label = label.join("");
   }
 
-  return value;
+  return label;
 };
 
 export default label;
