@@ -1,4 +1,4 @@
-export const getRouting = (langs, labels, data) => {
+export const getRouting = (baseUrl, langs, labels, data) => {
   const routes = {};
   const pages = {};
   const template = "page.template.html";
@@ -10,7 +10,8 @@ export const getRouting = (langs, labels, data) => {
       pages[lang] = {};
     }
 
-    const indexPageName = "index";
+    const indexPageUrl = `/${lang}/index`;
+    const indexPageName = `index-${lang}`;
     const indexPageObject = {
       template,
       pageName: indexPageName,
@@ -18,8 +19,9 @@ export const getRouting = (langs, labels, data) => {
     if (index == 0) {
       indexPageObject.alts = ["/"];
     }
-    routes[`/${lang}/index`] = indexPageObject;
+    routes[indexPageUrl] = indexPageObject;
     pages[lang][indexPageName] = {
+      url: `${baseUrl}${indexPageUrl}`,
       type: "cover",
       meta: {
         title: labels[lang].meta.title,
@@ -27,12 +29,14 @@ export const getRouting = (langs, labels, data) => {
       },
     };
 
-    const articlesPageName = "articles";
-    routes[`/${lang}/articles`] = {
+    const articlesPageUrl = `/${lang}/articles`;
+    const articlesPageName = `articles-${lang}`;
+    routes[articlesPageUrl] = {
       template,
       pageName: articlesPageName,
     };
     pages[lang][articlesPageName] = {
+      url: `${baseUrl}${articlesPageUrl}`,
       type: "list",
       meta: {
         title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -42,12 +46,14 @@ export const getRouting = (langs, labels, data) => {
     };
 
     for (let article of data.articles) {
-      const articlePageName = `article/${article.id}`;
-      routes[`/${lang}/article/${article.id}`] = {
+      const articlePageUrl = `/${lang}/article/${article.id}`;
+      const articlePageName = `article-${lang}-${article.id}`;
+      routes[articlePageUrl] = {
         template,
         pageName: articlePageName,
       };
       pages[lang][articlePageName] = {
+        url: `${baseUrl}${articlePageUrl}`,
         type: "item",
         meta: {
           title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -56,12 +62,14 @@ export const getRouting = (langs, labels, data) => {
       };
     }
 
-    const blogPageName = "blog";
-    routes[`/${lang}/blog`] = {
+    const blogPageUrl = `/${lang}/blog`;
+    const blogPageName = `blog-${lang}`;
+    routes[blogPageUrl] = {
       template,
       pageName: blogPageName,
     };
     pages[lang][blogPageName] = {
+      url: `${baseUrl}${blogPageUrl}`,
       type: "list",
       meta: {
         title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -71,12 +79,14 @@ export const getRouting = (langs, labels, data) => {
     };
 
     for (let post of data.blog) {
-      const blogPostPageName = `blog/${post.id}`;
-      routes[`/${lang}/blog/${post.id}`] = {
+      const blogPostPageUrl = `/${lang}/blog/${post.id}`;
+      const blogPostPageName = `blog-${lang}-${post.id}`;
+      routes[blogPostPageUrl] = {
         template,
         pageName: blogPostPageName,
       };
       pages[lang][blogPostPageName] = {
+        url: `${baseUrl}${blogPostPageUrl}`,
         type: "item",
         meta: {
           title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -85,12 +95,14 @@ export const getRouting = (langs, labels, data) => {
       };
     }
 
-    const coursesPageName = "courses";
-    routes[`/${lang}/courses`] = {
+    const coursesPageUrl = `/${lang}/courses`;
+    const coursesPageName = `courses-${lang}`;
+    routes[coursesPageUrl] = {
       template,
       pageName: coursesPageName,
     };
     pages[lang][coursesPageName] = {
+      url: `${baseUrl}${coursesPageUrl}`,
       type: "list",
       meta: {
         title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -99,13 +111,14 @@ export const getRouting = (langs, labels, data) => {
       content: data.courses,
     };
 
-    const projectsPageName = "projects";
-    routes[`/${lang}/projects`] = {
+    const projectsPageUrl = `/${lang}/projects`;
+    const projectsPageName = `projects-${lang}`;
+    routes[projectsPageUrl] = {
       template,
       pageName: projectsPageName,
     };
     pages[lang][projectsPageName] = {
-      template: "page.template.html",
+      url: `${baseUrl}${projectsPageUrl}`,
       type: "list",
       meta: {
         title: `${labels[lang].pages.projects.meta.title}${metaSeparator}${labels[lang].meta.title}`,
@@ -114,12 +127,14 @@ export const getRouting = (langs, labels, data) => {
       content: data.projects,
     };
 
-    const talksPageName = "talks";
-    routes[`/${lang}/talks`] = {
+    const talksPageUrl = `/${lang}/talks`;
+    const talksPageName = `talks-${lang}`;
+    routes[talksPageUrl] = {
       template,
       pageName: talksPageName,
     };
     pages[lang][talksPageName] = {
+      url: `${baseUrl}${talksPageUrl}`,
       type: "list",
       meta: {
         title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,

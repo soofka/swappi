@@ -2,6 +2,7 @@ import path from "path";
 import { getRouting } from "./routing.js";
 import { getTheming } from "./theming.js";
 
+const url = "https://swn.ski";
 const langs = ["en", "pl"];
 const labels = {};
 for (let lang of langs) {
@@ -39,7 +40,7 @@ const data = {
   ).default,
 };
 const { colors, themes } = getTheming();
-const { routes, pages } = getRouting(langs, labels, data);
+const { routes, pages } = getRouting(url, langs, labels, data);
 
 const appPath = path.resolve(path.join("examples", "full2"));
 
@@ -52,8 +53,8 @@ export const config = {
   data: {
     name: "swn.ski",
     type: "website",
-    url: "https://swn.ski",
     author: "Jakub Sowiński <j@swn.ski> (https://swn.ski)",
+    url,
     langs,
     themes,
     colors,

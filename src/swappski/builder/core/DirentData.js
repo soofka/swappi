@@ -1,4 +1,5 @@
 import path from "path";
+import crypto from "crypto";
 import { getDirentObject, isInArray } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
@@ -69,6 +70,16 @@ export class DirentData {
       this.#relDir = relDir;
     }
     return this;
+  }
+
+  resetContentHash(salt = "") {
+    this.#contentHash = crypto
+      .createHash(
+        getConfig().hashOptions.algorithm,
+        getConfig().hashOptions.algorithmOptions,
+      )
+      .update(`${this.#content}${salt}`)
+      .digest("hex");
   }
 
   clone() {

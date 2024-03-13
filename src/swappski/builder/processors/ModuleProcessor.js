@@ -30,6 +30,9 @@ export class ModuleProcessor extends Processor {
           const newDist = file.dists[0].clone();
           newDist.name = dist.name;
           newDist.content = dist.content;
+          if (dist.resetContentHash) {
+            newDist.resetContentHash(dist.contentHashSalt);
+          }
           return newDist;
         });
       } else {

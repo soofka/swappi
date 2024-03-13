@@ -1,5 +1,4 @@
 import path from "path";
-import crypto from "crypto";
 import Dirent from "./Dirent.js";
 import DirentData from "./DirentData.js";
 import {
@@ -50,13 +49,7 @@ export class File extends Dirent {
     this.src.contentEncoding = isImage(this.src) ? null : "utf8";
     this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
     if (!this.src.contentHash || this.src.contentHash === "") {
-      this.src.contentHash = crypto
-        .createHash(
-          getConfig().hashOptions.algorithm,
-          getConfig().hashOptions.algorithmOptions,
-        )
-        .update(this.src.content)
-        .digest("hex");
+      this.src.resetContentHash();
     }
     return this;
   }

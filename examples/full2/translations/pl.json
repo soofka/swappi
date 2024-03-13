@@ -5,11 +5,11 @@
   },
   "nav": {
     "home": "home",
-    "articles": "articles",
+    "articles": "artykuły",
     "blog": "blog",
-    "courses": "courses",
-    "project": "projects",
-    "talks": "talks"
+    "courses": "szkolenia",
+    "project": "projekty",
+    "talks": "wystąpienia"
   },
   "pages": {
     "home": {
@@ -43,8 +43,8 @@
     },
     "articles": {
       "meta": {
-        "title": "Articles",
-        "description": "Articles"
+        "title": "Artykuły",
+        "description": "Artykuły"
       }
     },
     "blog": {
@@ -55,20 +55,20 @@
     },
     "courses": {
       "meta": {
-        "title": "Courses",
-        "description": "Courses"
+        "title": "Szkolenia",
+        "description": "Szkolenia"
       }
     },
     "projects": {
       "meta": {
-        "title": "Projects",
-        "description": "Projects"
+        "title": "Projekty",
+        "description": "Projekty"
       }
     },
     "talks": {
       "meta": {
-        "title": "Talks",
-        "description": "Talks"
+        "title": "Wystąpienia",
+        "description": "Wystąpienia"
       }
     }
   }

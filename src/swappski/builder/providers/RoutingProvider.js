@@ -1,7 +1,6 @@
 import path from "path";
 import Provider from "./Provider.js";
 import { DirentData, File } from "../core/index.js";
-import { isObject } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class RoutingProvider extends Provider {

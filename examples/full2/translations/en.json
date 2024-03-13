@@ -5,11 +5,11 @@
   },
   "nav": {
     "home": "home",
-    "articles": "artykuły",
+    "articles": "articles",
     "blog": "blog",
-    "courses": "szkolenia",
-    "project": "projekty",
-    "talks": "wystąpienia"
+    "courses": "courses",
+    "project": "projects",
+    "talks": "talks"
   },
   "pages": {
     "home": {
