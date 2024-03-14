@@ -25,9 +25,9 @@ const head = (data, dists, { lang, url, meta }) => `
     ${data.themes
       .map(
         (theme) => `
-          <meta class="${theme.name}-theme" name="theme-color" content="${theme.color}" media="(prefers-color-scheme: ${theme.name})"></meta>
-          <link class="${theme.name}-theme" rel="manifest" href="${dists.find((dist) => dist.name === `manifest-${lang}-${theme.name}` && dist.ext === ".webmanifest").rel}" media="(prefers-color-scheme: ${theme.name})">
-          <link class="${theme.name}-theme" rel="stylesheet" href="${dists.find((dist) => dist.name === `style-${theme.name}` && dist.ext === ".css").rel}" media="(prefers-color-scheme: ${theme.name})">
+          <meta class="theme-item ${theme.name}-theme-item" name="theme-color" content="${theme.color}" media="(prefers-color-scheme: ${theme.name})"></meta>
+          <link class="theme-item ${theme.name}-theme-item" rel="manifest" href="${dists.find((dist) => dist.name === `manifest-${lang}-${theme.name}` && dist.ext === ".webmanifest").rel}" media="(prefers-color-scheme: ${theme.name})">
+          <link class="theme-item ${theme.name}-theme-item" rel="stylesheet" href="${dists.find((dist) => dist.name === `style-${theme.name}` && dist.ext === ".css").rel}" media="(prefers-color-scheme: ${theme.name})">
         `,
       )
       .join("")}

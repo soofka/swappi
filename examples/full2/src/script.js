@@ -1,16 +1,15 @@
 let theme =
-  window.location.search
-    .substring(1)
-    .split("&")
-    .filter((e) => e === "theme=dark").length > 0 ||
-  (window.matchMedia && window.matchMedia("(prefers-colors-scheme: dark)"))
+  localStorage.getItem("theme") === "dark" ||
+  (window.matchMedia &&
+    window.matchMedia("(prefers-colors-scheme: dark)").matches)
     ? "dark"
     : "light";
+
 applyTheme(theme, true);
 
 document
   .querySelector("#theme-toggle")
-  .addEventListener("click", (e) =>
+  .addEventListener("click", () =>
     applyTheme(theme === "light" ? "dark" : "light"),
   );
 
@@ -19,23 +18,22 @@ function applyTheme(newTheme, force = false) {
     (newTheme === "light" || newTheme === "dark") &&
     (newTheme !== theme || force)
   ) {
-    for (let element of document.querySelectorAll(`.${theme}-theme`)) {
-      element.media = `(prefers-colors-scheme: ${theme})`;
+    theme = newTheme;
+
+    for (let element of document.querySelectorAll(
+      `.theme-item:not(.${theme}-theme-item)`,
+    )) {
       element.disabled = true;
     }
-    theme = newTheme;
-    for (let element of document.querySelectorAll(`.${theme}-theme`)) {
-      element.media = "";
-      element.disabled = false;
+    for (let element of document.querySelectorAll(
+      `.theme-item.${theme}-theme-item`,
+    )) {
+      element.removeAttribute("media");
       element.removeAttribute("disabled");
     }
 
+    localStorage.setItem("theme", theme);
     document.querySelector("#theme-toggle").textContent =
       theme === "dark" ? "light" : "dark";
-    window.history.pushState(
-      {},
-      document.title,
-      `${window.location.pathname}?theme=${theme}`,
-    );
   }
 }
