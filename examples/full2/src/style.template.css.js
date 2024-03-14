@@ -4,10 +4,10 @@ const style = (data, theme) => `
     --off-fg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 2] : data.colors.grayscale[1]};
     --off-fg-2: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 3] : data.colors.grayscale[2]};
     --alt-fg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 4] : data.colors.grayscale[3]};
-    --bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 5] : data.colors.grayscale[4]};
-    --off-bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 6] : data.colors.grayscale[5]};
-    --off-bg-2: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 7] : data.colors.grayscale[6]};
-    --alt-bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 8] : data.colors.grayscale[7]};
+    --bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 8] : data.colors.grayscale[7]};
+    --off-bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 7] : data.colors.grayscale[6]};
+    --off-bg-2: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 6] : data.colors.grayscale[5]};
+    --alt-bg: ${theme === "dark" ? data.colors.grayscale[data.colors.grayscale.length - 5] : data.colors.grayscale[4]};
 
     --architect-fg: ${theme === "dark" ? data.colors.accents.architect.dark : data.colors.accents.architect.light};
     --architect-bg: ${theme === "dark" ? data.colors.accents.architect.light : data.colors.accents.architect.dark};

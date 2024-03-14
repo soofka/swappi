@@ -33,8 +33,8 @@ const mainCover = (data, dists, { lang }) => `
               <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.lead", lang }))}"></partial></h3>
               <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.talks", lang }))}"></partial></button>
-                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.articles", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.talks", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.articles", lang }))}"></partial></button>
               </div>
             </div>
           </div>
@@ -50,8 +50,8 @@ const mainCover = (data, dists, { lang }) => `
               <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.lead", lang }))}"></partial></h3>
               <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.project", lang }))}"></partial></button>
-                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.blog", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.projects", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.blog", lang }))}"></partial></button>
               </div>
             </div>
             <div class="col"><partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></div>
@@ -69,7 +69,7 @@ const mainCover = (data, dists, { lang }) => `
               <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.lead", lang }))}"></partial></h3>
               <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.text", lang }))}"></partial></p>
               <div class="buttons">
-                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "nav.courses", lang }))}"></partial></button>
+                <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.leader.courses", lang }))}"></partial></button>
               </div>
             </div>
           </div>

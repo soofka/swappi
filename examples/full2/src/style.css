@@ -7,7 +7,6 @@
 }
 @media (max-width: 960px) {
   :root {
-    /* --gap: 4px; */
     --gap-rel: 1rem;
   }
 }
@@ -188,7 +187,7 @@ section {
 }
 body.cover section {
   min-height: 100vh;
-  scroll-snap-align: end;
+  /* scroll-snap-align: end; */
 }
 section article {
   margin: 0;

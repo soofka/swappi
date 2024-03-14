@@ -17,23 +17,28 @@
         "head": "lorem duporem",
         "lead": "lorem duporem",
         "text": "lorem duporem",
-        "info": "check out my prace",
-        "contact": "contact się ze mną"
+        "info": "check out my work",
+        "contact": "contact me"
       },
       "architect": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "talks": "Check out my wystąpienia",
+        "articles": "Check out my artykuły"
       },
       "developer": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "projects": "Check out my projekty",
+        "blog": "Check out my blog"
       },
       "leader": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "courses": "Check out my kursy"
       },
       "contact": {
         "head": "lorem duporem",

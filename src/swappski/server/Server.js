@@ -33,9 +33,9 @@ export class Server {
           `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
         );
 
-        const filePath = isInObject(routing, req.url)
-          ? routing[req.url]
-          : req.url;
+        const qsIndex = req.url.indexOf("?");
+        const url = qsIndex === -1 ? req.url : req.url.substring(0, qsIndex);
+        const filePath = isInObject(routing, url) ? routing[url] : url;
         const mimeType = Object.keys(mimeTypes).find(
           (key) =>
             Object.hasOwn(mimeTypes[key], "extensions") &&

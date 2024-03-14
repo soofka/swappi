@@ -23,17 +23,22 @@
       "architect": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "talks": "Check out my talks",
+        "articles": "Check out my articles"
       },
       "developer": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "projects": "Check out my projects",
+        "blog": "Check out my blog"
       },
       "leader": {
         "head": "lorem duporem",
         "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "text": "lorem duporem",
+        "courses": "Check out my courses"
       },
       "contact": {
         "head": "lorem duporem",
