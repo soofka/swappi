@@ -4,11 +4,9 @@
   --gap-rel: 2rem;
   --page-min-size: 320px;
   --page-max-size: 960px;
-}
-@media (max-width: 960px) {
-  :root {
-    --gap-rel: 1rem;
-  }
+
+  --serif: "Times New Roman", serif;
+  --sans-serif: Arial, sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -20,7 +18,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: serif;
+  font-family: var(--serif);
   font-size: 18px;
   line-height: 1.618;
   color: var(--fg);
@@ -33,20 +31,38 @@ html {
   scroll-snap-type: y mandatory;
 } */
 body {
+  position: relative;
+  display: grid;
+  grid-template-rows: /*auto */ 1fr auto;
+}
+body.cover section {
+  min-height: 100vh;
+  /* height: 100%; */
+  /* scroll-snap-align: start; */
+}
+body.cover section:first-of-type {
+  margin-top: 0;
+}
+/* body.cover section .wrapper {
+  height: 100%;
+} */
+/* body.cover section article {
   display: grid;
   grid-template-rows: auto 1fr auto;
-}
+  height: 100%;
+} */
 h1 {
   width: 100%;
-  font-family: sans-serif;
+  font-family: var(--sans-serif);
+  text-align: center;
   text-transform: uppercase;
   font-size: 4rem;
-  margin: 0;
+  margin: 0 0 2rem 0;
   padding: 0;
 }
 h2 {
   width: 100%;
-  font-family: sans-serif;
+  font-family: var(--sans-serif);
   font-size: 2.47rem;
   margin: 0 0 1.24rem 0;
   padding: 0;
@@ -54,7 +70,7 @@ h2 {
 h3 {
   width: 100%;
   font-size: 1.53rem;
-  text-align: justify;
+  /* text-align: justify; */
   margin: 0 0 0.76rem 0;
   padding: 0;
 }
@@ -64,23 +80,29 @@ li {
   width: 100%;
   font-size: 1rem;
   margin: 0 0 0.5rem 0;
-  text-align: justify;
+  /* text-align: justify; */
   padding: 0;
 }
-button {
+button,
+.button {
   cursor: pointer;
-  font-family: serif;
+  font-family: var(--sans-serif);
   font-size: 1rem;
+  text-decoration: none;
   margin: 0;
   padding: calc(2 * var(--gap)) calc(4 * var(--gap));
   color: var(--off-fg);
-  background: var(--off-bg);
-  border: 1px solid var(--alt-bg);
+  background: var(--alt-bg);
+  border: 1px solid var(--off-bg-2);
 }
 button:hover,
+.button:hover,
 button:focus,
-button:active {
+.button:focus,
+button:active,
+.button:active {
   background: var(--off-bg-2);
+  text-decoration: none;
 }
 small {
   font-size: 0.85rem;
@@ -115,11 +137,23 @@ a:active {
 }
 
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   margin: 0;
   padding: 0;
   background: var(--off-bg);
   border-bottom: 1px solid var(--alt-bg);
+}
+header #menu-toggle {
+  display: none;
+  position: absolute;
+  top: var(--gap);
+  right: var(--gap);
+  margin: 0;
+  padding: var(--gap);
+  border: 1px solid var(--off-fg);
 }
 header nav {
   display: flex;
@@ -127,7 +161,8 @@ header nav {
   justify-content: space-between;
 }
 header nav #logo {
-  font-family: monospace;
+  font-family: var(--sans-serif);
+  letter-spacing: 2px;
 }
 header nav #logo,
 header nav #logo:hover,
@@ -170,10 +205,10 @@ header nav ul li h4 {
 }
 main {
   width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--off-bg);
+  border-bottom: 1px solid var(--off-bg);
 }
 section {
   width: 100%;
@@ -184,10 +219,6 @@ section {
   flex-flow: column nowrap;
   row-gap: var(--gap-rel);
   column-gap: var(--gap);
-}
-body.cover section {
-  min-height: 100vh;
-  /* scroll-snap-align: end; */
 }
 section article {
   margin: 0;
@@ -207,11 +238,20 @@ section article img {
     0 0 0 1px var(--bg),
     0 0 0 2px var(--fg);
 }
-section#hero {
+/* section#hero {
   background-image: url("me.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+} */
+section#architect h2 {
+  color: var(--architect-fg);
+}
+section#developer h2 {
+  color: var(--developer-fg);
+}
+section#leader h2 {
+  color: var(--leader-fg);
 }
 .col-3-1 {
   display: flex;
@@ -255,14 +295,10 @@ section#hero {
   border: 1px solid var(--off-off-bg);
 } */
 footer {
-  margin: calc(4 * var(--gap-rel)) 0 0 0;
+  /* margin: calc(4 * var(--gap-rel)) 0 0 0; */
+  background: var(--off-bg-2);
+  border-top: 1px solid var(--alt-bg);
   padding: 0 var(--gap);
-}
-body.cover footer {
-  margin-top: 0;
-}
-footer p {
-  text-align: center;
 }
 
 .wrapper {
@@ -307,4 +343,20 @@ footer p {
   color: var(--bg);
   background: var(--teacher-bg);
   border-color: var(--teacher-fg);
+}
+
+@media (max-width: 960px) {
+  :root {
+    --gap-rel: 1rem;
+  }
+  header #menu-toggle {
+    display: block;
+  }
+  header nav {
+    display: none;
+    flex-flow: column nowrap;
+  }
+  header nav ul {
+    flex-flow: column nowrap;
+  }
 }

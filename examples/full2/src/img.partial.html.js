@@ -2,7 +2,9 @@ const img = (data, dists, { src }) => {
   let picture = "<picture>";
   const imgName = src.split(".")[0];
   const imgDists = dists.filter(
-    (element) => element.name.substring(0, imgName.length) === imgName,
+    (element) =>
+      element.name === imgName ||
+      element.name.substring(0, imgName.length + 1) === `${imgName}-`,
   );
   for (let index in imgDists) {
     const dist = imgDists[index];

@@ -14,36 +14,49 @@
   "pages": {
     "home": {
       "intro": {
-        "head": "lorem duporem",
-        "lead": "lorem duporem",
-        "text": "lorem duporem",
-        "info": "check out my work",
-        "contact": "contact me"
+        "head": "Hello!",
+        "lead": "My name is Jakub, I'm a software enthusiast, and I work as a solution architect, software developer, programming teacher, and tech lead. Welcome to my corner of the Internet!",
+        "text": "If you want to hire me, waste no time, <a href=\"mailto:j@swn.ski\" target=\"_blank\">drop me a message</a>. If you yet don't know that you want to hire me, please refer to my resume or read more about my work. Otherwise, enjoy fruits of my labor, such as my projects, talks, articles, courses, or blog posts, or just chill out here with me. Peace!",
+        "buttons": {
+          "cv": "My resume",
+          "info": "More about my work",
+          "contact": "Contact me"
+        },
+        "imgAlt": "Jakub Sowiński - solution architect, software developer, teacher and leader"
       },
       "architect": {
-        "head": "lorem duporem",
+        "head": "Solution architect",
         "lead": "lorem duporem",
         "text": "lorem duporem",
-        "talks": "Check out my talks",
-        "articles": "Check out my articles"
+        "buttons": {
+          "talks": "My talks",
+          "articles": "My articles"
+        },
+        "imgAlt": "me architecting"
       },
       "developer": {
-        "head": "lorem duporem",
+        "head": "Sotware developer",
         "lead": "lorem duporem",
         "text": "lorem duporem",
-        "projects": "Check out my projects",
-        "blog": "Check out my blog"
+        "buttons": {
+          "projects": "My projects",
+          "blog": "My blog"
+        },
+        "imgAlt": "me developing"
       },
       "leader": {
-        "head": "lorem duporem",
+        "head": "Teacher and leader",
         "lead": "lorem duporem",
         "text": "lorem duporem",
-        "courses": "Check out my courses"
+        "buttons": {
+          "courses": "Check out my courses"
+        },
+        "imgAlt": "me teaching and leading"
       },
       "contact": {
-        "head": "lorem duporem",
-        "lead": "lorem duporem",
-        "text": "lorem duporem"
+        "head": "Contact me",
+        "lead": "If you wish to contact me, please drop me a message at <a href=\"mailto:j@swn.ski\" target=\"_blank\">j@swn.ski</a>.",
+        "text": "You can also find me on <ul><li>LinkedIn</li><li>GitHub</li><li>Last.fm</a>"
       }
     },
     "articles": {

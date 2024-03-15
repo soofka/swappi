@@ -9,7 +9,7 @@ export class ImgProcessor extends Processor {
     super(options, {
       test: (direntData) => isImage(direntData),
       resize: true,
-      resizeWidths: [320, 640, 1280, 1920, 2560],
+      resizeWidths: [320, 640, 1280],
       convert: true,
       convertTypes: ["avif", "webp", "jpg"],
       keepOriginal: true,

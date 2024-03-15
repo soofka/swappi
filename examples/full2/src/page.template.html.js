@@ -7,6 +7,7 @@ const page = (data, dists, lang, url, type, meta, content) => {
       <body class="${type}">
         <header>
           <div class="wrapper">
+            <button id="menu-toggle">a</button>
             <nav>
               <ul>
                 <li><a href="/${lang}/index" id="logo"><h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span>.ski</h4></a></li>
@@ -25,14 +26,18 @@ const page = (data, dists, lang, url, type, meta, content) => {
         </header>
         <partial name="main-${type}" data="${encodeURI(JSON.stringify({ lang, content }))}"></partial>
         <footer>
-          <div class="wrapper">
-            <p>
-              <small
-                >swn.ski 2007-2024 | powered by <a href="#">swappi</a> |
-                <a href="#">repo</a></small
-              >
-            </p>
-          </div>
+          <section id="contact">
+            <div class="wrapper">
+              <article>
+                <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.head", lang }))}"></partial></h2>
+                <div>
+                  <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.lead", lang }))}"></partial></h3>
+                  <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.text", lang }))}"></partial></p>
+                </div>
+                <p><small>swn.ski 2007-2024 | powered by <a href="#">swappi</a> | <a href="#">repo</a> | this page does not contain cookies</small></p>
+              </article>
+            </div>
+          </section>
         </footer>
         ${dists
           .filter(
