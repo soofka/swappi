@@ -2,8 +2,8 @@ export const getTheming = () => {
   const colors = {
     grayscale: [
       "#000000",
-      "#080808",
       "#111111",
+      "#222222",
       "#333333",
       "#CCCCCC",
       "#EEEEEE",

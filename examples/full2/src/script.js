@@ -40,18 +40,18 @@ function applyTheme(newTheme, force = false) {
 }
 
 // menu
-const menu = document.querySelector("#menu-toggle");
-menu.textContent = "☰";
-menu.addEventListener("click", () => {
-  const nav = document.querySelector("nav");
-  if (!nav.style.display || nav.style.display === "none") {
-    menu.textContent = "☓";
-    nav.style.display = "block";
+const menu = document.querySelector("nav #menu");
+const menuButton = document.querySelector("nav #menu-toggle");
+function setMenu() {
+  if (!menu.style.display || menu.style.display === "none") {
+    menu.style.display = "block";
+    menuButton.textContent = "☓";
   } else {
-    menu.textContent = "☰";
-    nav.style.display = "none";
+    menu.style.display = "none";
+    menuButton.textContent = "☰";
   }
-});
+}
+menuButton.addEventListener("click", setMenu);
 
 // text scroll
 const container = document.querySelector(".text-blinker");
@@ -72,7 +72,7 @@ let currentLetterId = 0;
 let currentBlinkCount = 0;
 let mode = 0; // 0 - forward, 1 - blink when typed, 2 - backward, 3 - blink when empty
 
-const type = () => {
+function type() {
   text.innerText =
     currentLetterId === 0
       ? " "
@@ -128,7 +128,7 @@ const type = () => {
   }
 
   setTimeout(type, timeout);
-};
+}
 
 const getTimeout = (range) => Math.random() * (range[1] - range[0]) + range[0];
 const blink = () =>

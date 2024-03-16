@@ -18,9 +18,9 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <a class="button " href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.cv", lang }))}"></partial></a>
-            <a class="button" href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.info", lang }))}"></partial></a>
-            <a class="button" href="#contact"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.contact", lang }))}"></partial></a>
+            <a class="button architect-bg" href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.cv", lang }))}"></partial></a>
+            <a class="button developer-bg" href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.info", lang }))}"></partial></a>
+            <a class="button leader-bg" href="#contact"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.contact", lang }))}"></partial></a>
           </div>
         </article>
       </div>
@@ -40,8 +40,8 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.talks", lang }))}"></partial></button>
-            <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.articles", lang }))}"></partial></button>
+            <a class="button architect-bg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.talks", lang }))}"></partial></a>
+            <a class="button"><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.architect.articles", lang }))}"></partial></a>
           </div>
         </article>
       </div>
@@ -61,8 +61,8 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.projects", lang }))}"></partial></button>
-            <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.blog", lang }))}"></partial></button>
+            <a class="button"><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.projects", lang }))}"></partial></a>
+            <a class="button developer-bg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.developer.blog", lang }))}"></partial></a>
           </div>
         </article>
       </div>
@@ -82,7 +82,7 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <button><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.leader.courses", lang }))}"></partial></button>
+            <a class="button leader-bg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "page.home.leader.courses", lang }))}"></partial></a>
           </div>
         </article>
       </div>
