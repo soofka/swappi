@@ -10,8 +10,8 @@ const page = (data, dists, lang, url, type, meta, content) => {
             <button id="menu-toggle">a</button>
             <nav>
               <ul>
-                <li><a href="/${lang}/index" id="logo"><h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span>.ski</h4></a></li>
-                <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "index", label: "nav.home" }))}"></partial></li>
+                <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "index", content: '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span>.ski</h4>' }))}"></partial></li>
+                <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "projects", label: "nav.projects" }))}"></partial></li>
                 <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "courses", label: "nav.courses" }))}"></partial></li>
                 <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "talks", label: "nav.talks" }))}"></partial></li>
                 <li><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "articles", label: "nav.articles" }))}"></partial></li>
@@ -34,7 +34,7 @@ const page = (data, dists, lang, url, type, meta, content) => {
                   <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.lead", lang }))}"></partial></h3>
                   <p><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.contact.text", lang }))}"></partial></p>
                 </div>
-                <p><small>swn.ski 2007-2024 | powered by <a href="#">swappi</a> | <a href="#">repo</a> | this page does not contain cookies</small></p>
+                <p><small>swn.ski 2007-2024 | powered by <a href="#">swappi</a> | <a href="#">repo</a></small></p>
               </article>
             </div>
           </section>

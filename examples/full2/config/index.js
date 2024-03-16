@@ -1,44 +1,11 @@
 import path from "path";
+import { getContent } from "./content.js";
 import { getRouting } from "./routing.js";
 import { getTheming } from "./theming.js";
 
 const langs = ["en", "pl"];
-const labels = {};
-for (let lang of langs) {
-  labels[lang] = (
-    await import(`../translations/${lang}.json`, {
-      assert: { type: "json" },
-    })
-  ).default;
-}
-const data = {
-  articles: (
-    await import("../data/articles.json", {
-      assert: { type: "json" },
-    })
-  ).default,
-  blog: (
-    await import("../data/blog.json", {
-      assert: { type: "json" },
-    })
-  ).default,
-  courses: (
-    await import("../data/courses.json", {
-      assert: { type: "json" },
-    })
-  ).default,
-  projects: (
-    await import("../data/projects.json", {
-      assert: { type: "json" },
-    })
-  ).default,
-  talks: (
-    await import("../data/talks.json", {
-      assert: { type: "json" },
-    })
-  ).default,
-};
 const { colors, themes } = getTheming();
+const { data, labels } = await getContent(langs);
 const { routes, pages } = getRouting(langs, labels, data);
 
 const appPath = path.resolve(path.join("examples", "full2"));

@@ -1,11 +1,14 @@
 [
   {
-    "title": "Simple Web App Processing Interface",
-    "description": "yooyoy",
-    "repo": "https://github.com/soofka/swappi",
-    "demo": "",
-    "starsCount": 0,
-    "forksCount": 0,
-    "downloadsCount": 0
+    "title": "Netlify Plugin Chromium",
+    "description": "netlify-plugin-chromium",
+    "github": "netlify-plugin-chromium",
+    "npm": "netlify-plugin-chromium"
+  },
+  {
+    "title": "Webpack Bundle Content Validator",
+    "description": "webpack-bundle-content-validator",
+    "github": "webpack-bundle-content-validator",
+    "npm": "webpack-bundle-content-validator"
   }
 ]

@@ -43,14 +43,18 @@ body.cover section {
 body.cover section:first-of-type {
   margin-top: 0;
 }
+body.cover footer .wrapper,
+body.cover footer section {
+  height: 100%;
+}
 /* body.cover section .wrapper {
   height: 100%;
 } */
-/* body.cover section article {
+body.cover section article {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100%;
-} */
+}
 h1 {
   width: 100%;
   font-family: var(--sans-serif);
@@ -160,25 +164,25 @@ header nav {
   flex-flow: row nowrap;
   justify-content: space-between;
 }
-header nav #logo {
+header nav ul:first-of-type li:first-of-type a {
   font-family: var(--sans-serif);
   letter-spacing: 2px;
 }
-header nav #logo,
-header nav #logo:hover,
-header nav #logo:focus,
-header nav #logo:active,
-header nav #logo:visited {
+header nav ul:first-of-type li:first-of-type a,
+header nav ul:first-of-type li:first-of-type a:hover,
+header nav ul:first-of-type li:first-of-type a:focus,
+header nav ul:first-of-type li:first-of-type a:active,
+header nav ul:first-of-type li:first-of-type a:visited {
   cursor: pointer;
   color: var(--fg);
   text-decoration: none;
 }
-header nav #logo:visited {
+header nav ul:first-of-type li:first-of-type a:visited {
   color: var(--alt-fg);
 }
-header nav #logo:hover,
-header nav #logo:focus,
-header nav #logo:active {
+header nav ul:first-of-type li:first-of-type a:hover,
+header nav ul:first-of-type li:first-of-type a:focus,
+header nav ul:first-of-type li:first-of-type a:active {
   color: var(--off-fg);
   text-decoration: none;
 }
@@ -299,6 +303,15 @@ footer {
   background: var(--off-bg-2);
   border-top: 1px solid var(--alt-bg);
   padding: 0 var(--gap);
+}
+footer section {
+  padding-bottom: 0;
+}
+footer section article {
+  padding-bottom: 0;
+}
+footer section article > p {
+  text-align: center;
 }
 
 .wrapper {

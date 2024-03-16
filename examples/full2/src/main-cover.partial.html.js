@@ -18,7 +18,7 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-          <a class="button" href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.cv", lang }))}"></partial></a>
+            <a class="button " href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.cv", lang }))}"></partial></a>
             <a class="button" href="#architect"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.info", lang }))}"></partial></a>
             <a class="button" href="#contact"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.buttons.contact", lang }))}"></partial></a>
           </div>

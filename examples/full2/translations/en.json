@@ -4,7 +4,7 @@
     "description": "swn.ski description"
   },
   "nav": {
-    "home": "home",
+    "projects": "projects",
     "articles": "articles",
     "blog": "blog",
     "courses": "courses",
@@ -26,8 +26,8 @@
       },
       "architect": {
         "head": "Solution architect",
-        "lead": "lorem duporem",
-        "text": "lorem duporem",
+        "lead": "I have 5+ years of experience in solultion and software architecture positions, as well as 3+ years of experience as an university lecturer in software architecture.",
+        "text": "I can help you design, document, and govern architecture for your software project, be it small or large scale.",
         "buttons": {
           "talks": "My talks",
           "articles": "My articles"
