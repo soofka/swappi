@@ -3,19 +3,19 @@ const mainCover = (data, dists, { lang }) => `
     <section id="intro">
       <div class="wrapper">
         <article>
-          <h1 class="extended">
+          <h1>
             <span class="architect-fg">J</span>
-            <span class="leader-fg">@</span>
-            <span class="architect-fg hidden">K</span>
-            <span class="architect-fg hidden">U</span>
-            <span class="architect-fg hidden">B</span>
-            <span class="leader-fg hidden">_</span>
+            <span class="architect-fg name">A</span>
+            <span class="leader-fg mail">@</span>
+            <span class="architect-fg name">K</span>
+            <span class="architect-fg name">U</span>
+            <span class="architect-fg name">B</span>
             <span class="developer-fg">S</span>
-            <span class="developer-fg hidden">O</span>
+            <span class="developer-fg name">O</span>
             <span class="developer-fg">W</span>
-            <span class="developer-fg hidden">I</span>
+            <span class="developer-fg name">I</span>
             <span class="developer-fg">N</span>
-            <span class="leader-fg">.</span>
+            <span class="leader-fg mail">.</span>
             <span class="developer-fg">S</span>
             <span class="developer-fg">K</span>
             <span class="developer-fg">I</span>

@@ -55,7 +55,7 @@
       },
       "contact": {
         "head": "Contact me",
-        "lead": "If you wish to contact me, please drop me a message at <a href=\"mailto:j@swn.ski\" target=\"_blank\">j@swn.ski</a>.",
+        "lead": "If you wish to contact me, please drop me a message at <a href=\"mailto:j@swn.ski\" target=\"_blank\">j[at]swn.ski</a>.",
         "text": "You can also find me on:"
       }
     },

@@ -113,20 +113,27 @@ a:active {
   color: var(--off-fg);
   text-decoration: underline 2px;
 }
+img {
+  filter: var(--img-filter);
+}
 
 header {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 1;
   width: 100%;
   margin: 0;
   padding: 0;
   background: var(--off-bg);
   border-bottom: 1px solid var(--alt-bg);
+  transition: height 0.5s ease-in-out;
 }
 header #menu-toggle {
   display: none;
+  width: 5ch;
   padding: 0 var(--gap);
+  border: 1px solid var(--alt-bg);
 }
 header nav {
   display: flex;
@@ -320,37 +327,73 @@ body.cover section article {
   height: 100%;
 }
 body.cover h1 {
-  font-size: 3rem;
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   overflow: hidden;
+  font-size: 3em;
 }
 body.cover h1 span {
   display: block;
-  width: max-content;
+  width: 2ch;
   max-width: max-content;
   overflow: hidden;
   transition:
     width 0.5s ease-in-out,
     opacity 0.5s ease-in-out;
 }
-body.cover h1 .hidden {
+body.cover h1 .name {
   width: 0;
   opacity: 0;
-  animation: 2s ease-in-out disappear;
+  animation: 3s ease-in-out disappear;
 }
-body.cover h1:hover .hidden {
+body.cover h1:hover .name {
   width: 2ch;
   opacity: 1;
 }
+body.cover h1 .mail {
+  animation: 3s ease-in-out appear;
+}
+body.cover h1:hover .mail {
+  width: 0;
+  opacity: 0;
+}
 
+@keyframes slidein {
+  0% {
+    top: -100%;
+  }
+  100% {
+    top: 0;
+  }
+}
+@keyframes appear {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  66% {
+    width: 0;
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    width: 2ch;
+    opacity: 1;
+  }
+}
 @keyframes disappear {
   0% {
     width: 2ch;
     opacity: 1;
   }
-  50% {
+  66% {
+    width: 2ch;
+    opacity: 1;
+  }
+  80% {
     opacity: 1;
   }
   100% {
@@ -442,5 +485,9 @@ body.cover h1:hover .hidden {
   }
   header #menu-toggle {
     display: block;
+  }
+  body.cover h1 .name,
+  body.cover h1 .mail {
+    animation: none;
   }
 }

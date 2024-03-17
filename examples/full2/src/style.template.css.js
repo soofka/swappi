@@ -15,6 +15,8 @@ const style = (data, theme) => `
     --developer-bg: ${theme === "dark" ? data.colors.accents.developer.light : data.colors.accents.developer.dark};
     --leader-fg: ${theme === "dark" ? data.colors.accents.leader.dark : data.colors.accents.leader.light};
     --leader-bg: ${theme === "dark" ? data.colors.accents.leader.light : data.colors.accents.leader.dark};
+
+    --img-filter: ${theme === "dark" ? "brightness(0.8) contrast(1.2)" : "brightness(1.2) contrast(0.8)"};
   }
 `;
 
