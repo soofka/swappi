@@ -3,7 +3,23 @@ const mainCover = (data, dists, { lang }) => `
     <section id="intro">
       <div class="wrapper">
         <article>
-          <h1><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.head", lang }))}"></partial></h1>
+          <h1 class="extended">
+            <span class="architect-fg">J</span>
+            <span class="leader-fg">@</span>
+            <span class="architect-fg hidden">K</span>
+            <span class="architect-fg hidden">U</span>
+            <span class="architect-fg hidden">B</span>
+            <span class="leader-fg hidden">_</span>
+            <span class="developer-fg">S</span>
+            <span class="developer-fg hidden">O</span>
+            <span class="developer-fg">W</span>
+            <span class="developer-fg hidden">I</span>
+            <span class="developer-fg">N</span>
+            <span class="leader-fg">.</span>
+            <span class="developer-fg">S</span>
+            <span class="developer-fg">K</span>
+            <span class="developer-fg">I</span>
+          </h1>
           <div class="col-3-1">
             <div class="col col-3">
               <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.intro.lead", lang }))}"></partial></h3>

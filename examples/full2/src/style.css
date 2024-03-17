@@ -24,38 +24,10 @@ body {
   color: var(--fg);
   background: var(--bg);
 }
-html {
-  scroll-behavior: smooth;
-}
-/* html:has(body.cover) {
-  scroll-snap-type: y mandatory;
-} */
 body {
   position: relative;
   display: grid;
   grid-template-rows: /*auto */ 1fr auto;
-}
-body.cover section {
-  min-height: 100vh;
-  border-top: 1px solid var(--alt-bg);
-  /* height: 100%; */
-  /* scroll-snap-align: start; */
-}
-body.cover section:first-of-type {
-  margin-top: 0;
-  border-top: none;
-}
-body.cover footer .wrapper,
-body.cover footer section {
-  height: 100%;
-}
-/* body.cover section .wrapper {
-  height: 100%;
-} */
-body.cover section article {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  height: 100%;
 }
 h1 {
   width: 100%;
@@ -279,11 +251,20 @@ section#leader h2 {
 .buttons {
   width: 100%;
   margin: var(--gap-rel) 0;
-  padding: 0;
+  padding: var(--gap);
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   gap: var(--gap);
+}
+.buttons button,
+.buttons .button {
+  flex-grow: 1;
+}
+.buttons button::before,
+.buttons .button::before {
+  content: "»";
+  margin-right: var(--gap);
 }
 /* .tags {
   width: 100%;
@@ -314,6 +295,68 @@ footer section article {
 }
 footer section article > p {
   text-align: center;
+}
+
+body.cover section {
+  min-height: 100vh;
+  border-top: 1px solid var(--alt-bg);
+  /* height: 100%; */
+  /* scroll-snap-align: start; */
+}
+body.cover section:first-of-type {
+  margin-top: 0;
+  border-top: none;
+}
+body.cover footer .wrapper,
+body.cover footer section {
+  height: 100%;
+}
+/* body.cover section .wrapper {
+  height: 100%;
+} */
+body.cover section article {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+body.cover h1 {
+  font-size: 3rem;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  overflow: hidden;
+}
+body.cover h1 span {
+  display: block;
+  width: max-content;
+  max-width: max-content;
+  overflow: hidden;
+  transition:
+    width 0.5s ease-in-out,
+    opacity 0.5s ease-in-out;
+}
+body.cover h1 .hidden {
+  width: 0;
+  opacity: 0;
+  animation: 2s ease-in-out disappear;
+}
+body.cover h1:hover .hidden {
+  width: 2ch;
+  opacity: 1;
+}
+
+@keyframes disappear {
+  0% {
+    width: 2ch;
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    opacity: 0;
+  }
 }
 
 .wrapper {
