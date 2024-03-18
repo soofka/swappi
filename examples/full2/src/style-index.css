@@ -28,8 +28,8 @@ body.cover h1 span {
   max-width: max-content;
   overflow: hidden;
   transition:
-    width 0.5s ease-in-out,
-    opacity 0.5s ease-in-out;
+    width var(--transition-duration) var(--transition-easing),
+    opacity var(--transition-duration) var(--transition-easing);
 }
 body.cover h1 .name {
   width: 0;

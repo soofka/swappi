@@ -23,7 +23,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
                       '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span><span class="teacher-fg">.</span>ski</h4>',
                   }),
                 )}"></partial>
-                <button id="menu-toggle">☰</button>
+                <button id="menu-toggle"></button>
               </div>
               <div id="menu">
                 <ul>
