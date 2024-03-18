@@ -1,25 +1,37 @@
-const manifest = (data, lang, theme) => {
-  const color = theme === "dark" ? data.colors[4] : data.colors[0];
-  return JSON.stringify({
-    background_color: color,
-    categories: "",
-    description: "",
+const manifest = (data, dists, lang, theme) =>
+  JSON.stringify({
+    background_color:
+      theme.name === "dark"
+        ? data.colors.accents.developer.dark
+        : data.colors.accents.developer.light,
+    description: data.labels[lang].meta.description,
     display: "standalone",
-    icons: [],
+    icons: dists
+      .filter((dist) => dist.name === "icon-192" || dist.name === "icon-512")
+      .map((dist) => ({
+        src: dist.abs,
+        type: "image/png",
+        sizes: dist.name === "icon-192" ? "192x192" : "512x512",
+      })),
     name: data.labels[lang].meta.title,
-    orientation: "",
     scope: "/",
     screenshots: [],
     short_name: data.labels[lang].meta.title,
-    shortcuts: [],
-    start_url: "/",
-    theme_color: color,
+    start_url: data.url,
+    theme_color: theme.color,
   });
-};
 
 export default {
-  "-en-dark": (data) => manifest(data, "en", "dark"),
-  "-pl-dark": (data) => manifest(data, "pl", "dark"),
-  "-en-light": (data) => manifest(data, "en", "light"),
-  "-pl-light": (data) => manifest(data, "pl", "light"),
+  generate: (data) => {
+    const dists = [];
+    for (let lang of data.langs) {
+      for (let theme of data.themes) {
+        dists.push({
+          name: `manifest-${lang}-${theme.name}`,
+          content: (data, dists) => manifest(data, dists, lang, theme),
+        });
+      }
+    }
+    return dists;
+  },
 };

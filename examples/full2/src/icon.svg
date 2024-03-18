@@ -1,0 +1,20 @@
+<svg width="512" height="512">
+  <defs>
+    <linearGradient
+      id="background"
+      gradientUnits="userSpaceOnUse"
+      x2="32"
+      spreadMethod="repeat"
+      gradientTransform="rotate(-45)"
+    >
+      <stop offset="0" stop-color="#0083d6" />
+      <stop offset="0.50" stop-color="#0083d6" />
+      <stop offset="0.50" stop-color="#006db2" />
+      <stop offset="1.0" stop-color="#006db2" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="100%" height="100%" fill="url(#background)" />
+  <text x="0" y="448px" fill="white" font-size="448px" font-family="Arial">
+    JS
+  </text>
+</svg>

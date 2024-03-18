@@ -31,8 +31,8 @@ export const getTheming = () => {
   };
 
   const themes = [
-    { name: "light", color: colors.grayscale[7] },
-    { name: "dark", color: colors.grayscale[0] },
+    { name: "light", color: colors.grayscale[6] },
+    { name: "dark", color: colors.grayscale[1] },
   ];
 
   return { colors, themes };

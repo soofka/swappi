@@ -20,15 +20,20 @@
 
 ### todo:
 
-- figure out image width vs pixel density
+- pure css hamburger with height animation on li items
+
 - aria tags
 - per page content
 - full translation with meta
-- favicon
+
 - service worker
 - test
+
   - seo manifests etc
   - history
   - lighthouse
   - w3c
   - iphone
+
+- canonical links no language?
+- figure out image width vs pixel density

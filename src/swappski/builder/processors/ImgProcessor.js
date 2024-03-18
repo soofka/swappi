@@ -8,11 +8,28 @@ export class ImgProcessor extends Processor {
   constructor(options) {
     super(options, {
       test: (direntData) => isImage(direntData),
-      resize: true,
-      resizeWidths: [320, 640, 1280],
-      convert: true,
-      convertTypes: ["avif", "webp", "jpg"],
-      keepOriginal: true,
+      getVariants: (src) => {
+        if (src.name === "icon") {
+          return [
+            [16, "png"],
+            [32, "png"],
+            [48, "ico", "favicon"],
+            [76, "png"],
+            [120, "png"],
+            [152, "png"],
+            [192, "png"],
+            [512, "png"],
+          ];
+        } else {
+          const variants = [];
+          for (let width of [320, 640, 1280]) {
+            for (let type of ["avif", "webp", "jpg"]) {
+              variants.push([width, type]);
+            }
+          }
+          return variants;
+        }
+      },
     });
   }
 
@@ -22,14 +39,12 @@ export class ImgProcessor extends Processor {
       newDists.push(file.dists[0]);
       this.#variants.push({});
     }
-    for (let width of this.options.resizeWidths) {
-      for (let type of this.options.convertTypes) {
-        const newDist = file.dists[0].clone();
-        newDist.name = `${newDist.name}-${width}`;
-        newDist.ext = `.${type}`;
-        newDists.push(newDist);
-        this.#variants.push({ width, type });
-      }
+    for (let [width, type, name] of this.options.getVariants(file.src)) {
+      const newDist = file.dists[0].clone();
+      newDist.name = name || `${newDist.name}-${width}`;
+      newDist.ext = `.${type}`;
+      newDists.push(newDist);
+      this.#variants.push({ width, type });
     }
     file.dists = newDists;
     return file;

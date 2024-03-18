@@ -13,25 +13,37 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
 
     <meta name="robots" content="index,follow"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="${data.themes.map((theme) => theme.name).join(" ")}">
 
+    <link rel="canonical" href="${url}" />
     ${data.langs
+      .filter((l) => l !== lang)
       .map(
         (lang) =>
-          `<link rel="alternate" href="${url.replace(new RegExp(`/${data.langs.join("|")}/`), `/${lang}`)}" hreflang="${lang}" />`,
+          `<link rel="alternate" href="${url.replace(new RegExp(data.langs.join("|")), lang)}" hreflang="${lang}" />`,
       )
       .join("")}
-    <link rel="canonical" href="${url}" />
 
     ${data.themes
       .map(
-        (theme) => `
+        (theme, index) => `
           <meta class="theme-item ${theme.name}-theme-item" name="theme-color" content="${theme.color}" media="(prefers-color-scheme: ${theme.name})"></meta>
-          <link class="theme-item ${theme.name}-theme-item" rel="manifest" href="${dists.find((dist) => dist.name === `manifest-${lang}-${theme.name}` && dist.ext === ".webmanifest").rel}" media="(prefers-color-scheme: ${theme.name})">
-          <link class="theme-item ${theme.name}-theme-item" rel="stylesheet" href="${dists.find((dist) => dist.name === `style-${theme.name}` && dist.ext === ".css").rel}" media="(prefers-color-scheme: ${theme.name})">
+          <link class="theme-item ${theme.name}-theme-item" rel="manifest" href="${dists.find((dist) => dist.name === `manifest-${lang}-${theme.name}` && dist.ext === ".webmanifest").rel}" media="${index == 0 ? "" : `(prefers-color-scheme: ${theme.name})`}">
+          <link class="theme-item ${theme.name}-theme-item" rel="stylesheet" href="${dists.find((dist) => dist.name === `style-${theme.name}` && dist.ext === ".css").rel}" media="${index == 0 ? "" : `(prefers-color-scheme: ${theme.name})`}">
+          <meta name="apple-mobile-web-app-status-bar-style" content="${theme.color}" media="${index == 0 ? "" : `(prefers-color-scheme: ${theme.name})`}">
         `,
       )
       .join("")}
-    <meta name="color-scheme" content="${data.themes.map((theme) => theme.name).join(" ")}">
+    
+    ${dists
+      .filter((dist) => dist.name.startsWith("icon-"))
+      .map((dist) =>
+        dist.name === "icon-16" || dist.name === "icon-32"
+          ? `<link rel="icon" type="image/png" sizes="${dist.name === "icon-16" ? "16x16" : "32x32"}" href="${dist.rel}">`
+          : `<link rel="apple-touch-icon" sizes="${dist.name.substring(5, 2)}x${dist.name.substring(5, 2)}" href="${dist.rel}">`,
+      )
+      .join("")}
 
     ${dists
       .filter(
