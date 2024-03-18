@@ -1,25 +1,37 @@
 const page = (data, dists, pageName, lang, url, type, meta, content) => {
   const name = pageName.substring(0, pageName.length - lang.length - 1);
+  const isIndex = name === "index";
   const theOtherLang = lang === "pl" ? "en" : "pl";
+  const getMenuLink = (page) =>
+    // `<partial name="link" data="${encodeURI(JSON.stringify({ lang, page, content: `<li class="${name === page ? "active" : ""}"><partial name="label" data="${encodeURI(JSON.stringify({ lang, id: `nav.${page}` }))}"></partial></li>` }))}"></partial>`;
+    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page, label: `nav.${page}` }))}"></partial></li>`;
   return `
     <!doctype html>
     <html lang="${lang}">
-      <partial name="head" data="${encodeURI(JSON.stringify({ lang, url, meta }))}"></partial>
+      <partial name="head" data="${encodeURI(JSON.stringify({ lang, url, meta, isIndex }))}"></partial>
       <body class="${type}">
         <header>
           <div class="wrapper">
             <nav>
               <div id="controls">
-                <partial name="link" data="${encodeURI(JSON.stringify({ id: "logo", lang, page: "index", content: '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span>.ski</h4>' }))}"></partial>
+                <partial name="link" data="${encodeURI(
+                  JSON.stringify({
+                    id: "logo",
+                    lang,
+                    page: "index",
+                    content:
+                      '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span><span class="teacher-fg">.</span>ski</h4>',
+                  }),
+                )}"></partial>
                 <button id="menu-toggle">☰</button>
               </div>
               <div id="menu">
                 <ul>
-                  <li class="${name === "projects" ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "projects", label: "nav.projects" }))}"></partial></li>
-                  <li class="${name === "courses" ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "courses", label: "nav.courses" }))}"></partial></li>
-                  <li class="${name === "talks" ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "talks", label: "nav.talks" }))}"></partial></li>
-                  <li class="${name === "articles" ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "articles", label: "nav.articles" }))}"></partial></li>
-                  <li class="${name === "blog" ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ lang, page: "blog", label: "nav.blog" }))}"></partial></li>
+                  ${getMenuLink("projects")}
+                  ${getMenuLink("courses")}
+                  ${getMenuLink("talks")}
+                  ${getMenuLink("articles")}
+                  ${getMenuLink("blog")}
                   <li><a href="${url.replace(`/${lang}/`, `/${theOtherLang}/`)}">${theOtherLang}</a></li>
                   <li><a id="theme-toggle">&nbsp;</a></li>
                 </ul>
@@ -49,7 +61,10 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
         </footer>
         ${dists
           .filter(
-            (dist) => dist.name.startsWith("script") && dist.ext === ".js",
+            (dist) =>
+              (dist.name === "script" ||
+                (isIndex && dist.name === "script-index")) &&
+              dist.ext === ".js",
           )
           .map((script) => `<script src="${script.rel}"> </script>`)
           .join("")}

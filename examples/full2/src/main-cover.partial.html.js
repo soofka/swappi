@@ -15,7 +15,7 @@ const mainCover = (data, dists, { lang }) => `
             <span class="developer-fg">W</span>
             <span class="developer-fg name">I</span>
             <span class="developer-fg">N</span>
-            <span class="leader-fg mail">.</span>
+            <span class="teacher-fg mail">.</span>
             <span class="developer-fg">S</span>
             <span class="developer-fg">K</span>
             <span class="developer-fg">I</span>
@@ -44,7 +44,7 @@ const mainCover = (data, dists, { lang }) => `
     <section id="architect">
       <div class="wrapper">
         <article>
-          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.head", lang }))}"></partial></h2>
+          <h2 class="architect-fg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.architect.head", lang }))}"></partial></h2>
           <div class="col-3-1">
             <div class="col">
               <partial name="img" data="${encodeURI(JSON.stringify({ src: "me2.jpg" }))}"></partial>
@@ -65,7 +65,7 @@ const mainCover = (data, dists, { lang }) => `
     <section id="developer">
       <div class="wrapper">
         <article>
-          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.head", lang }))}"></partial></h2>
+          <h2 class="developer-fg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.head", lang }))}"></partial></h2>
           <div class="col-3-1">
             <div class="col col-3">
               <h3><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.developer.lead", lang }))}"></partial></h3>
@@ -86,7 +86,7 @@ const mainCover = (data, dists, { lang }) => `
     <section id="leader">
       <div class="wrapper">
         <article>
-          <h2><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.head", lang }))}"></partial></h2>
+          <h2 class="leader-fg"><partial name="label" data="${encodeURI(JSON.stringify({ id: "pages.home.leader.head", lang }))}"></partial></h2>
           <div class="col-3-1">
             <div class="col">
               <partial name="img" data="${encodeURI(JSON.stringify({ src: "me3.jpg" }))}"></partial>

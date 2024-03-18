@@ -1,4 +1,4 @@
-const head = (data, dists, { lang, url, meta }) => `
+const head = (data, dists, { lang, url, meta, isIndex }) => `
   <head>
     <meta charset="utf-8">
     <title>${meta.title}</title>
@@ -32,7 +32,16 @@ const head = (data, dists, { lang, url, meta }) => `
       )
       .join("")}
     <meta name="color-scheme" content="${data.themes.map((theme) => theme.name).join(" ")}">
-    <link rel="stylesheet" href="${dists.find((dist) => dist.name === "style" && dist.ext === ".css").rel}" />
+
+    ${dists
+      .filter(
+        (dist) =>
+          (dist.name === "style" || (isIndex && dist.name === "style-index")) &&
+          dist.ext === ".css",
+      )
+      .sort((a, b) => (a.name === "style" ? -1 : 0))
+      .map((script) => `<link rel="stylesheet" href="${script.rel}">`)
+      .join("")}
   </head>
 `;
 

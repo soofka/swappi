@@ -1,0 +1,142 @@
+body.cover section {
+  min-height: 100vh;
+  border-top: 1px solid var(--alt-bg);
+}
+body.cover section:first-of-type {
+  margin-top: 0;
+  border-top: none;
+}
+body.cover footer .wrapper,
+body.cover footer section {
+  height: 100%;
+}
+body.cover section article {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+body.cover h1 {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 3.33rem;
+}
+body.cover h1 span {
+  display: block;
+  width: 2ch;
+  max-width: max-content;
+  overflow: hidden;
+  transition:
+    width 0.5s ease-in-out,
+    opacity 0.5s ease-in-out;
+}
+body.cover h1 .name {
+  width: 0;
+  opacity: 0;
+  animation: 3s ease-in-out disappear;
+}
+body.cover h1:hover .name {
+  width: 2ch;
+  opacity: 1;
+}
+body.cover h1 .mail {
+  animation: 3s ease-in-out appear;
+}
+body.cover h1:hover .mail {
+  width: 0;
+  opacity: 0;
+}
+@keyframes appear {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  66% {
+    width: 0;
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    width: 2ch;
+    opacity: 1;
+  }
+}
+@keyframes disappear {
+  0% {
+    width: 2ch;
+    opacity: 1;
+  }
+  66% {
+    width: 2ch;
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
+.button.architect-bg:hover,
+.button.architect-bg:focus,
+.button.architect-bg:active {
+  color: white;
+  text-shadow: 1px 2px var(--architect-bg);
+  background: var(--architect-fg);
+}
+.button.developer-bg:hover,
+.button.developer-bg:focus,
+.button.developer-bg:active {
+  color: white;
+  text-shadow: 1px 2px var(--developer-bg);
+  background: var(--developer-fg);
+}
+.button.leader-bg:hover,
+.button.leader-bg:focus,
+.button.leader-bg:active {
+  color: white;
+  text-shadow: 1px 2px var(--leader-bg);
+  background: var(--leader-fg);
+}
+.button.teacher-bg:hover,
+.button.teacher-bg:focus,
+.button.teacher-bg:active {
+  color: white;
+  text-shadow: 1px 2px var(--teacher-bg);
+  background: var(--teacher-fg);
+}
+h1.architect-fg,
+h1 .architect-fg,
+h2.architect-fg,
+h2 .architect-fg {
+  text-shadow: 1px 2px var(--architect-bg);
+}
+h1.developer-fg,
+h1 .developer-fg,
+h2.developer-fg,
+h2 .developer-fg {
+  text-shadow: 1px 2px var(--developer-bg);
+}
+h1.leader-fg,
+h1 .leader-fg,
+h2.leader-fg,
+h2 .leader-fg {
+  text-shadow: 1px 2px var(--leader-bg);
+}
+h1.teacher-fg,
+h1 .teacher-fg,
+h2.teacher-fg,
+h2 .teacher-fg {
+  text-shadow: 1px 2px var(--teacher-bg);
+}
+
+@media (max-width: 960px) {
+  body.cover h1 .name,
+  body.cover h1 .mail {
+    animation: none;
+  }
+}

@@ -2,16 +2,6 @@
 
 ### todo
 
-#### now
-
-- proper data
-- routing to pages
-- articles and blog posts
-- active in menu
-- client side
-
-#### next
-
 - do i really always have to reprocess files that rely on other files?
 - tester
 - swappski elements as singletons?
@@ -30,19 +20,12 @@
 
 ### todo:
 
-- fix partials content
-- add all assets properly to files through partials/templates
 - figure out image width vs pixel density
-- scroll anchor bug again
-- build as per comments
 - aria tags
 - per page content
 - full translation with meta
 - favicon
 - service worker
-- split into libraries
-  - scroll text
-  - anchors
 - test
   - seo manifests etc
   - history

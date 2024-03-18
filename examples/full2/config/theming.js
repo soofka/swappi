@@ -23,6 +23,10 @@ export const getTheming = () => {
         light: "#00c9d6",
         dark: "#00a8b2",
       },
+      teacher: {
+        light: "#a68553",
+        dark: "#8e7247",
+      },
     },
   };
 
