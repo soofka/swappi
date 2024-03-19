@@ -20,20 +20,10 @@
 
 ### todo:
 
-- accessible links and aria tags
 - per page content
 - full translation with meta
 - print css
-- keyboard test
-
 - service worker
-- test
-
-  - seo manifests etc
-  - history
-  - lighthouse
-  - w3c
-  - iphone
 
 - canonical links no language?
 - figure out image width vs pixel density

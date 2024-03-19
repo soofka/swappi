@@ -2,7 +2,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
   const name = pageName.substring(0, pageName.length - lang.length - 1);
   const isIndex = name === "index";
   const getMenuLink = (page) =>
-    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: `${page}-${lang}`, content: data.labels[lang].nav[page] }))}"></partial></li>`;
+    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: pageName, content: data.labels[lang].nav[page] }))}"></partial></li>`;
   return `
     <!doctype html>
     <html lang="${lang}">
@@ -20,7 +20,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
                       '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span><span class="teacher-fg">.</span>ski</h4>',
                   }),
                 )}"></partial>
-                <button id="menu-toggle"></button>
+                <button id="menu-toggle" aria-label="Menu"> </button>
               </div>
               <div id="menu">
                 <ul>
@@ -35,7 +35,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
                       (otherLang) =>
                         `<li><a href="${url.replace(`/${lang}/`, `/${otherLang}/`)}">${otherLang}</a></li>`,
                     )}
-                  <li><a href="" id="theme-toggle">&nbsp;</a></li>
+                  <li><a href="" id="theme-toggle"> </a></li>
                 </ul>
               </div>
             </nav>

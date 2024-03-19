@@ -3,8 +3,6 @@ import Processor from "./Processor.js";
 import { isFunction, isImage, isInObject } from "../../helpers/index.js";
 
 export class ImgProcessor extends Processor {
-  #variants = [];
-
   constructor(options) {
     super(options, {
       test: (direntData) => isImage(direntData),
@@ -34,17 +32,19 @@ export class ImgProcessor extends Processor {
   }
 
   async prepareFile(file) {
+    const ogDist = file.dists[0].clone();
+    const { width: ogWidth, height: ogHeight } = await sharp(
+      Buffer.from(ogDist.content),
+    ).metadata();
+    const aspectRatio = ogHeight / ogWidth;
+
     const newDists = [];
-    if (this.options.keepOriginal) {
-      newDists.push(file.dists[0]);
-      this.#variants.push({});
-    }
     for (let [width, type, name] of this.options.getVariants(file.src)) {
-      const newDist = file.dists[0].clone();
-      newDist.name = name || `${newDist.name}-${width}`;
+      const newDist = ogDist.clone();
+      const dimensions = `${width}x${Math.round(width * aspectRatio)}`;
+      newDist.name = name || `${newDist.name}-${dimensions}`;
       newDist.ext = `.${type}`;
       newDists.push(newDist);
-      this.#variants.push({ width, type });
     }
     file.dists = newDists;
     return file;
@@ -52,9 +52,10 @@ export class ImgProcessor extends Processor {
 
   async process(dist) {
     let width;
-    const widthArray = dist.name.split("-");
-    if (widthArray.length > 0) {
-      width = parseInt(widthArray[1]);
+    let height;
+    const nameArray = dist.name.split("-");
+    if (nameArray.length > 1) {
+      [width, height] = nameArray[1].split("x").map((e) => parseInt(e));
     }
     const type = dist.ext.substring(1);
     const isValidWidth = !isNaN(width);
@@ -63,7 +64,7 @@ export class ImgProcessor extends Processor {
     if (isValidWidth || isValidType) {
       let image = sharp(Buffer.from(dist.content));
       if (isValidWidth) {
-        image = image.resize(parseInt(width));
+        image = image.resize(width);
       }
       if (isValidType) {
         image = image[type]();

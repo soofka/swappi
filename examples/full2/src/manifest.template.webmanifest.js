@@ -7,11 +7,13 @@ const manifest = (data, dists, lang, theme) =>
     description: data.labels[lang].meta.description,
     display: "standalone",
     icons: dists
-      .filter((dist) => dist.name === "icon-192" || dist.name === "icon-512")
+      .filter(
+        (dist) => dist.name === "icon-192x192" || dist.name === "icon-512x512",
+      )
       .map((dist) => ({
-        src: dist.abs,
+        src: dist.rel,
         type: "image/png",
-        sizes: dist.name === "icon-192" ? "192x192" : "512x512",
+        sizes: dist.name.split("-")[1],
       })),
     name: data.labels[lang].meta.title,
     scope: "/",

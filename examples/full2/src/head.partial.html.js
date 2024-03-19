@@ -16,12 +16,11 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="color-scheme" content="${data.themes.map((theme) => theme.name).join(" ")}">
 
-    <link rel="canonical" href="${url}" />
+    <link rel="canonical" href="${data.url}${url}" />
     ${data.langs
-      .filter((tempLang) => tempLang !== lang)
       .map(
         (lang) =>
-          `<link rel="alternate" href="${url.replace(new RegExp(data.langs.join("|")), lang)}" hreflang="${lang}" />`,
+          `<link rel="alternate" href="${`${data.url}${url.replace(new RegExp(data.langs.join("|")), lang)}`}" hreflang="${lang}" />`,
       )
       .join("")}
 
@@ -39,9 +38,9 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
     ${dists
       .filter((dist) => dist.name.startsWith("icon-"))
       .map((dist) =>
-        dist.name === "icon-16" || dist.name === "icon-32"
-          ? `<link rel="icon" type="image/png" sizes="${dist.name === "icon-16" ? "16x16" : "32x32"}" href="${dist.rel}">`
-          : `<link rel="apple-touch-icon" sizes="${dist.name.substring(5, 2)}x${dist.name.substring(5, 2)}" href="${dist.rel}">`,
+        dist.name === "icon-16x16" || dist.name === "icon-32x32"
+          ? `<link rel="icon" type="image/png" sizes="${dist.name.split("-")[1]}" href="${dist.rel}">`
+          : `<link rel="apple-touch-icon" sizes="${dist.name.split("-")[1]}" href="${dist.rel}">`,
       )
       .join("")}
 

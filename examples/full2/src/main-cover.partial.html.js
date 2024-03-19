@@ -22,6 +22,7 @@ const mainCover = (data, dists, { lang }) => `
           </h1>
           <div class="col-3-1">
             <div class="col col-3">
+              <h2>👋</h2>
               <h3>${data.labels[lang].pages.home.intro.lead}</h3>
               <p>${data.labels[lang].pages.home.intro.text}</p>
             </div>
@@ -56,8 +57,21 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <a class="button architect-bg">${data.labels[lang].pages.home.architect.buttons.talks}</a>
-            <a class="button">${data.labels[lang].pages.home.architect.buttons.articles}</a>
+            <partial name="link" data="${encodeURI(
+              JSON.stringify({
+                classes: "button architect-bg",
+                page: `talks-${lang}`,
+                content: data.labels[lang].pages.home.architect.buttons.talks,
+              }),
+            )}"></partial>
+            <partial name="link" data="${encodeURI(
+              JSON.stringify({
+                classes: "button",
+                page: `articles-${lang}`,
+                content:
+                  data.labels[lang].pages.home.architect.buttons.articles,
+              }),
+            )}"></partial>
           </div>
         </article>
       </div>
@@ -77,8 +91,21 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <a class="button">${data.labels[lang].pages.home.developer.buttons.projects}</a>
-            <a class="button developer-bg">${data.labels[lang].pages.home.developer.buttons.blog}</a>
+            <partial name="link" data="${encodeURI(
+              JSON.stringify({
+                classes: "button",
+                page: `projects-${lang}`,
+                content:
+                  data.labels[lang].pages.home.developer.buttons.projects,
+              }),
+            )}"></partial>
+            <partial name="link" data="${encodeURI(
+              JSON.stringify({
+                classes: "button developer-bg",
+                page: `blog-${lang}`,
+                content: data.labels[lang].pages.home.developer.buttons.blog,
+              }),
+            )}"></partial>
           </div>
         </article>
       </div>
@@ -98,7 +125,13 @@ const mainCover = (data, dists, { lang }) => `
             </div>
           </div>
           <div class="buttons">
-            <a class="button leader-bg">${data.labels[lang].pages.home.leader.buttons.courses}</a>
+            <partial name="link" data="${encodeURI(
+              JSON.stringify({
+                classes: "button leader-bg",
+                page: `courses-${lang}`,
+                content: data.labels[lang].pages.home.leader.buttons.courses,
+              }),
+            )}"></partial>
           </div>
         </article>
       </div>

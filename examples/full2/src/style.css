@@ -375,9 +375,9 @@ footer section article > p {
     margin-left: 0;
     text-align: right;
   }
-  header nav #menu ul li:active,
-  header nav #menu ul li:focus,
-  header nav #menu ul li:hover {
+  header nav #menu ul li a:active,
+  header nav #menu ul li a:focus,
+  header nav #menu ul li a:hover {
     background: var(--off-bg-2);
   }
   header #menu-toggle {

@@ -1,27 +1,36 @@
 const img = (data, dists, { src, alt = "" }) => {
-  let picture = "<picture>";
   const imgName = src.split(".")[0];
   const imgDists = dists.filter(
     (element) =>
       element.name === imgName ||
       element.name.substring(0, imgName.length + 1) === `${imgName}-`,
   );
-  let imgString = "";
-  for (let index in imgDists) {
-    const dist = imgDists[index];
+
+  let imgDist;
+  const srcSetDists = [];
+  for (let dist of imgDists) {
     const nameArray = dist.name.split("-");
-    console.log("img partial", nameArray, dist.ext);
-    if (
-      nameArray.length < 2 ||
-      (nameArray[1] === "1280" && dist.ext === ".jpg")
-    ) {
-      imgString = `<img src="/${dist.full}" alt="${alt}">`;
-    } else {
-      picture += `<source srcset="/${dist.full} ${nameArray[1]}w" type="image/${dist.ext.substring(1)}">`;
+    const distObj = { dist };
+    if (nameArray.length > 1) {
+      const dimensions = nameArray[1].split("x");
+      distObj.width = parseInt(dimensions[0]);
+      distObj.height = parseInt(dimensions[1]);
+
+      if (!imgDist || imgDist.width < distObj.width) {
+        if (imgDist) {
+          srcSetDists.push(imgDist);
+        }
+        imgDist = distObj;
+      } else {
+        srcSetDists.push(distObj);
+      }
     }
   }
 
-  return picture + imgString + "</picture>";
+  return `<picture>
+      ${srcSetDists.map(({ dist, width }) => `<source srcset="${dist.rel} ${width}w" type="image/${dist.ext.substring(1)}">`).join("")}
+      ${imgDist && `<img src="${imgDist.dist.rel}" alt="${alt}" width="${imgDist.width}" height="${imgDist.height}">`}
+    </picture>`;
 };
 
 export default img;
