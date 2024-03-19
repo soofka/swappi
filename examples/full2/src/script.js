@@ -40,43 +40,43 @@ function applyTheme(newTheme, force = false) {
 }
 
 // menu
-const menu = document.querySelector("nav #menu");
-const menuList = document.querySelector("nav #menu ul");
-const menuButton = document.querySelector("nav #menu-toggle");
+// const menu = document.querySelector("nav #menu");
+// const menuList = document.querySelector("nav #menu ul");
+// const menuButton = document.querySelector("nav #menu-toggle");
 
-window.addEventListener("resize", () => setupMenu());
-menuButton.addEventListener("click", () => setMenu());
-menuButton.addEventListener("blur", () => {
-  setMenu(false);
-  window.removeEventListener("scroll", hideMenuOnNextScroll);
-});
-menuButton.classList.add("no-before");
+// window.addEventListener("resize", () => setupMenu());
+// menuButton.addEventListener("click", () => setMenu());
+// menuButton.addEventListener("blur", () => {
+//   setMenu(false);
+//   window.removeEventListener("scroll", hideMenuOnNextScroll);
+// });
+// menuButton.classList.add("no-before");
 
-setupMenu();
+// setupMenu();
 
-function setupMenu() {
-  if (window.innerWidth <= 960) {
-    setMenu(false);
-  } else {
-    setMenu(true);
-    window.removeEventListener("scroll", hideMenuOnNextScroll);
-  }
-}
-function hideMenuOnNextScroll() {
-  setMenu(false);
-  window.removeEventListener("scroll", hideMenuOnNextScroll);
-}
-function setMenu(on) {
-  let open = on === true || on === false ? on : menu.style.height === "0px";
-  if (open) {
-    menu.style.height = `${menuList.offsetHeight}px`;
-    menuButton.textContent = "☓";
-    if (window.innerWidth <= 960) {
-      window.removeEventListener("scroll", hideMenuOnNextScroll);
-      window.addEventListener("scroll", hideMenuOnNextScroll);
-    }
-  } else {
-    menu.style.height = "0px";
-    menuButton.textContent = "☰";
-  }
-}
+// function setupMenu() {
+//   if (window.innerWidth <= 960) {
+//     setMenu(false);
+//   } else {
+//     setMenu(true);
+//     window.removeEventListener("scroll", hideMenuOnNextScroll);
+//   }
+// }
+// function hideMenuOnNextScroll() {
+//   setMenu(false);
+//   window.removeEventListener("scroll", hideMenuOnNextScroll);
+// }
+// function setMenu(on) {
+//   let open = on === true || on === false ? on : menu.style.height === "0px";
+//   if (open) {
+//     menu.style.height = `${menuList.offsetHeight}px`;
+//     menuButton.textContent = "☓";
+//     if (window.innerWidth <= 960) {
+//       window.removeEventListener("scroll", hideMenuOnNextScroll);
+//       window.addEventListener("scroll", hideMenuOnNextScroll);
+//     }
+//   } else {
+//     menu.style.height = "0px";
+//     menuButton.textContent = "☰";
+//   }
+// }

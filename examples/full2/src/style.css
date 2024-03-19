@@ -362,17 +362,23 @@ footer section article > p {
     flex-flow: column nowrap;
   }
   header nav #menu {
-    height: 0;
+    height: auto;
+    max-height: 0;
     overflow: hidden;
-    transition: height var(--transition-duration) var(--transition-easing);
+    transition: max-height var(--transition-duration) var(--transition-easing);
   }
   header nav #menu ul {
     flex-flow: column nowrap;
   }
-  header nav ul li:nth-last-child(1),
-  header nav ul li:nth-last-child(2) {
+  header nav #menu ul li:nth-last-child(1),
+  header nav #menu ul li:nth-last-child(2) {
     margin-left: 0;
     text-align: right;
+  }
+  header nav #menu ul li:active,
+  header nav #menu ul li:focus,
+  header nav #menu ul li:hover {
+    background: var(--off-bg-2);
   }
   header #menu-toggle {
     display: block;
@@ -380,10 +386,12 @@ footer section article > p {
   header #menu-toggle::before {
     content: "☰";
   }
-  header #menu-toggle:active::before {
+  /* header #menu-toggle:active::before {
     content: "☓";
-  }
+  } */
+  header nav:has(#menu ul li a:focus) #menu,
+  header nav:has(#menu-toggle:focus) #menu,
   header nav:has(#menu-toggle:active) #menu {
-    height: auto;
+    max-height: 14rlh;
   }
 }

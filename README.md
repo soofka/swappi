@@ -20,11 +20,11 @@
 
 ### todo:
 
-- pure css hamburger with height animation on li items
-
-- aria tags
+- accessible links and aria tags
 - per page content
 - full translation with meta
+- print css
+- keyboard test
 
 - service worker
 - test

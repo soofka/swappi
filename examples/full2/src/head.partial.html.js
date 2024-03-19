@@ -18,7 +18,7 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
 
     <link rel="canonical" href="${url}" />
     ${data.langs
-      .filter((l) => l !== lang)
+      .filter((tempLang) => tempLang !== lang)
       .map(
         (lang) =>
           `<link rel="alternate" href="${url.replace(new RegExp(data.langs.join("|")), lang)}" hreflang="${lang}" />`,

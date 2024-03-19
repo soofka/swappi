@@ -32,7 +32,7 @@
           "talks": "My talks",
           "articles": "My articles"
         },
-        "imgAlt": "me architecting"
+        "imgAlt": "Jakub Sowiński architecting"
       },
       "developer": {
         "head": "Sotware developer",
@@ -42,7 +42,7 @@
           "projects": "My projects",
           "blog": "My blog"
         },
-        "imgAlt": "me developing"
+        "imgAlt": "Jakub Sowiński programming"
       },
       "leader": {
         "head": "Teacher and leader",
@@ -51,7 +51,7 @@
         "buttons": {
           "courses": "Check out my courses"
         },
-        "imgAlt": "me teaching and leading"
+        "imgAlt": "Jakub Sowiński teaching and leading"
       },
       "contact": {
         "head": "Contact me",

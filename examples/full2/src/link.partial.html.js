@@ -1,6 +1,6 @@
-const link = (data, dists, { id = "", lang, page, label, content }) =>
-  `<a id="${id}" href="${(data.pages[`${page}-${lang}`] && data.pages[`${page}-${lang}`].url) || "#"}">
-    ${content ? content : `<partial name="label" data="${encodeURI(JSON.stringify({ id: label, lang }))}"></partial>`}
+const link = (data, dists, { id = "", page, content = "" }) =>
+  `<a id="${id}" href="${(page && data.pages[page] && data.pages[page].url) || ""}">
+    ${content}
   </a>`;
 
 export default link;
