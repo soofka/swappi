@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "swn.ski",
+    "description": "Jakub Sowiński - solution architect, software developer, programming teacher, and technical leader"
+  },
+  "nav": {
+    "home": "home",
+    "projects": "projects",
+    "articles": "articles",
+    "blog": "blog",
+    "courses": "courses",
+    "project": "projects",
+    "talks": "talks"
+  },
+  "pages": {
+    "home": {
+      "intro": {
+        "head": "Hello!",
+        "lead": "My name is Jakub and I'm a software enthusiast. I work as a solution architect, software developer, programming teacher, and technical leader. Welcome to my corner of the Internet!",
+        "text": "If you want to hire me, cut the chase and <a href=\"mailto:j@swn.ski\" target=\"_blank\">drop me a message</a>. If you don't know yet that you want to hire me, please refer to my resume or read more about my work. Otherwise, enjoy fruits of my labor, such as my projects, talks, articles, courses, and blog posts, or just chill out here with me. Peace!",
+        "buttons": {
+          "cv": "My resume",
+          "info": "More about my work",
+          "contact": "Contact me"
+        },
+        "imgAlt": "Jakub Sowiński - solution architect, software developer, teacher and leader"
+      },
+      "architect": {
+        "head": "Solution architect",
+        "lead": "As an architect, it is my job to ensure that software not only is built properly, but even more so that it is being built properly.",
+        "text": "I have over 5 years of experience in solultion and software architecture positions, as well as over 3 years of experience as an university lecturer in software architecture. I can draw from my experience and help your project by bringing structure and technical guidance to its architectural design, but also to its software development and deployment processes.",
+        "buttons": {
+          "talks": "My talks",
+          "articles": "My articles"
+        },
+        "imgAlt": "Jakub Sowiński architecting"
+      },
+      "developer": {
+        "head": "Software developer",
+        "lead": "I started coding as a teenager and I never stopped since. In that time, I have dabbled in many programming languages, but ultimately I've fallen in love with web technologies, and especially JavaScript.",
+        "text": "I have participated in multiple open source projects and authored a couple of them, as well as written a couple of blog posts on web and JavaScript development, feel free to check them out. Or reach out to me if you have an interesting project and you need some help!",
+        "buttons": {
+          "projects": "My projects",
+          "blog": "My blog"
+        },
+        "imgAlt": "Jakub Sowiński programming"
+      },
+      "leader": {
+        "head": "Teacher and leader",
+        "lead": "Throughout my career, I have been sharing knowledge and experience with my peers as a coach, mentor, teacher, trainer, public speaker, and leader of communities and projects.",
+        "text": "Currently I work as a lecturer in software architecture at Polish-Japanese Academy of Information Technology in Warsaw, Poland, but I am open for other teaching and leading opportunities. Reach out to me if you're interested in one of my basic web development courses or you need something more specific!",
+        "buttons": {
+          "courses": "My courses"
+        },
+        "imgAlt": "Jakub Sowiński teaching and leading"
+      },
+      "contact": {
+        "head": "Contact me",
+        "lead": "Need an architect or consultant for your project? Have a great, preferably open source project for me to work on? Need programming training? Looking for leader or mentor in IT?<br><br>Please drop me a message at",
+        "text": "You can also find me on:"
+      }
+    },
+    "articles": {
+      "meta": {
+        "title": "Articles",
+        "description": "Articles"
+      }
+    },
+    "blog": {
+      "meta": {
+        "title": "Blog",
+        "description": "Blog"
+      }
+    },
+    "courses": {
+      "meta": {
+        "title": "Courses",
+        "description": "Courses"
+      }
+    },
+    "projects": {
+      "meta": {
+        "title": "Projects",
+        "description": "Projects"
+      }
+    },
+    "talks": {
+      "meta": {
+        "title": "Talks",
+        "description": "Talks"
+      }
+    }
+  }
+}

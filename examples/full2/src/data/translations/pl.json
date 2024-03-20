@@ -1,9 +1,10 @@
 {
   "meta": {
-    "title": "swn.ski",
+    "title": "swn.ski PO POLSKU",
     "description": "swn.ski description"
   },
   "nav": {
+    "home": "home",
     "projects": "projects",
     "articles": "articles",
     "blog": "blog",

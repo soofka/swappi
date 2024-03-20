@@ -1,8 +1,9 @@
 const page = (data, dists, pageName, lang, url, type, meta, content) => {
   const name = pageName.substring(0, pageName.length - lang.length - 1);
   const isIndex = name === "index";
+  const mailLink = '<a href="mailto:j@swn.ski">j[at]swn.ski</a>';
   const getMenuLink = (page) =>
-    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: pageName, content: data.labels[lang].nav[page] }))}"></partial></li>`;
+    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: `${page}-${lang}`, content: data.labels[lang].nav[page] }))}"></partial></li>`;
   return `
     <!doctype html>
     <html lang="${lang}">
@@ -23,7 +24,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
                 <button id="menu-toggle" aria-label="Menu"> </button>
               </div>
               <div id="menu">
-                <ul>
+                <ul class="horizontal-list">
                   ${getMenuLink("projects")}
                   ${getMenuLink("courses")}
                   ${getMenuLink("talks")}
@@ -48,17 +49,18 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
               <article>
                 <h2>${data.labels[lang].pages.home.contact.head}</h2>
                 <div>
-                  <h3>${data.labels[lang].pages.home.contact.lead}</h3>
-                  <p>${data.labels[lang].pages.home.contact.text}</p>
+                  ${isIndex ? `<h3>${data.labels[lang].pages.home.contact.lead} ${mailLink}</h3>` : ""}
+                  ${isIndex ? `<p>${data.labels[lang].pages.home.contact.text}</p>` : ""}
                   <ul>
-                    <li><a href="https://linkedin.com/in/jakub-sowi%C5%84ski/" target="_blank">linkedin.com/in/jakub-sowiński/</a></li>
+                    ${isIndex ? "" : `<li>${mailLink}</li>`}
+                    <li><a href="https://linkedin.com/in/jakub-sowi%C5%84ski/" target="_blank">linkedin.com/in/jakub-sowiński</a></li>
                     <li><a href="https://github.com/soofka/" target="_blank">github.com/soofka</a<></li>
                     <li><a href="https://last.fm/user/soofka/" target="_blank">last.fm/soofka</a></li>
                   </ul>
                 </div>
                 <p><small>swn.ski 2007-2024 | powered by <a href="#">swappi</a> | <a href="#">repo</a></small></p>
-              </article>
-            </div>
+                </article>
+              </div>
           </section>
         </footer>
         ${dists

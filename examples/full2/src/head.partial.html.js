@@ -8,8 +8,8 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
     <meta property="og:type" content="${data.type}">
     <meta property="og:url" content="${data.url}${url}">
     <meta property="og:description" content="${meta.description}">
-    <meta property="og:image" content="me.jpg">
-    <meta property="og:image:alt" content="me">
+    <meta property="og:image" content="${dists.find((dist) => dist.name === "me-1280x1280" && dist.ext === ".jpg").rel}">
+    <meta property="og:image:alt" content="${dists.find((dist) => dist.name === "icon-512x512").rel}">
 
     <meta name="robots" content="index,follow"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,7 +47,9 @@ const head = (data, dists, { lang, url, meta, isIndex }) => `
     ${dists
       .filter(
         (dist) =>
-          (dist.name === "style" || (isIndex && dist.name === "style-index")) &&
+          (dist.name === "style" ||
+            (isIndex && dist.name === "style-index") ||
+            (!isIndex && dist.name === "style-page")) &&
           dist.ext === ".css",
       )
       .sort((a, b) => (a.name === "style" ? -1 : 0))

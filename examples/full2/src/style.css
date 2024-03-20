@@ -55,6 +55,7 @@ h3 {
   font-size: 1.53rem;
   margin: 0 0 0.76rem 0;
   padding: 0;
+  text-align: justify;
 }
 h4,
 p,
@@ -62,8 +63,8 @@ li {
   width: 100%;
   font-size: 1rem;
   margin: 0 0 0.5rem 0;
-  text-align: justify;
   padding: 0;
+  text-align: justify;
 }
 button,
 .button {
@@ -178,17 +179,7 @@ header nav a#logo:active {
   color: var(--off-fg);
   text-decoration: none;
 }
-header nav ul {
-  display: flex;
-  flex-flow: row nowrap;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
 header nav ul li {
-  width: auto;
-  margin: 0;
-  padding: 0;
   border-top: 1px solid var(--off-bg-2);
 }
 header nav ul li a {
@@ -286,6 +277,18 @@ footer section article > p {
 }
 .no-before::before {
   display: none;
+}
+.horizontal-list {
+  display: flex;
+  flex-flow: row nowrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.horizontal-list li {
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 .buttons {
   width: 100%;

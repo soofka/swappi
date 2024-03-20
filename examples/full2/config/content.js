@@ -2,7 +2,7 @@ export const getContent = async (langs) => {
   const labels = {};
   for (let lang of langs) {
     labels[lang] = (
-      await import(`../data/translations/${lang}.json`, {
+      await import(`../src/data/translations/${lang}.json`, {
         assert: { type: "json" },
       })
     ).default;
@@ -10,46 +10,45 @@ export const getContent = async (langs) => {
 
   const data = {
     articles: (
-      await import("../data/articles.json", {
+      await import("../src/data/articles.json", {
         assert: { type: "json" },
       })
     ).default,
     blog: (
-      await import("../data/blog.json", {
+      await import("../src/data/blog.json", {
         assert: { type: "json" },
       })
     ).default,
     courses: (
-      await import("../data/courses.json", {
+      await import("../src/data/courses.json", {
         assert: { type: "json" },
       })
     ).default,
     projects: (
-      await import("../data/projects.json", {
+      await import("../src/data/projects.json", {
         assert: { type: "json" },
       })
     ).default,
     talks: (
-      await import("../data/talks.json", {
+      await import("../src/data/talks.json", {
         assert: { type: "json" },
       })
     ).default,
   };
 
   // for (let project of data.projects) {
-  //   const meta = [];
+  //   const meta = { links: [], stats: [] };
   //   if (project.demo) {
-  //     meta.push(`<a href="${project.demo}" target="_blank">demo</a>`);
+  //     meta.links.push(`<a href="${project.demo}" target="_blank">demo</a>`);
   //   }
   //   if (project.github) {
   //     const { forks_count: forks = 0, stargazers_count: stars = 0 } = await (
   //       await fetch(`https://api.github.com/repos/soofka/${project.github}`)
   //     ).json();
-  //     meta.push(
-  //       `<a href="https://github.com/soofka/${project.github}" target="_blank">repo</a>`,
-  //       `${stars} stars`,
-  //       `${forks} forks`,
+  //     meta.links.push(
+  //       `<a href="https://github.com/soofka/${project.github}" target="_blank">github.com/soofka/${project.github}</a>`,
   //     );
+  //     meta.stats.push(`${stars} stars`, `${forks} forks`);
   //   }
   //   if (project.npm) {
   //     const { downloads = 0 } = await (
@@ -58,9 +57,9 @@ export const getContent = async (langs) => {
   //       )
   //     ).json();
   //     project.downloads = downloads;
-  //     meta.push(`${downloads} npm installs`);
+  //     meta.stats.push(`${downloads} npm installs`);
   //   }
-  //   project.meta = meta.join(" | ");
+  //   project.meta = meta;
   // }
 
   return { data, labels };
