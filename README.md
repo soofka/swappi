@@ -20,6 +20,7 @@
 
 ### todo:
 
+- href on accessible urls makes them reload :-(
 - per page content
 - full translation with meta
 - print css

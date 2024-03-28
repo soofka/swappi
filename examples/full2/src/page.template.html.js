@@ -1,7 +1,8 @@
 const page = (data, dists, pageName, lang, url, type, meta, content) => {
   const name = pageName.substring(0, pageName.length - lang.length - 1);
   const isIndex = name === "index";
-  const mailLink = '<a href="mailto:j@swn.ski">j[at]swn.ski</a>';
+  const getMailLink = (content) =>
+    `<a href="mailto:j@swn.ski">${content || "j[at]swn.ski"}</a>`;
   const getMenuLink = (page) =>
     `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: `${page}-${lang}`, content: data.labels[lang].nav[page] }))}"></partial></li>`;
   return `
@@ -47,20 +48,35 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
           <section id="contact">
             <div class="wrapper">
               <article>
-                <h2>${data.labels[lang].pages.home.contact.head}</h2>
+                ${
+                  isIndex
+                    ? `<h2>${data.labels[lang].pages.home.contact.head}</h2>
+                      <div>
+                        <ul>
+                          <li><h3 class="architect-fg" style="width:auto;margin:0;padding:0;">Architecture offer?</h3></li>
+                          <li><h3 class="developer-fg" style="width:auto;margin:0;padding:0;">Development offer?</h3></li>
+                          <li><h3 class="leader-fg" style="width:auto;margin:0;padding:0;">Leadership offer?</h3></li>
+                          <li><h3 class="teacher-fg" style="width:auto;margin:0;padding:0;">Teachingship offer?</h3></li>
+                        </ul>
+                        ${getMailLink('<h3 id="contact-mail">j[at]swn.ski</h3>')}
+                      </div>`
+                    : ""
+                }
                 <div>
-                  ${isIndex ? `<h3>${data.labels[lang].pages.home.contact.lead} ${mailLink}</h3>` : ""}
-                  ${isIndex ? `<p>${data.labels[lang].pages.home.contact.text}</p>` : ""}
-                  <ul>
-                    ${isIndex ? "" : `<li>${mailLink}</li>`}
-                    <li><a href="https://linkedin.com/in/jakub-sowi%C5%84ski/" target="_blank">linkedin.com/in/jakub-sowiński</a></li>
-                    <li><a href="https://github.com/soofka/" target="_blank">github.com/soofka</a<></li>
-                    <li><a href="https://last.fm/user/soofka/" target="_blank">last.fm/soofka</a></li>
-                  </ul>
+                  <p>
+                    ${getMailLink()}
+                    | <a href="https://linkedin.com/in/jakub-sowi%C5%84ski/" target="_blank">linkedin</a>
+                    | <a href="https://github.com/soofka/" target="_blank">github.com</a>
+                    | <a href="https://last.fm/user/soofka/" target="_blank">last.fm</a>
+                  </p>
+                  <p><small>
+                    swn.ski 2007-2024
+                    | <a href="https://europa.eu/youreurope/business/running-business/intellectual-property/copyright/index_en.htm" target="_blank">all rights reserved</a>
+                    | <a href="#">repo</a>
+                  </small></p>
                 </div>
-                <p><small>swn.ski 2007-2024 | powered by <a href="#">swappi</a> | <a href="#">repo</a></small></p>
-                </article>
-              </div>
+              </article>
+            </div>
           </section>
         </footer>
         ${dists

@@ -66,12 +66,13 @@ const mainCover = (data, dists, { lang }) => `
             )}"></partial>
             <partial name="link" data="${encodeURI(
               JSON.stringify({
-                classes: "button",
+                classes: "button architect-bg",
                 page: `articles-${lang}`,
                 content:
                   data.labels[lang].pages.home.architect.buttons.articles,
               }),
             )}"></partial>
+            <a class="button" href="#contact">${data.labels[lang].pages.home.intro.buttons.contact}</a>
           </div>
         </article>
       </div>
@@ -93,7 +94,7 @@ const mainCover = (data, dists, { lang }) => `
           <div class="buttons">
             <partial name="link" data="${encodeURI(
               JSON.stringify({
-                classes: "button",
+                classes: "button developer-bg",
                 page: `projects-${lang}`,
                 content:
                   data.labels[lang].pages.home.developer.buttons.projects,
@@ -106,6 +107,7 @@ const mainCover = (data, dists, { lang }) => `
                 content: data.labels[lang].pages.home.developer.buttons.blog,
               }),
             )}"></partial>
+            <a class="button" href="#contact">${data.labels[lang].pages.home.intro.buttons.contact}</a>
           </div>
         </article>
       </div>
@@ -132,6 +134,7 @@ const mainCover = (data, dists, { lang }) => `
                 content: data.labels[lang].pages.home.leader.buttons.courses,
               }),
             )}"></partial>
+            <a class="button" href="#contact">${data.labels[lang].pages.home.intro.buttons.contact}</a>
           </div>
         </article>
       </div>

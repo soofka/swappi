@@ -1,0 +1,9 @@
+main section h2 {
+  margin: var(--gap-rel) 0 0 0;
+}
+footer section article {
+  padding: var(--gap) 0;
+}
+footer section article p {
+  margin: 0;
+}

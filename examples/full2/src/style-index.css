@@ -1,9 +1,11 @@
+body.cover h3 {
+  text-align: justify;
+}
 body.cover section {
   min-height: 100vh;
   border-top: 1px solid var(--alt-bg);
 }
 body.cover section:first-of-type {
-  margin-top: 0;
   border-top: none;
 }
 body.cover footer .wrapper,
@@ -47,6 +49,11 @@ body.cover h1:hover .mail {
   width: 0;
   opacity: 0;
 }
+body.cover footer #contact-mail {
+  text-align: center;
+  margin: 0;
+  padding: calc(2 * var(--gap-rel)) 0;
+}
 @keyframes appear {
   0% {
     width: 0;
@@ -63,6 +70,11 @@ body.cover h1:hover .mail {
     width: 2ch;
     opacity: 1;
   }
+}
+footer section article img {
+  width: auto;
+  display: block;
+  margin: calc(2 * var(--gap-rel)) auto;
 }
 @keyframes disappear {
   0% {
