@@ -1,7 +1,20 @@
 [
   {
-    "title": "Microfrontends pt 1",
-    "description": "yooyoy",
-    "content": ""
+    "id": "microfrontends-3",
+    "title": "Microfrontends — part 3: tools and processes for development and maintenance",
+    "date": "2019-06",
+    "publication": "https://medium.com/stepstone-tech/microfrontends-part-3-tools-and-processes-for-development-and-maintenance-50d47c41ddaf"
+  },
+  {
+    "id": "microfrontends-2",
+    "title": "Microfrontends — part 2: integration and communication",
+    "date": "2019-06",
+    "publication": "https://medium.com/stepstone-tech/microfrontends-part-2-integration-and-communication-3385bc242673"
+  },
+  {
+    "id": "microfrontends-1",
+    "title": "Microfrontends — part 1: extending service-oriented architecture to frontend development",
+    "date": "2019-06",
+    "publication": "https://medium.com/stepstone-tech/microfrontends-extending-service-oriented-architecture-to-frontend-development-part-1-120b71c87b68"
   }
 ]

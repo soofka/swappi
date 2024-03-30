@@ -1,5 +1,11 @@
 [
   {
+    "title": "Simple Web App Processing Interface",
+    "description": "swappi",
+    "github": "swappi",
+    "npm": "swappi"
+  },
+  {
     "title": "Netlify Plugin Chromium",
     "description": "netlify-plugin-chromium",
     "github": "netlify-plugin-chromium",

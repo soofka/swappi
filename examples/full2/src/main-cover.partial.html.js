@@ -60,14 +60,14 @@ const mainCover = (data, dists, { lang }) => `
             <partial name="link" data="${encodeURI(
               JSON.stringify({
                 classes: "button architect-bg",
-                page: `talks-${lang}`,
+                pageId: `talks-${lang}`,
                 content: data.labels[lang].pages.home.architect.buttons.talks,
               }),
             )}"></partial>
             <partial name="link" data="${encodeURI(
               JSON.stringify({
                 classes: "button architect-bg",
-                page: `articles-${lang}`,
+                pageId: `articles-${lang}`,
                 content:
                   data.labels[lang].pages.home.architect.buttons.articles,
               }),
@@ -95,7 +95,7 @@ const mainCover = (data, dists, { lang }) => `
             <partial name="link" data="${encodeURI(
               JSON.stringify({
                 classes: "button developer-bg",
-                page: `projects-${lang}`,
+                pageId: `projects-${lang}`,
                 content:
                   data.labels[lang].pages.home.developer.buttons.projects,
               }),
@@ -103,7 +103,7 @@ const mainCover = (data, dists, { lang }) => `
             <partial name="link" data="${encodeURI(
               JSON.stringify({
                 classes: "button developer-bg",
-                page: `blog-${lang}`,
+                pageId: `blog-${lang}`,
                 content: data.labels[lang].pages.home.developer.buttons.blog,
               }),
             )}"></partial>
@@ -130,7 +130,7 @@ const mainCover = (data, dists, { lang }) => `
             <partial name="link" data="${encodeURI(
               JSON.stringify({
                 classes: "button leader-bg",
-                page: `courses-${lang}`,
+                pageId: `courses-${lang}`,
                 content: data.labels[lang].pages.home.leader.buttons.courses,
               }),
             )}"></partial>

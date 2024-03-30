@@ -1,14 +1,21 @@
-const page = (data, dists, pageName, lang, url, type, meta, content) => {
-  const name = pageName.substring(0, pageName.length - lang.length - 1);
+const page = (data, dists, { id, url, name, lang, type, meta, content }) => {
   const isIndex = name === "index";
   const getMailLink = (content) =>
     `<a href="mailto:j@swn.ski">${content || "j[at]swn.ski"}</a>`;
-  const getMenuLink = (page) =>
-    `<li class="${name === page ? "active" : ""}"><partial name="link" data="${encodeURI(JSON.stringify({ page: `${page}-${lang}`, content: data.labels[lang].nav[page] }))}"></partial></li>`;
+  const getMenuLink = (pageName) =>
+    `<li class="${name === pageName ? "active" : ""}">
+      <partial name="link" data="${encodeURI(
+        JSON.stringify({
+          pageId: `${pageName}-${lang}`,
+          content: data.labels[lang].nav[pageName],
+        }),
+      )}"></partial>
+    </li>`;
+
   return `
     <!doctype html>
     <html lang="${lang}">
-      <partial name="head" data="${encodeURI(JSON.stringify({ lang, url, meta, isIndex }))}"></partial>
+      <partial name="head" data="${encodeURI(JSON.stringify({ url, lang, meta, isIndex }))}"></partial>
       <body class="${type}">
         <header>
           <div class="wrapper">
@@ -17,7 +24,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
                 <partial name="link" data="${encodeURI(
                   JSON.stringify({
                     id: "logo",
-                    page: `index-${lang}`,
+                    pageId: `index-${lang}`,
                     content:
                       '<h4><span class="architect-fg">s</span><span class="developer-fg">w</span><span class="leader-fg">n</span><span class="teacher-fg">.</span>ski</h4>',
                   }),
@@ -43,7 +50,7 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
             </nav>
           </div>
         </header>
-        <partial name="main-${type}" data="${encodeURI(JSON.stringify({ lang, content }))}"></partial>
+        <partial name="main-${type}" data="${encodeURI(JSON.stringify({ id, name, lang, content }))}"></partial>
         <footer>
           <section id="contact">
             <div class="wrapper">
@@ -94,25 +101,11 @@ const page = (data, dists, pageName, lang, url, type, meta, content) => {
 };
 
 export default {
-  generate: (data) => {
-    const dists = [];
-    for (let pageName of Object.keys(data.pages)) {
-      const { lang, url, type, meta, content } = data.pages[pageName];
-      dists.push({
-        name: pageName,
-        content: (data, dists) =>
-          page(data, dists, pageName, lang, url, type, meta, content),
-        resetContentHash: true,
-        contentHashSalt: JSON.stringify({
-          name: pageName,
-          lang,
-          url,
-          type,
-          meta,
-          content,
-        }),
-      });
-    }
-    return dists;
-  },
+  generate: (data) =>
+    data.pages.map((pageData) => ({
+      name: pageData.id,
+      content: (data, dists) => page(data, dists, pageData),
+      resetContentHash: true,
+      contentHashSalt: `${pageData.id}${JSON.stringify(pageData.content)}`,
+    })),
 };

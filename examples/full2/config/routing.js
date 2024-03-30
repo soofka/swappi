@@ -1,153 +1,183 @@
 export const getRouting = (langs, labels, data) => {
   const routes = {};
-  const pages = {};
+  const pages = [];
   const template = "page.template.html";
-  const metaSeparator = " | ";
+
+  const indexPageName = "index";
+  const articlesPageName = "articles";
+  const articlePageName = "article";
+  const blogPageName = "blog";
+  const blogPostPageName = "post";
+  const coursesPageName = "courses";
+  const projectsPageName = "projects";
+  const talksPageName = "talks";
 
   for (let index in langs) {
     const lang = langs[index];
 
-    const indexPageUrl = `/${lang}/index`;
-    const indexPageName = `index-${lang}`;
+    const indexPageUrl = `/${lang}/${indexPageName}`;
+    const indexPageId = `${indexPageName}-${lang}`;
     const indexPageObject = {
       template,
-      pageName: indexPageName,
+      pageId: indexPageId,
     };
     if (index == 0) {
       indexPageObject.alts = ["/"];
     }
     routes[indexPageUrl] = indexPageObject;
-    pages[indexPageName] = {
-      lang,
+    pages.push({
+      id: indexPageId,
       url: indexPageUrl,
+      name: indexPageName,
+      lang,
       type: "cover",
-      meta: {
-        title: labels[lang].meta.title,
-        description: labels[lang].meta.description,
-      },
-    };
+    });
 
-    const articlesPageUrl = `/${lang}/articles`;
-    const articlesPageName = `articles-${lang}`;
+    const articlesPageUrl = `/${lang}/${articlesPageName}`;
+    const articlesPageId = `${articlesPageName}-${lang}`;
     routes[articlesPageUrl] = {
       template,
-      pageName: articlesPageName,
+      pageId: articlesPageId,
     };
-    pages[articlesPageName] = {
-      lang,
+    pages.push({
+      id: articlesPageId,
       url: articlesPageUrl,
+      name: articlesPageName,
+      lang,
       type: "list",
       meta: {
-        title: `${labels[lang].pages.articles.meta.title}${metaSeparator}${labels[lang].meta.title}`,
-        description: `${labels[lang].pages.articles.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+        title: labels[lang].pages.articles.meta.title,
+        description: labels[lang].pages.articles.meta.description,
       },
       content: data.articles,
-    };
+    });
 
     for (let article of data.articles) {
-      const articlePageUrl = `/${lang}/article/${article.id}`;
-      const articlePageName = `article-${lang}-${article.id}`;
+      const articlePageUrl = `/${lang}/${articlePageName}/${parseTitleToUrl(article.title)}`;
+      const articlePageId = `${articlePageName}-${lang}-${article.id}`;
       routes[articlePageUrl] = {
         template,
-        pageName: articlePageName,
+        pageId: articlePageId,
       };
-      pages[articlePageName] = {
-        lang,
+      pages.push({
+        id: articlePageId,
         url: articlePageUrl,
+        name: articlePageName,
+        lang,
         type: "item",
         meta: {
-          title: `${article.title}${metaSeparator}${labels[lang].meta.title}`,
-          description: `${article.description}${metaSeparator}${labels[lang].meta.description}`,
+          title: article.title,
+          description: article.description,
         },
-      };
+        content: article,
+      });
     }
 
-    const blogPageUrl = `/${lang}/blog`;
-    const blogPageName = `blog-${lang}`;
+    const blogPageUrl = `/${lang}/${blogPageName}`;
+    const blogPageId = `${blogPageName}-${lang}`;
     routes[blogPageUrl] = {
       template,
-      pageName: blogPageName,
+      pageId: blogPageId,
     };
-    pages[blogPageName] = {
-      lang,
+    pages.push({
+      id: blogPageId,
       url: blogPageUrl,
+      name: blogPageName,
+      lang,
       type: "list",
       meta: {
-        title: `${labels[lang].pages.blog.meta.title}${metaSeparator}${labels[lang].meta.title}`,
-        description: `${labels[lang].pages.blog.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+        title: labels[lang].pages.blog.meta.title,
+        description: labels[lang].pages.blog.meta.description,
       },
       content: data.blog,
-    };
+    });
 
     for (let post of data.blog) {
-      const blogPostPageUrl = `/${lang}/blog/${post.id}`;
-      const blogPostPageName = `blog-${lang}-${post.id}`;
+      const blogPostPageUrl = `/${lang}/${blogPostPageName}/${parseTitleToUrl(post.title)}`;
+      const blogPostPageId = `${blogPostPageName}-${lang}-${post.id}`;
       routes[blogPostPageUrl] = {
         template,
-        pageName: blogPostPageName,
+        pageId: blogPostPageId,
       };
-      pages[blogPostPageName] = {
-        lang,
+      pages.push({
+        id: blogPostPageId,
         url: blogPostPageUrl,
+        name: blogPostPageName,
+        lang,
         type: "item",
         meta: {
-          title: `${post.title}${metaSeparator}${labels[lang].meta.title}`,
-          description: `${post.description}${metaSeparator}${labels[lang].meta.description}`,
+          title: post.title,
+          description: post.description,
         },
-      };
+        content: post,
+      });
     }
 
-    const coursesPageUrl = `/${lang}/courses`;
-    const coursesPageName = `courses-${lang}`;
+    const coursesPageUrl = `/${lang}/${coursesPageName}`;
+    const coursesPageId = `${coursesPageName}-${lang}`;
     routes[coursesPageUrl] = {
       template,
-      pageName: coursesPageName,
+      pageId: coursesPageId,
     };
-    pages[coursesPageName] = {
-      lang,
+    pages.push({
+      id: coursesPageId,
       url: coursesPageUrl,
+      name: coursesPageName,
+      lang,
       type: "list",
       meta: {
-        title: `${labels[lang].pages.courses.meta.title}${metaSeparator}${labels[lang].meta.title}`,
-        description: `${labels[lang].pages.courses.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+        title: labels[lang].pages.courses.meta.title,
+        description: labels[lang].pages.courses.meta.description,
       },
       content: data.courses,
-    };
+    });
 
-    const projectsPageUrl = `/${lang}/projects`;
-    const projectsPageName = `projects-${lang}`;
+    const projectsPageUrl = `/${lang}/${projectsPageName}`;
+    const projectsPageId = `${projectsPageName}-${lang}`;
     routes[projectsPageUrl] = {
       template,
-      pageName: projectsPageName,
+      pageId: projectsPageId,
     };
-    pages[projectsPageName] = {
-      lang,
+    pages.push({
+      id: projectsPageId,
       url: projectsPageUrl,
+      name: projectsPageName,
+      lang,
       type: "list",
       meta: {
-        title: `${labels[lang].pages.projects.meta.title}${metaSeparator}${labels[lang].meta.title}`,
-        description: `${labels[lang].pages.projects.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+        title: labels[lang].pages.projects.meta.title,
+        description: labels[lang].pages.projects.meta.description,
       },
       content: data.projects,
-    };
+    });
 
-    const talksPageUrl = `/${lang}/talks`;
-    const talksPageName = `talks-${lang}`;
+    const talksPageUrl = `/${lang}/${talksPageName}`;
+    const talksPageId = `${talksPageName}-${lang}`;
     routes[talksPageUrl] = {
       template,
-      pageName: talksPageName,
+      pageId: talksPageId,
     };
-    pages[talksPageName] = {
-      lang,
+    pages.push({
+      id: talksPageId,
       url: talksPageUrl,
+      name: talksPageName,
+      lang,
       type: "list",
       meta: {
-        title: `${labels[lang].pages.talks.meta.title}${metaSeparator}${labels[lang].meta.title}`,
-        description: `${labels[lang].pages.talks.meta.description}${metaSeparator}${labels[lang].meta.description}`,
+        title: labels[lang].pages.talks.meta.title,
+        description: labels[lang].pages.talks.meta.description,
       },
       content: data.talks,
-    };
+    });
   }
 
   return { routes, pages };
 };
+
+const parseTitleToUrl = (title) =>
+  title
+    ? title
+        .trim()
+        .toLowerCase()
+        .replaceAll(new RegExp("[^a-zA-Z0-9]", "g"), "-")
+    : title;

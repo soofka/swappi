@@ -1,5 +1,5 @@
-const link = (data, dists, { id = "", classes = "", page, content = "" }) =>
-  `<a id="${id}" class="${classes}" href="${(page && data.pages[page] && data.pages[page].url) || ""}">
+const link = (data, dists, { id = "", classes = "", pageId, content = "" }) =>
+  `<a id="${id}" class="${classes}" href="${data.pages.find((page) => page.id === pageId).url}">
     ${content}
   </a>`;
 

@@ -1,4 +1,4 @@
-const img = (data, dists, { src, alt = "" }) => {
+const img = (data, dists, { src, alt = "", withCaption = false }) => {
   const imgName = src.split(".")[0];
   const imgDists = dists.filter(
     (element) =>
@@ -27,10 +27,14 @@ const img = (data, dists, { src, alt = "" }) => {
     }
   }
 
-  return `<picture>
+  const picture = `<picture>
       ${srcSetDists.map(({ dist, width }) => `<source srcset="${dist.rel} ${width}w" type="image/${dist.ext.substring(1)}">`).join("")}
       ${imgDist && `<img src="${imgDist.dist.rel}" alt="${alt}" width="${imgDist.width}" height="${imgDist.height}">`}
     </picture>`;
+
+  return withCaption
+    ? `<figure>${picture}<figcaption>${alt}</figcaption></figure>`
+    : picture;
 };
 
 export default img;

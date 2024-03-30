@@ -11,10 +11,10 @@ export class RoutingProvider extends Provider {
   provide(src) {
     const routing = {};
     for (let route of Object.keys(getConfig().routes)) {
-      const { template, pageName, alts = [] } = getConfig().routes[route];
+      const { template, pageId, alts = [] } = getConfig().routes[route];
       const srcFile = src.files.find((file) => file.src.name === template);
       if (srcFile) {
-        const dist = srcFile.dists.find((dist) => dist.name === pageName);
+        const dist = srcFile.dists.find((dist) => dist.name === pageId);
         if (dist) {
           routing[route] = dist.full;
           for (let alt of alts) {
