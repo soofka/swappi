@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import PartialInjector from "./PartialInjector.js";
-import { isInObject } from "../../helpers/index.js";
+import { isInObject, isObject } from "../../helpers/index.js";
 import { getLogger } from "../../utils/index.js";
 
 export class HtmlPartialInjector extends PartialInjector {
@@ -29,19 +29,19 @@ export class HtmlPartialInjector extends PartialInjector {
     for (let element of htmlParser(this.options.selector)) {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr("name");
-      let partialData = elementParsed.attr("data");
+      const partialContent = elementParsed.html();
+      let partialData;
 
       try {
-        partialData = JSON.parse(decodeURI(partialData));
+        partialData = JSON.parse(decodeURI(elementParsed.attr("data")));
       } catch (e) {
-        getLogger().warn(`Cannot parse partial data: ${partialData}`);
-        partialData = {};
+        partialData = elementParsed.attr();
       }
 
       if (isInObject(this.partials, partialName)) {
         const partial = this.partials[partialName];
         elementParsed.replaceWith(
-          this.executePartial(partial, dists, partialData),
+          this.executePartial(partial, dists, partialData, partialContent),
         );
       }
     }

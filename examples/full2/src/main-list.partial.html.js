@@ -9,56 +9,96 @@ const mainList = (data, dists, { id, name, lang, content = [] }) => `
   </main>
 `;
 
-const getItem = ({ id, title, description, alt, meta }, pageName, lang) => {
-  let titleElement = `<h3>${title}</h3>`;
-  if (pageName === "articles" || pageName === "blog") {
-    const itemPageName = pageName === "articles" ? "article" : "post";
-    titleElement = `<partial name="link" data="${encodeURI(
-      JSON.stringify({
-        pageId: `${itemPageName}-${lang}-${id}`,
-        content: titleElement,
-      }),
-    )}"></partial>`;
+const getItem = (item, pageName, lang) => {
+  let title = `<h3>${item.title}</h3>`;
+  let content = `<p>${item.description}</p>`;
+  let meta = item.date;
+  let alt;
+
+  switch (pageName) {
+    case "articles":
+      title = `<partial name="link" data="${encodeURI(
+        JSON.stringify({
+          pageId: `article-${lang}-${item.id}`,
+          content: title,
+        }),
+      )}"></partial>`;
+      if (item.publications && item.publications.length > 0) {
+        meta = `${meta} | published by ${item.publications.map((publication) => `<a href="${publication.url}" target="_blank">${publication.name}</a>`).join(", ")}`;
+      }
+      alt = `<partial name="img" data="${encodeURI(JSON.stringify({ src: item.image, alt: item.title }))}"></partial>`;
+      break;
+
+    case "blog":
+      title = `<partial name="link" data="${encodeURI(
+        JSON.stringify({
+          pageId: `post-${lang}-${item.id}`,
+          content: title,
+        }),
+      )}"></partial>`;
+      alt = `<partial name="img" data="${encodeURI(JSON.stringify({ src: item.image, alt: item.title }))}"></partial>`;
+      break;
+
+    case "courses":
+      if (item.clients && item.clients.length > 0) {
+        meta = `${meta} | taught for ${item.clients.join(", ")}`;
+      }
+      alt = `<ul>${item.content.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+      break;
+
+    case "projects":
+      const metaItems = [meta];
+      if (item.demo) {
+        metaItems.push(`<a href="${item.demo}" target="_blank">demo</a>`);
+      }
+      if (item.github) {
+        metaItems.push(
+          `<a href="https://github.com/soofka/${item.github}" target="_blank">github</a> (${item.stars} stars, ${item.forks} forks)`,
+        );
+      }
+      if (item.npm) {
+        metaItems.push(
+          `<a href="https://npmjs.com/package/${item.npm}" target="_blank">npm</a> (${item.downloads} downloads)`,
+        );
+      }
+      meta = metaItems.join(" | ");
+      break;
+
+    case "talks":
+      meta = `${meta} | ${item.conference}, ${item.place} | <a href="https://youtube.com/watch?v=${item.youtube}" target="_blank">youtube</a>`;
+      alt = `<partial name="youtube" data="${encodeURI(JSON.stringify({ id: item.youtube, title: item.title, width: 320, height: 190 }))}"></partial>`;
+      break;
+
+    default:
+      break;
   }
-  const content = `${getItemLinks(meta)}${getItemStats(meta)}${description}`;
+
+  meta = `<h4>${meta}</h4>`;
   return alt
-    ? getDoubleColumnItem(titleElement, content, alt)
-    : getSingleColumnItem(titleElement, content);
+    ? getDoubleColumnItem(title, meta, content, alt)
+    : getSingleColumnItem(title, meta, content);
 };
 
-const getSingleColumnItem = (title, content) => `
+const getSingleColumnItem = (title, meta, content) => `
   <article>
-    <h3>${title}</h3>
+    ${title}
+    ${meta}
     ${content}
   </article>
 `;
 
-const getDoubleColumnItem = (title, content, alt) => `
+const getDoubleColumnItem = (title, meta, content, alt) => `
   <article>
-    <h3>${title}</h3>
     <div class="col-3-1">
       <div class="col col-3">
+        ${title}
+        ${meta}
         ${content}
       </div>
       <div class="col">
-        <partial name="${alt.name}" data="${encodeURI(JSON.stringify(alt.data))}"></partial>
+        ${alt}
       </div>
     </div>
   </article>`;
-
-const getItemLinks = (itemMeta) =>
-  itemMeta && itemMeta.links && itemMeta.links.length > 0
-    ? `<h4>${itemMeta.links
-        .map(
-          (link) =>
-            `<a href="${link}" target="_blank">${link.replace(new RegExp("^http://|^https://"), "")}</a>`,
-        )
-        .join(" | ")}</h4>`
-    : "";
-
-const getItemStats = (itemMeta) =>
-  itemMeta && itemMeta.stats && itemMeta.stats.length > 0
-    ? `<h4>${itemMeta.stats.join(" | ")}</h4>`
-    : "";
 
 export default mainList;

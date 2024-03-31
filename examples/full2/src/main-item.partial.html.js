@@ -1,7 +1,7 @@
 const mainItem = (data, dists, { id, name, lang, content }) => {
   const dist = dists.find(
     (dist) =>
-      dist.relDir.endsWith(id.substring(name.length + lang.length + 2)) &&
+      dist.relDir.endsWith(content.id) &&
       dist.name === "index" &&
       dist.ext === ".html",
   );
@@ -9,11 +9,12 @@ const mainItem = (data, dists, { id, name, lang, content }) => {
     <main>
       <div class="wrapper">
         <section>
-          <partial name="img" data="${encodeURI(JSON.stringify({ src: "microfrontends_1.jpg", alt: content.title }))}"></partial>
           <h2>${content.title}</h2>
-          <h3>${content.date}</h3>
+          <h4>${content.date}</h4>
           <article>
-            ${dist ? dist.content : "error"}
+            <partial name="img" data="${encodeURI(JSON.stringify({ src: content.image, alt: content.title }))}"></partial>
+            <h3>${content.description}</h3>
+            ${dist.content}
           </article>
         </section>
       </div>

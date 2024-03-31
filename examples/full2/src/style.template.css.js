@@ -18,7 +18,7 @@ const style = (data, theme) => `
     --teacher-fg: ${theme === "dark" ? data.colors.accents.teacher.dark : data.colors.accents.teacher.light};
     --teacher-bg: ${theme === "dark" ? data.colors.accents.teacher.light : data.colors.accents.teacher.dark};
 
-    --img-filter: ${theme === "dark" ? "brightness(0.85) contrast(1.15)" : "brightness(1.15) contrast(0.85)"};
+    --img-filter: ${theme === "dark" ? "brightness(0.9) contrast(1.1)" : "brightness(1.1) contrast(0.9)"};
   }
 `;
 

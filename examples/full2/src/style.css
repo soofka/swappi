@@ -89,14 +89,32 @@ button:active,
   background: var(--off-bg-2);
   text-decoration: none;
 }
-small {
+small,
+figcaption {
   font-size: 0.85rem;
   margin: 0;
   padding: 0;
   color: var(--off-fg);
 }
-code {
-  font-family: monospace;
+figure {
+  margin: 0 auto;
+  padding: 0;
+}
+figcaption {
+  width: 100%;
+  text-align: center;
+}
+code pre {
+  font-family: "Courier New", monospace;
+  background: var(--off-bg);
+  padding: var(--gap);
+  margin: var(--gap-rel) 0;
+  overflow-x: scroll;
+}
+hr {
+  margin: var(--gap-rel);
+  padding: 0;
+  border-color: var(--alt-bg);
 }
 ul {
   list-style: square;

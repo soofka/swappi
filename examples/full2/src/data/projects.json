@@ -2,18 +2,21 @@
   {
     "title": "Simple Web App Processing Interface",
     "description": "swappi",
+    "date": "2024",
     "github": "swappi",
     "npm": "swappi"
   },
   {
     "title": "Netlify Plugin Chromium",
     "description": "netlify-plugin-chromium",
+    "date": "2020",
     "github": "netlify-plugin-chromium",
     "npm": "netlify-plugin-chromium"
   },
   {
     "title": "Webpack Bundle Content Validator",
     "description": "webpack-bundle-content-validator",
+    "date": "2017",
     "github": "webpack-bundle-content-validator",
     "npm": "webpack-bundle-content-validator"
   }

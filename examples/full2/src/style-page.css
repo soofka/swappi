@@ -7,3 +7,11 @@ footer section article {
 footer section article p {
   margin: 0;
 }
+
+body.item section article h3 {
+  margin-top: var(--gap-rel);
+}
+
+body.item section article figure {
+  margin: var(--gap-rel) auto;
+}

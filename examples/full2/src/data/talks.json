@@ -2,15 +2,15 @@
   {
     "title": "Micro frontends revisited",
     "description": "description",
-    "youtubeId": "Yac9wgicbUM",
+    "youtube": "Yac9wgicbUM",
     "date": "2023-06",
-    "conference": "Axel Springer Media & Tech Con 2023",
+    "conference": "Axel Springer Media & Tech 2023",
     "place": "Berlin, Germany"
   },
   {
     "title": "Micro frontends: extending service-oriented architecture to front-end development",
     "description": "description",
-    "youtubeId": "Il9O2vchlRg",
+    "youtube": "Il9O2vchlRg",
     "date": "2019-08",
     "conference": "Devoxx Poland 2019",
     "place": "Cracow, Poland"
@@ -18,7 +18,7 @@
   {
     "title": "Micro frontends: extending service-oriented architecture to front-end development",
     "description": "description",
-    "youtubeId": "lkl_C3CObp0",
+    "youtube": "lkl_C3CObp0",
     "date": "2019-07",
     "conference": "Infoshare 2019",
     "place": "Gdansk, Poland"
@@ -26,7 +26,7 @@
   {
     "title": "3 lata życia aplikacji w React i TypeScript - lekcje i wnioski",
     "description": "description",
-    "youtubeId": "aQw3jpVsf6w",
+    "youtube": "aQw3jpVsf6w",
     "date": "2019-06",
     "conference": "4Developers 2019",
     "place": "Warsaw, Poland"
@@ -34,7 +34,7 @@
   {
     "title": "Mikro front-endy: continous delivery w dużych projektach",
     "description": "description",
-    "youtubeId": "j-1i05AMBB8",
+    "youtube": "j-1i05AMBB8",
     "date": "2019-06",
     "conference": "4Developers 2019",
     "place": "Warsaw, Poland"
@@ -42,7 +42,7 @@
   {
     "title": "Modern web development: React PWA with Push Notifications (case study)",
     "description": "description",
-    "youtubeId": "n1Be_RzXzjQ",
+    "youtube": "n1Be_RzXzjQ",
     "date": "2017-11",
     "conference": "Code Europe Autumn 2017",
     "place": "Warsaw, Poland"
@@ -50,7 +50,7 @@
   {
     "title": "Practical tips for JavaScript optimisation",
     "description": "description",
-    "youtubeId": "Gl8vucNqtZQ",
+    "youtube": "Gl8vucNqtZQ",
     "date": "2017-07",
     "conference": "Code Europe Spring 2017",
     "place": "Warsaw, Poland"

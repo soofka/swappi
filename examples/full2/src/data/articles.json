@@ -1,20 +1,41 @@
 [
   {
-    "id": "microfrontends-3",
+    "id": "microfrontends_3",
     "title": "Microfrontends — part 3: tools and processes for development and maintenance",
+    "description": "Microfrontends part 3",
+    "image": "microfrontends_3-1280x960.jpg",
     "date": "2019-06",
-    "publication": "https://medium.com/stepstone-tech/microfrontends-part-3-tools-and-processes-for-development-and-maintenance-50d47c41ddaf"
+    "publications": [
+      {
+        "name": "medium.com/stepstone-tech",
+        "url": "https://medium.com/stepstone-tech/microfrontends-part-3-tools-and-processes-for-development-and-maintenance-50d47c41ddaf"
+      }
+    ]
   },
   {
-    "id": "microfrontends-2",
+    "id": "microfrontends_2",
     "title": "Microfrontends — part 2: integration and communication",
+    "description": "Microfrontends part 2",
+    "image": "microfrontends_2-1280x960.jpg",
     "date": "2019-06",
-    "publication": "https://medium.com/stepstone-tech/microfrontends-part-2-integration-and-communication-3385bc242673"
+    "publications": [
+      {
+        "name": "medium.com/stepstone-tech",
+        "url": "https://medium.com/stepstone-tech/microfrontends-part-2-integration-and-communication-3385bc242673"
+      }
+    ]
   },
   {
-    "id": "microfrontends-1",
+    "id": "microfrontends_1",
     "title": "Microfrontends — part 1: extending service-oriented architecture to frontend development",
+    "description": "Microfrontends part 1",
+    "image": "microfrontends_1-1280x960.jpg",
     "date": "2019-06",
-    "publication": "https://medium.com/stepstone-tech/microfrontends-extending-service-oriented-architecture-to-frontend-development-part-1-120b71c87b68"
+    "publications": [
+      {
+        "name": "medium.com/stepstone-tech",
+        "url": "https://medium.com/stepstone-tech/microfrontends-extending-service-oriented-architecture-to-frontend-development-part-1-120b71c87b68"
+      }
+    ]
   }
 ]

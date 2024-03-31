@@ -20,9 +20,10 @@ export const getRouting = (langs, labels, data) => {
     const indexPageObject = {
       template,
       pageId: indexPageId,
+      alts: [`/${lang}`],
     };
     if (index == 0) {
-      indexPageObject.alts = ["/"];
+      indexPageObject.alts.push("/");
     }
     routes[indexPageUrl] = indexPageObject;
     pages.push({
@@ -68,6 +69,7 @@ export const getRouting = (langs, labels, data) => {
         meta: {
           title: article.title,
           description: article.description,
+          image: article.image,
         },
         content: article,
       });
