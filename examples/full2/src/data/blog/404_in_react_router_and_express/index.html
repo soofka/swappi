@@ -1,0 +1,85 @@
+<p>
+  When building web applications in React, I usually choose Express to be my
+  server, and more often than not I use React-Router to manage redirections and
+  changes in history. Not without a reason - both are among the most popular
+  choices in their respective fields nowadays; both are simple and elegant in
+  every day work. However, I had some tough moments with both of them when it
+  came up to setting all unrecognized routing to "Not Found" page, and this
+  piece came as a result of them.
+</p>
+<p>
+  My goal was to have Not Found page as part of my Single Page Application, not
+  some separate and entirely different piece of code, which I can't reliably
+  control, and which may stand out noticeably from my sleek user interface. It
+  required me to shift most of the decision making process when it comes to
+  routing from my back-end to my front-end. Therefore, I came to realization,
+  that I will now use Express to serve static content only, and this is common
+  and well documented use case. Quickly I came up with simple configuration,
+  that always serves static index.html file.
+</p>
+<partial name="code">
+  <pre>
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+
+const app = express();
+
+app.use(express.static(path.join(__dirname, '../dist/index.html')));
+
+app.use((request, response) => {
+  fs.readFile(indexPath, (error, file) => {
+    if (error) {
+      response.status(404).send(error.toString());
+    } else {
+      response.status(200).send(file.toString());
+    }
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server started on port 3000');
+});
+</pre
+  >
+</partial>
+<p>
+  Then, I moved to React-Router. Basic component of this library is Route, with
+  property path, which describes chunk of URL, corresponding to the view to be
+  displayed. React-Router documentation states, that "Routes without a path
+  always match", and that was exactly what I needed. Having Route without path,
+  pointing to Not Found view, I only needed to redirect some other routes to
+  meaningful views that I had consciously created, and everything else is
+  covered.
+</p>
+<p>
+  However, in React-Router, Routes on their own render when they match URL
+  inclusively. Not Found view stated as a Route without path would render
+  unconditionally and irrespectively of the URL. Switch, also coming from
+  React-Router, solved me this issue. In Switch, routes render when they match
+  the URL exclusively, which means that always up to one Route will be rendered,
+  and always it will be the first one that matches the URL. I put my Not Found
+  Route at the end of Switch, and I was good to leave the office. Job well done.
+</p>
+<partial name="code">
+  <pre>
+import * as React from 'react';
+import { Route, Switch } from 'react-router-dom';
+
+import Home from 'components/Home';
+import About from 'components/About';
+import NotFound from 'components/NotFound';
+
+export const App = (): JSX.Element => {
+  return (
+    <Switch>
+      <Route exact={true} path="/" component={Home}/>
+      <Route path="/about" component={About}/>
+      <Route component={NotFound} />
+    </Switch>
+  );
+};
+
+export default App;
+</pre>
+</partial>

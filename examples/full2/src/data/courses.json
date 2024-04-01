@@ -1,95 +1,210 @@
 [
   {
-    "title": "Fundamentals of Software Architecture",
-    "description": "software architecture description",
+    "title": {
+      "en": "Fundamentals of Software Architecture",
+      "pl": "Podstawy architektury oprogramowania"
+    },
+    "description": {
+      "en": "software architecture description",
+      "pl": "Opis architektury oprogramowania"
+    },
     "date": "2024",
-    "clients": ["Polish-Japanese Academy of Information Technology"],
-    "content": [
-      "Requirements engineering",
-      "Quality attributes",
-      "Documentation and tooling",
-      "Data in architecture",
-      "Modularity",
-      "Design and architectural patterns",
-      "Architectural styles",
-      "Development processes"
-    ]
+    "langs": ["en", "pl"],
+    "clients": {
+      "en": ["Polish-Japanese Academy of Information Technology in Warsaw"],
+      "pl": ["Polsko-Japońska Akademia Technik Komputerowych w Warszawie"]
+    },
+    "content": {
+      "en": [
+        "Requirements engineering",
+        "Quality attributes",
+        "Documentation",
+        "Data in architecture",
+        "Modularity",
+        "Design and architectural patterns",
+        "Architectural styles",
+        "Development processes"
+      ],
+      "pl": [
+        "Inżynieria wymagań",
+        "Atrybuty jakości",
+        "Dokumentacja",
+        "Dane w architekturze",
+        "Modułowość",
+        "Wzorce projektowe i architektoniczne",
+        "Style architektoniczne",
+        "Procesy wytwarzania oprogramowania"
+      ]
+    }
   },
   {
-    "title": "Setup and tooling for JavaScript project",
-    "description": "typescript fundamentals description",
+    "title": {
+      "en": "Setup and tooling for JavaScript project",
+      "pl": "Środowisko i narzędzia do tworzenia projektu JavaScript"
+    },
+    "description": {
+      "en": "Description",
+      "pl": "Opis"
+    },
     "date": "2022",
+    "langs": ["en", "pl"],
     "clients": ["Stepstone Services"],
-    "content": [
-      "Environment setup",
-      "NPM project initialization",
-      "package.json and package-lock.json",
-      "NPM scripts",
-      "JavaScript modules and versions",
-      "JavaScript transpilation",
-      "TypeScript transpilation",
-      "Testing and reporting",
-      "Semantic versioning",
-      "Conventional commits",
-      "CI/CD"
-    ]
+    "content": {
+      "en": [
+        "Environment setup",
+        "NPM project initialization",
+        "Project dependencies",
+        "NPM scripts",
+        "JavaScript modules and versions",
+        "JavaScript and TypeScript transpilation",
+        "Testing and reporting",
+        "Semantic versioning",
+        "Conventional commits",
+        "CI/CD"
+      ],
+      "pl": [
+        "Konfiguracja środowiska",
+        "Inicjalizacja projektu NPM",
+        "Zależności projektu",
+        "Skrypty NPM",
+        "Moduły i wersje JavaScript",
+        "Transpilacja JavaScript i TypeScript",
+        "Testowanie i raportowanie",
+        "Semantic versioning",
+        "Conventional commits",
+        "CI/CD"
+      ]
+    }
   },
   {
-    "title": "React.js fundamentals",
-    "description": "react.js fundamentals description",
+    "title": {
+      "en": "React.js fundamentals",
+      "pl": "Podstawy React.js"
+    },
+    "description": {
+      "en": "react.js fundamentals description",
+      "pl": "react.js podstawy opis"
+    },
     "date": "2022",
+    "langs": ["en", "pl"],
     "clients": ["Stepstone Services"],
-    "content": [
-      "Introduction to React",
-      "Components",
-      "Component's props",
-      "Component's state",
-      "Component's lifecycle",
-      "Hooks",
-      "Sharing data between components",
-      "Dissecting and composing components",
-      "Shared state management"
-    ]
+    "content": {
+      "en": [
+        "Introduction to React.js",
+        "Components",
+        "Component's props",
+        "Component's state",
+        "Component's lifecycle",
+        "Hooks",
+        "Sharing data between components",
+        "Dissecting and composing components",
+        "Shared state management"
+      ],
+      "pl": [
+        "Wstęp do React.js",
+        "Komponenty",
+        "Parametry komponentu",
+        "Stan komponentu",
+        "Cykl życia komponentu",
+        "Hooki",
+        "Współdzielenie danych pomiędzy komponentami",
+        "Podział i kompozycja komponentów",
+        "Zarządzanie współdzielonym stanem"
+      ]
+    }
   },
   {
-    "title": "Introduction to OOP",
-    "description": "oop description",
+    "title": {
+      "en": "Introduction to Object-Oriented Programming",
+      "pl": "Wstęp do programowania obiektowego"
+    },
+    "description": {
+      "en": "oop description",
+      "pl": "obiektówka opis"
+    },
     "date": "2021",
-    "clients": [
-      "Academic High School of Polish-Japanese Academy of Information Technology"
-    ],
-    "content": [
-      "Classes and objects",
-      "Fields and methods",
-      "Access modifiers",
-      "Enum types",
-      "Interfaces",
-      "Encapsulation and inheritance",
-      "Polymorphism and abstraction",
-      "Dependencies and relationships",
-      "Composing classes into application"
-    ]
+    "langs": ["en", "pl"],
+    "clients": {
+      "en": [
+        "Academic High School of Polish-Japanese Academy of Information Technology in Warsaw"
+      ],
+      "pl": [
+        "Akademickie Liceum Ogólnokształcące przy Polsko-Japońskiej Akademii Technik Komputerowych w Warszawie"
+      ]
+    },
+    "content": {
+      "en": [
+        "Classes and objects",
+        "Fields and methods",
+        "Access modifiers",
+        "Interfaces",
+        "Encapsulation and inheritance",
+        "Polymorphism and abstraction",
+        "Dependencies and relationships",
+        "Object-oriented application composition"
+      ],
+      "pl": [
+        "Klasy i obiekty",
+        "Pola i metody",
+        "Modyfikatory dostępu",
+        "Interfejsy",
+        "Enkapsulacja i dziedziczenie",
+        "Polimorfizm i abstrakcja",
+        "Zależności i relacje",
+        "Kompozycja aplikacji obiektowej"
+      ]
+    }
   },
   {
-    "title": "Introduction to programming",
-    "description": "programming description",
+    "title": {
+      "en": "Introduction to computer programming",
+      "pl": "Wstęp do programowania komputerowego"
+    },
+    "description": {
+      "en": "programming description",
+      "pl": "opis programowania"
+    },
     "date": "2021",
-    "clients": [
-      "Academic High School of Polish-Japanese Academy of Information Technology"
-    ],
-    "content": [
-      "How does a computer work",
-      "Development environment",
-      "Variables and functions",
-      "Basic data types",
-      "Arrays",
-      "Operators",
-      "Conditionals",
-      "Loops",
-      "Flow control",
-      "Standard library",
-      "Exceptions",
-      "Recursion"
-    ]
+    "langs": ["en", "pl"],
+    "clients": {
+      "en": [
+        "Academic High School of Polish-Japanese Academy of Information Technology in Warsaw",
+        "girls.js"
+      ],
+      "pl": [
+        "Akademickie Liceum Ogólnokształcące przy Polsko-Japońskiej Akademii Technik Komputerowych w Warszawie",
+        "girls.js"
+      ]
+    },
+    "content": {
+      "en": [
+        "How does a computer work",
+        "Development environment",
+        "Variables and functions",
+        "Primitive data types",
+        "Arrays",
+        "Operators",
+        "Conditionals",
+        "Loops",
+        "Flow control",
+        "Standard library",
+        "Exceptions",
+        "Recursion"
+      ],
+      "pl": [
+        "Jak działa komputer",
+        "Środowisko programistyczne",
+        "Zmienne i funkcje",
+        "Proste typy danych",
+        "Tablice",
+        "Operatory",
+        "Instrukcje warunkowe",
+        "Pętle",
+        "Kontrola przepływu danych",
+        "Biblioteka standardowa",
+        "Wyjątki",
+        "Rekurencja"
+      ]
+    }
   }
 ]

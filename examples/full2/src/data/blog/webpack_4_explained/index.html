@@ -1,0 +1,373 @@
+<p>
+  Using a skeleton for your application prepared by someone else comes with
+  great benefit of a lot of time saved, but also with huge cost of a lot of
+  knowledge not obtained. Sometimes you'll manage to complete your assignment
+  just fine with some predefined boilerplate, without too much need for deep
+  investigation of it's nooks and crannies. Other times, you'll end up in a
+  position, where you reverse engineer it in order to introduce some major
+  change, or just give up and start from scratch with your own thing. I wouldn't
+  like you to give up on my application skeleton. Thus, I'll describe some of
+  it's shenanigans in it's documentation. Today, I'm explaining build process.
+</p>
+<p>
+  Here's what happens when you type npm run build:base and hit enter on cloned
+  react-redux-typescript-boilerplate repository. It invokes Webpack (with
+  --color parameter, because I like colors), a module bundler, which will build
+  our application and output results in dist directory in project root. By
+  "build" I mean transpilation of TypeScript code to ECMAScript 6 (officially
+  known as ECMAScript 2015), then transpilation from ES6 to browser-compatible
+  JavaScript code with Babel (they actually use word "compiler" in their
+  documentation now), then copying static assets, and a few other steps here and
+  there. Webpack finds it's configuration in it's standard, expected location,
+  which is root directory of our project, in a file named webpack.config.js.
+  Actual configuration, however, is located in /scripts/bundler directory (this
+  is because it's also used in other parts of the project).
+</p>
+<partial name="code">
+  <pre>
+const getBundlerConfig = (environment = 'dev', mode = 'normal') => {
+  const devEnv = environment === 'dev';
+
+  console.log(`Bundling ${environment} package (mode: ${mode}`);
+
+  return {
+    entry: getEntry(),
+    output: getOutput(),
+    resolve: getResolve(),
+    module: getModule(devEnv),
+    plugins: getPlugins(devEnv, mode),
+    mode: getMode(devEnv),
+  }
+};
+</pre
+  >
+</partial>
+<p>
+  Main function of this script generates Webpack configuration. It will be
+  different, depending on environment, and if it's meant for local server, or if
+  it's meant for audit, which is represented by mode parameter.
+</p>
+<p>
+  The configuration is verbose and not much self-explanatory to say the least.
+  That's the main issue people have with Webpack, from what I hear, and it's
+  also the main reason why this kind of explanation makes sense. And it's
+  already on Webpack 4, believe me, it's been worse.
+</p>
+<h3>Entry</h3>
+<partial name="code">
+  <pre>
+const getEntry = () => {
+  const main = [
+    './src/index.tsx'
+  ];
+
+  const vendor =  [
+    'axios',
+    'babel-polyfill',
+    'history',
+    'immutable',
+    'react',
+    'react-dom',
+    'react-redux',
+    'react-router-dom',
+    'react-router-redux',
+    'redux',
+    'redux-immutable',
+    'redux-saga',
+  ];
+
+  return {
+    main,
+    vendor,
+  };
+};
+</pre
+  >
+</partial>
+<p>
+  First item in the configuration, entry, defines entry point for your JS files
+  - where Webpack should start building it's dependency graphs. It is divided
+  into two fields. main represents entry point to package with application
+  source code - starting point of your application. From there, Webpack will
+  basically analyze all imports and include them into this file. As a result,
+  this file will often be a subject for change. vendor, on the other hand,
+  represents all external dependencies, which will be naturally modified much
+  more rarely and thus can be cached for increased performance. Content of this
+  section is more less equal to dependencies section of package.json file.
+</p>
+<h3>Output</h3>
+<partial name="code">
+  <pre>
+const getOutput = () => {
+  return {
+    path: path.resolve('dist'),
+    publicPath: '/',
+    filename: 'assets/js/[name].[hash].js',
+  };
+};
+</pre
+  >
+</partial>
+<p>
+  Second item, output, tells Webpack where to emit the bundles it created, and
+  how to name them. Therefore, field path pointing to /dist directory. Field
+  publicPath defines a path where all assets that are not imported directly in
+  your code, but linked, will be pointed to. Then, there are names and locations
+  of files that will be produced as a result of this build. Using [name] means,
+  that there will be main and vendor files produces, as defined in entry.
+  Additionally, using [hash], will add a unique string to the file name, which
+  can help with cache busting for both development and production purposes.
+</p>
+<h3>Resolve</h3>
+<partial name="code">
+  <pre>
+const getResolve = () => ({
+  modules: [
+    'src',
+    'node_modules'
+  ],
+  extensions: [
+    '.ts',
+    '.tsx',
+    '.js'
+  ]
+});
+</pre
+  >
+</partial>
+<p>
+  This section defines how modules are resolved. Quoting Webpack documentation,
+  "webpack provides reasonable defaults", and it appears to be true, so we only
+  want to tell it where should he look for our modules and how do they look
+  like.
+</p>
+<h3>Module</h3>
+<partial name="code">
+  <pre>
+const getModule = (devEnv) => {
+  let typeScriptLoaders = [];
+
+  if (!devEnv) {
+    typeScriptLoaders.push('babel-loader');
+  }
+
+  typeScriptLoaders.push(
+    {
+      loader: 'awesome-typescript-loader',
+      query: {
+        configFileName: 'tsconfig.json',
+        silent: true
+      }
+    },
+    {
+      loader: 'tslint-loader',
+      query: {
+        configFile: 'tslintconfig.json'
+      },
+    }
+  );
+
+  const styleLoaders = ExtractTextWebpackPlugin.extract({
+    use: [
+      {
+        loader: 'css-loader',
+        options: {
+          minimize: !devEnv,
+        }
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          includePaths: ['./src']
+        }
+      }
+    ],
+  });
+
+  const fontLoaders = [{
+    loader: 'file-loader',
+    options: {
+      name: 'assets/fonts/[name].[ext]?[hash]',
+    },
+  }];
+
+  const imageLoaders = [{
+    loader: 'file-loader',
+    options: {
+      name: 'assets/images/[name].[ext]?[hash]',
+    },
+  }];
+
+  if (!devEnv) {
+    imageLoaders.push('image-webpack-loader');
+  }
+
+  return {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        loaders: typeScriptLoaders,
+      },
+      {
+        test: /\.scss$/,
+        loader: styleLoaders,
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: fontLoaders,
+      }, {
+        test: /\.(gif|ico|jpe?g|png|svg)$/,
+        loaders: imageLoaders,
+      },
+    ],
+  };
+};
+</pre
+  >
+</partial>
+<p>
+  module section is where some fun starts, with creative ways to utilize
+  Webpack. This section defines how different types of modules will be treated
+  by Webpack. Different kinds of assets can be imported in your code, and will
+  automatically added to the resulting bundle, if handled properly in this
+  section. Each kind of asset may be treated differently - copied, bundled,
+  modified - with different loader, based on regular expression matching the
+  file name.
+</p>
+<p>
+  Loaders for each type of asset are invoked in a sequence, starting from the
+  last one in the array. That's why for files with TypeScript code there will be
+  TSLint Loader invoked first, which will present it's output in the console (as
+  defined in tslintconfig.json). Then, Awesome Typescript Loader will transpile
+  TypeScript code to ES6 (as defined in tsconfig.json), and then Babel (in case
+  of code meant for production environment) will transpile it further to
+  JavaScript understood by common browsers (as defined in .babelrc).
+</p>
+<p>
+  For styles, they will be first transpiled from SCSS to CSS with SASS Loader,
+  and then bundled with CSS Loader. Moreover, Extract Text Webpack Plugin will
+  move all CSS modules to separate file, as defined in plugins section of this
+  configuration. For other kinds of modules that can be imported in your TS
+  code, they will be treated with File Loader (or Image Webpack Loader, in case
+  of need for production-level image optimization). All of them will then be put
+  in /dist/assets directory.
+</p>
+<h3>Plugins</h3>
+<partial name="code">
+  <pre>
+const getPlugins = (devEnv, mode) => {
+  let plugins = [
+    new webpack.DefinePlugin({
+      'process.env':{
+        'NODE_ENV': JSON.stringify(devEnv ? 'development' : 'production')
+      }
+    }),
+    new ExtractTextWebpackPlugin({
+      filename: 'assets/styles/style.[hash].css',
+      allChunks: true,
+    }),
+    new CopyWebpackPlugin([{ from: './src/assets/static/', to: './assets/'}]),
+    new HtmlWebpackPlugin({
+      template: './src/index.ejs',
+      favicon: './src/assets/favicon.ico',
+      title: appConfig.title,
+      meta: appConfig.meta,
+      inject: false,
+      mobile: true,
+      unsupportedBrowser: false,
+      links: [],
+      scripts: [],
+      minify: devEnv ? false : {
+        collapseBooleanAttributes: true,
+        collapseInlineTagWhitespace: true,
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        minifyCSS: true,
+        minifyJS: true,
+        minifyURLs: true,
+        removeComments: true,
+      },
+    }),
+  ];
+
+  if (!devEnv) {
+    plugins.push(
+      new webpack.LoaderOptionsPlugin({
+        minimize: true,
+        debug: false
+      }),
+      new CompressionWebpackPlugin({
+        asset: '[path].gz[query]',
+        algorithm: 'gzip',
+        test: /\.js$|\.css$|\.html$/,
+        threshold: 10240,
+        minRatio: 0.8,
+      }),
+      new ImageminPlugin({
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+      }),
+    );
+  }
+
+  switch(mode) {
+    case 'audit':
+      plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          reportFilename: '../stats/report.html'
+        })
+      );
+      break;
+
+    case 'server':
+      plugins.push(
+        new webpack.NamedModulesPlugin(),
+        new webpack.HotModuleReplacementPlugin()
+      );
+      break;
+
+    default:
+      break;
+  }
+
+  return plugins;
+};
+</pre
+  >
+</partial>
+<p>
+  In plugins section one can do some really nasty magic with Webpack. There is
+  quite big library of Webpack built-in plugins available, and there are much
+  more provided by there community out there. One can always write his own too,
+  using Webpack Plugins API. In this example, I'm using Webpack plugins to copy
+  static assets to dist directory, generate index.html file according to my
+  configuration and automatically include all styles and scripts in it, compress
+  some of my static assets to gzip, generate report about content of my bundled
+  package, enable Hot Module Replacement, and others.
+</p>
+<h3>Mode</h3>
+<partial name="code">
+  <pre>
+const getMode = (devEnv) => devEnv ? 'development' : 'production';
+</pre
+  >
+</partial>
+<p>
+  The last bit of Webpack configuration is perhaps the most mysterious. Setting
+  this option properly tells Webpack to use its built-in optimizations
+  accordingly, which includes minification and uglification of bundle for
+  production environment.
+</p>
+<p>
+  Finally, as a result of main function of Webpack bundling script, there is a
+  Webpack configuration produced for given build, based on it's environment and
+  mode. Then, the config is applied by Webpack, which bundles the application in
+  certain way, plus performs all those extra tasks like transpilation,
+  compression, copying files in a meantime. Then, operation outcome is printed
+  in console, while resulting bundle lands in dist directory.
+</p>
+<p>
+  I hope that one, having this detailed description of the whole process, will
+  have an easier time modifying it in order to adjust it to his needs.
+</p>

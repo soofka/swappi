@@ -5,6 +5,7 @@
     "description": "Microfrontends part 3",
     "image": "microfrontends_3-1280x960.jpg",
     "date": "2019-06",
+    "langs": ["en"],
     "publications": [
       {
         "name": "medium.com/stepstone-tech",
@@ -18,6 +19,7 @@
     "description": "Microfrontends part 2",
     "image": "microfrontends_2-1280x960.jpg",
     "date": "2019-06",
+    "langs": ["en"],
     "publications": [
       {
         "name": "medium.com/stepstone-tech",
@@ -31,6 +33,7 @@
     "description": "Microfrontends part 1",
     "image": "microfrontends_1-1280x960.jpg",
     "date": "2019-06",
+    "langs": ["en"],
     "publications": [
       {
         "name": "medium.com/stepstone-tech",

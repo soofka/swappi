@@ -1,0 +1,102 @@
+<p>Hard to imagine, but it's over 1 year since I created this blog, and up until recently, it always had static head tags. Title always being "soofka.pl", for example, wasn't that much of an issue to me, but social meta tags never related to the content of the post I'm sharing on Twitter, that was not cool (it's also not cool when it comes to SEO, but it's not that much of my concern right now). I finally had to tackle it. Here's a simple way to do it that I've found.</p>
+<p>My solution is based on React Helmet library. It provides Helmet higher order component, which is used to wrap whatever head tags one wants to put on his website. It supports all valid head tags, so it can be used to add JS scripts and CSS files to the page as well, but for me, title and meta tags was all I needed.</p>
+<p>In my implementation, I created Meta component as a decorator over React Helmet, so that I can switch it to a different library easily, whenever I need to. Meta component is also responsible for translating a few information about given view into title, description, keywords, and bunch of valid social media tags supporting Facebook and Twitter.</p>
+<partial name="code"><pre>
+import * as React from 'react';
+import { Helmet } from 'react-helmet';
+
+export interface MetaPropsInterface {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  keywords?: string;
+  imageUrl?: string;
+}
+
+export const Meta = (props: MetaPropsInterface) => {
+  const { title, subtitle, description, keywords, imageUrl } = props;
+
+  const metaElements = [];
+
+  if (title) {
+    metaElements.push(
+      <title key="title">{title}</title>,
+      <meta key="og:site_name" property="og:site_name" content={title} />,
+      <meta key="twitter:site" property="twitter:site" content={title} />,
+      subtitle
+        ? <meta key="twitter:title" property="twitter:title" content={subtitle} />
+        : <meta key="twitter:title" property="twitter:title" content={title} />,
+    );
+  }
+
+  if (description) {
+    metaElements.push(
+      <meta key="description" name="description" content={description} />,
+      <meta key="og:description" property="og:description" content={description} />,
+      <meta key="twitter:description" property="twitter:description" content={description} />,
+    );
+  }
+
+  if (keywords) {
+    metaElements.push(
+      <meta key="keywords" name="keywords" content={keywords} />,
+    );
+  }
+
+  if (imageUrl) {
+    metaElements.push(
+      <meta key="og:image" name="og:image" content={imageUrl} />,
+      <meta key="twitter:image" name="twitter:image" content={imageUrl} />,
+    );
+  }
+
+  return(
+    <Helmet>
+      {metaElements}
+    </Helmet>
+  );
+};
+
+export default Meta;
+</pre></partial>
+<p>Probably the coolest thing about this library is that nested components override duplicate changes. Therefore, I don't have to take care of removing any tags from head provided by parent view, for example homepage, when user navigates to child view, such as entry - they are overwritten automatically. That's why I could straight up use my Meta component here and there (example below comes from entry view), and my job was done.</p>
+<partial name="code"><pre>
+import * as React from 'react';
+import { inject, observer } from 'mobx-react';
+
+import AssetsProvider from 'common/AssetsProvider';
+import LabelsProvider from 'common/LabelsProvider';
+import { LanguageStoreInterface } from 'store/language';
+
+import Meta from 'components/Meta';
+
+interface EntryMetaPropsInterface {
+  title: string;
+  description: string;
+  keywords: string[];
+  imageFileName: string;
+  languageStore?: LanguageStoreInterface;
+}
+
+export const EntryMeta = (props: EntryMetaPropsInterface) => {
+  const { title, description, keywords, imageFileName, languageStore: { getLanguage } } = props;
+  return <Meta
+    title={LabelsProvider.getLabel('page_title__entry', { entry_title: title }, getLanguage())}
+    description={LabelsProvider.getLabel('page_description', { description }, getLanguage())}
+    keywords={LabelsProvider.getLabel('page_keywords', { keywords: keywords.join(', ') }, getLanguage())}
+    imageUrl={AssetsProvider.getEntryImageFilePath(imageFileName)}
+  />
+};
+
+export default inject('languageStore')(observer(EntryMeta));
+</pre></partial>
+<p>That's it! Dynamic head tags are now supported.</p>
+<p>But it doesn't work. When I check link to any entry from my blog with Facebook Sharing Debugger or Twitter Card Validator, it appears as it was homepage - the same, static title and other meta data is presented. However, when I access the same address from my browser, I see them modified accordingly. What's wrong?</p>
+<p>Facebook and Twitter, as well as Google and other major search engines, typically don't run JavaScript. As it happens, my blog is written almost entirely in JavaScript (well, to be precise, it's in TypeScript, but for browser, it's compiled to JS). If you want to see it how those bots see it, turn off JavaScript in your browser and refresh the page (but not before you finish reading!). It's pretty much empty website with static, general title and meta tags. That's how it appears to Facebook.</p>
+<p>There are plenty of ways to solve it, one of them being rewriting this blog to some other, server-rendered language. Luckily, nowadays, we don't have to do that anymore, as JavaScript may very well be rendered on a server side as well. The technique is called Server Side Rendering (SSR, you might've heard of it ;-)), and it basically renders your application on server as it was rendered by client, caches it, then sends to the client plain, static files. This way, no JavaScript on client side is involved, he receives only HTML and CSS, which can be handled by almost every web browser without effort. Most popular implementations of this idea in JavaScript utilize NextJS framework and NodeJS server.</p>
+<p>SSR is really vast topic, and I don't want to mix it in this entry too much. I'm going to discover this area of programming in JS with you in separate, dedicated entries, as it's gaining more and more popularity lately, is getting more and more complex, and is really cool, interesting concept, that I'm getting into more and more every day. Today, however, we'll investigate much simpler way for SSR.</p>
+<p>Instead of implementing this whole thing myself, I'll just pay someone to do it (hopefully, but more on this in a second), for there is already number of services providing prerendering out of the box, with little to none effort on your side. An example of such service might be prerender.io, but I've selected different one.</p>
+<p>prerender.cloud, my weapon of choice, works similarly to general mechanism I've described: they take my website, render and cache it on their side, then provide user with static content, which is later replaced by actual client-side application, whenever it's ready to go (you can find more details on how it works in dedicated section of their documentation). All I had to do is redirect my traffic to their servers conditionally (exemplary .htaccess file can be found here). And of course pay for it, but I had no issue with that yet. It's free for up to 500 requests monthly, so I have still have some room for growth in popularity left.</p>
+<p>All in all, after busy day in my workshop, I managed to accomplish my task: my blog is finally social media friendly. And, I must admit, it wasn't that hard, technically speaking. It was mostly a matter of research and learning. I wish you similarly pleasant journey with this kind of assignment!</p>
+<p>As usual, you can find all the changes I described in this post on my blog repository on GitHub.</p>
+<p>PS It doesn't work for me personally at this moment, since my hosting provider has a hard time enabling some Apache modules. I'm moving to different provider soon, I'll update this post once you can actually test this feature on my blog!</p>

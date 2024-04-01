@@ -7,10 +7,10 @@ const head = (data, dists, { lang, url, meta, isIndex }) => {
   if (meta) {
     const metaSeparator = " | ";
     if (Object.hasOwn(meta, "title")) {
-      title += `${metaSeparator}${meta.title}`;
+      title = `${meta.title}${metaSeparator}${title}`;
     }
     if (Object.hasOwn(meta, "description")) {
-      description += `${metaSeparator}${meta.description}`;
+      description = `${meta.description}${metaSeparator}${description}`;
     }
     if (Object.hasOwn(meta, "image")) {
       const imageDot = meta.image.lastIndexOf(".");

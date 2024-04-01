@@ -5,10 +5,10 @@ import {
   deleteFile,
   isImage,
   isInArray,
+  isPdf,
   loadFile,
   saveFile,
 } from "../../helpers/index.js";
-import { getConfig } from "../../utils/index.js";
 
 export class File extends Dirent {
   #dists = [];
@@ -46,7 +46,8 @@ export class File extends Dirent {
   }
 
   async load() {
-    this.src.contentEncoding = isImage(this.src) ? null : "utf8";
+    this.src.contentEncoding =
+      isImage(this.src) || isPdf(this.src) ? null : "utf8";
     this.src.content = await loadFile(this.src.abs, this.src.contentEncoding);
     if (!this.src.contentHash || this.src.contentHash === "") {
       this.src.resetContentHash();
@@ -69,7 +70,7 @@ export class File extends Dirent {
   save() {
     const saving = [];
     for (let dist of this.#distsToProcess) {
-      saving.push(saveFile(dist.abs, dist.content));
+      saving.push(saveFile(dist.abs, dist.content, this.contentEncoding));
     }
     return saving;
   }

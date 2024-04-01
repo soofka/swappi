@@ -1,0 +1,145 @@
+<p>
+  One of the challenges that I faced while programming this, so far, very simple
+  blog app (the one that you are using to read this post, most likely), was how
+  to give my readers a possibility to comment on my posts. Obviously, it is one
+  of the crucial features of this kind of app – I would like my readers to be
+  able to tell me where am I wrong, and I would like me to be able to respond to
+  such heretic claims. However, the whole feature seems quite a lot of work to
+  implement from scratch. Luckily, there are plenty of ready out of the box
+  solutions out there, one of them being Disqus.
+</p>
+<p>
+  I’m sure there are other providers of such feature, but I decided to go for
+  this one, because it has a possibility to log in with your Google, Facebook,
+  or Twitter account, and – more importantly – it’s super simple to integrate it
+  with React. Once I figured it out, I decided to share this very basic setup in
+  a form of short note.
+</p>
+<p>
+  First of all, you’ll need a Disqus account. After successful registration, you
+  need to add your website, providing it’s name and URL address. When it’s done,
+  you’ll see plenty of predefined content management systems to integrate with.
+  You don’t need that. You’re keen on the code, you can do it yourself, so you
+  scroll down to the manual integration part and copy configuration code, that
+  you’ll paste somewhere on your website. Just remember to provide appropriate
+  page URL (root of your website) and identifier (based on variable, related to
+  the specific page, which will be the subject of reader’s comments; in my case
+  it’s part of given blog post’s nice URL).
+</p>
+<partial name="code">
+  <pre>
+var disqus_config = function () {
+    this.page.url = 'https://soofka.pl';
+    this.page.identifier =
+        document.location.href.substr(
+            document.location.href.indexOf(this.page.url) + this.page.url.length
+        );
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://soofka-pl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</pre
+  >
+</partial>
+<p>
+  Once the script above is ready, you need to add it to your site. Some people
+  are adding things like this to their application code, but I, for one, prefer
+  keeping this and other scripts from external providers in static assets
+  directory. All assets from there are copied by Webpack to my resulting package
+  during build process. For details of my setup check this blog on github.
+</p>
+<p>
+  You’re halfway done. Really! The only remaining part is to place your Disqus
+  comment box on your page of choice. For React application, you’d probably like
+  to have separate component for comments. All you need to do, is initialize
+  Disqus once this component is mounted (and with proper parameters), and render
+  element with specific ID, so that Disqus comment box can populate this element
+  with actual code.
+</p>
+<p>
+  However, having Disqus script loaded asynchronously during my build process,
+  I've encountered a case, in which my comments component is mounted, while
+  there is no DISQUS object in the browser yet. This led to unusual behavior: I
+  kept receiving e-mails about comments on this Disqus setup, but when I went to
+  this very page, comments section was empty. Turns out, Disqus comments section
+  on entry pages loaded properly after a while, but with it's basic setup, which
+  is for the home page of my blog. All comments displayed and added were added,
+  effectively, under soofka.pl URL in Disqus system. If someone managed to add a
+  comment under URL of specific entry, it was not visible below this entry at
+  all.
+</p>
+<p>
+  The best way to resolve this would be to wait for some information from Disqus
+  itself, that it's ready. However, I've failed to find such event in their
+  documentation, so I reverted to simple solution with timeout. My code attempts
+  to setup Disqus with proper configuration within 3 seconds from mounting of
+  comments component. It's displayed below. Note, that there is hard exit
+  condition for this loop. Make sure, that your implementation has it too.
+</p>
+<partial name="code">
+  <pre>
+import * as React from 'react';
+
+interface EntryCommentsPropsInterface {
+  title: string;
+  url: string;
+  shortName: string;
+  identifier: string;
+}
+
+declare const DISQUS: any;
+
+export class EntryComments extends React.Component {
+
+  private disqusSetupAttempts: number = 0;
+
+  componentDidMount(): void {
+    const { title, url, shortName, identifier } = this.props;
+
+    const disqusSetupAttempt = setInterval(
+      () => {
+        if (typeof DISQUS !== 'undefined') {
+          DISQUS.reset({
+            reload: true,
+            config() {
+              this.page.title = title;
+              this.page.url = window.location.href;
+              this.page.shortName = shortName;
+              this.page.identifier = identifier;
+            },
+          });
+          clearInterval(disqusSetupAttempt);
+        }
+
+        this.disqusSetupAttempts += 1;
+        if (this.disqusSetupAttempts >= 3) {
+          clearInterval(disqusSetupAttempt);
+        }
+      },
+      1000,
+    );
+  }
+
+  render(): JSX.Element {
+    return (
+      <div id="disqus_thread"></div>
+    );
+  }
+}
+
+export default EntryComments;
+</pre>
+</partial>
+<p>
+  The only thing to keep in mind, is that the identifier parameter here should
+  correspond to the identifier parameter set in global Disqus config.
+</p>
+<p>
+  Of course, it’s just the basic setup, and there are much more things that you
+  can do with this powerful tool. For more advanced usage, I recommend checking
+  Disqus developer documentation. But if you want to keep it simple, this short
+  tutorial describes all you need.
+</p>

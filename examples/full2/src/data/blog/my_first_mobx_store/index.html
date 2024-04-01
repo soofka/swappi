@@ -1,0 +1,322 @@
+<p>
+  My dad wants to read my blog. The only issue is that he doesn't speak English
+  very well. It's communicative, but it's not quite enough to understand
+  intricate, sophisticated Shakespearean language, I am decorating my posts
+  with. Worry not, father, as I've found the solution: language versions. I am
+  currently working on adaptations of my posts in Polish language. In the
+  meantime, I'm also adapting my codebase to be able to recognize and properly
+  handle language parameter. And for that purpose, for the first time, I decided
+  to use MobX.
+</p>
+<p>
+  So far, for a few years already, whenever I wanted my application to have some
+  global state, I've used Redux. It's reliable, it works, and it's quite easy to
+  implement, although, admittedly, it's not that easy to learn. In order to get
+  a grasp of it, one has to understand non-trivial implementation of flow of
+  data through store, actions, and reducers. It easily can get really confusing
+  at the beginning.
+</p>
+<p>
+  Another thing I've noticed about Redux is that it's often used wrongly. It's
+  easy to use it in a wrong way - more often than not it still works - but using
+  it properly, by the book, requires at least shallow understanding of
+  underlying theoretical concepts. More importantly, applying them to one's code
+  sometimes can be tricky, might require some refactoring, and usually ends up
+  somewhere around the end of technical debt list.
+</p>
+<p>
+  Lately, huge rise in popularity of another state management library, MobX, can
+  be observed. I see it being adapted in more and more projects and getting more
+  and more community support. Therefore, I wanted to try it out myself. My first
+  impression of it was that it must be simpler, more straight forward version of
+  Redux - it's described by its authors as "simple, scalable state management
+  library" for a reason. Given the nature of my project - this blog, which is
+  really far from being complex application - I figured, that the simplest
+  solution will be the best (and that it's also great opportunity to taste it).
+</p>
+<h3>Preparation</h3>
+<p>
+  First thing I've done in order take my first steps with MobX was taking a few
+  looks at it's very well written documentation. It covers not only technical
+  details of every piece of library, which I mostly left for later. More
+  importantly for me at the beginning, there is description of theoretical
+  foundation of the package, which I recommend to check out to everyone who
+  starts their adventure with it.
+</p>
+<p>
+  Once I got familiar with concepts and principles, I was ready to add the
+  library to my project. Along MobX itself, I installed also MobX-React package,
+  which redefines some of MobX features as React component wrappers, so that one
+  can implement it in their React application conveniently.
+</p>
+<partial name="code">
+  <pre>
+npm install --save mobx mobx-react
+</pre
+  >
+</partial>
+<p>
+  Knowing that I'm using React Router library to handle routing in my
+  application, and having experience from Redux, where I had to use additional
+  library to make these two get along well and without issues, I immediately
+  searched for some equivalent for MobX, and found MobX-React-Router.
+</p>
+<partial name="code">
+  <pre>
+npm install --save mobx-react-router
+</pre
+  >
+</partial>
+<p>
+  Following basic example in the documentation, I quickly set up simple store
+  with default routing, as provided by the library. I only had to modify main
+  file of my project, where root component is.
+</p>
+<partial name="code">
+  <pre>
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { Provider } from 'mobx-react';
+import { Router } from 'react-router-dom';
+import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
+import createBrowserHistory from 'history/createBrowserHistory';
+
+import Blog from 'components/Blog';
+
+const routingStore = new RouterStore();
+
+const browserHistory = createBrowserHistory();
+const history = syncHistoryWithStore(browserHistory, store.routingStore);
+
+const store = {
+  routingStore,
+};
+
+const render = () => {
+  ReactDOM.render(
+    <Provider {...store}>
+      <Router history={history}>
+        <Blog/>
+      </Router>
+    </Provider>,
+    document.querySelector('app'),
+  );
+};
+
+render();
+</pre>
+</partial>
+<p>Now I was ready to implement my own MobX store.</p>
+<h3>Implementation</h3>
+<h4>Defining the store</h4>
+<p>
+  What I wanted to implement was very simple, conceptually. I wanted to have
+  global app state with only one variable: language. Following MobX
+  documentation and a few basic tutorials I've found over the Internet (most
+  notably, short introduction to MobX and React, being part of MobX
+  documentation, and this basic example by JS Craft), I decided to go for simple
+  class with one field. Of course I did it in TypeScript.
+</p>
+<partial name="code">
+  <pre>
+export interface LanguageStoreInterface {
+  language: string;
+  getLanguage: () => string;
+  setLanguage: (language: string) => void;
+}
+
+class LanguageStore implements LanguageStoreInterface {
+
+  language = 'en';
+
+  getLanguage = (): string => this.language;
+
+  setLanguage = (language: string): void => this.language = language;
+
+}
+</pre
+  >
+</partial>
+<p>
+  Now I had one source of truth about currently selected language in my
+  application. How to make it accessible to all parts of my application and
+  ensure they all use the same instance? In order to achieve that, I wrapped it
+  in MobX decorator, defined language as an observable, and setLanguage as an
+  action. Therefore, language property became observed by MobX - any instance
+  which observes it will be notified about its change - and setLanguage method
+  became privileged to modify language in global context.
+</p>
+<partial name="code">
+  <pre>
+import { action, decorate, observable } from 'mobx';
+
+export interface LanguageStoreInterface {
+  language: string;
+  getLanguage: () => string;
+  setLanguage: (language: string) => void;
+}
+
+class LanguageStore implements LanguageStoreInterface {
+
+  language = 'en';
+
+  getLanguage = (): string => this.language;
+
+  setLanguage = (language: string): void => this.language = language;
+
+}
+
+decorate(LanguageStore, {
+  language: observable,
+  setLanguage: action,
+});
+</pre
+  >
+</partial>
+<p>
+  Last step was adding this small piece of code to my already existing store,
+  created with the help of MobX-React-Router. Again, I had to modify main file
+  of the application, where root component is.
+</p>
+<partial name="code">
+  <pre>
+import { languageStore } from 'store/language';
+
+// ...
+
+const store = {
+  routingStore,
+  languageStore,
+};
+</pre
+  >
+</partial>
+<p>
+  That's it - now I had simple MobX store in my application, ready to interact
+  with.
+</p>
+<h4>Modifying the store</h4>
+<p>
+  In the next step, I created simple component with two buttons, which purpose
+  was to switch between languages - LanguageSwitcher. Then, using inject method
+  from MobX-React, I made it familiar with LanguageStore, and used setLanguage
+  action to set proper value in global app state.
+</p>
+<partial name="code"><pre>
+import * as React from 'react';
+import { inject } from 'mobx-react';
+
+import { LanguageStoreInterface } from 'store/language';
+
+import GreatBritainFlag from './flags/GreatBritainFlag';
+import PolandFlag from './flags/PolandFlag';
+
+interface LanguageSwitcherPropsInterface {
+  languageStore?: LanguageStoreInterface;
+}
+
+export const LanguageSwitcher = (props: LanguageSwitcherPropsInterface): JSX.Element => {
+  const { languageStore: { setLanguage } } = props;
+
+  return (
+    <ul className="language-switcher">
+      <li>
+        <GreatBritainFlag onClick={() => setLanguage('en')} />
+      </li>
+      <li>
+        <PolandFlag onClick={() => setLanguage('pl')} />
+      </li>
+    </ul>
+  );
+};
+
+export default inject('languageStore')(LanguageSwitcher);
+</pre></partial>
+<p>Note, that languageStore prop in my props interface had to be optional. Otherwise, TypeScript would complain about it not being provided by parent component. I'm yet to discover how to implement it in a way, that this prop is required, as it should be. If you know the trick, don't hesitate to let me know in comments.</p>
+<p>Having my LanguageSwitcher, clicking on one of it's buttons altered global state and set proper language value in it. However, there was no visible change in my application - for that I had to implement components, that react to this change.</p>
+<h4>Reacting to changes in store</h4>
+<p>The most basic way of doing so in MobX, from what I've learned, was to implement observer. Wrapping React component with such decorator makes it aware of any changes in the state. Therefore, I created Label component, which observed the store and automatically reacted to language change, and I reimplemented all static pieces of text in my UI to use this component. Additionally, I had to inject LanguageStore to it, so that I could always get proper, current language value for my Label to render. Then I created simple JS objects with translations to both languages.</p>
+<partial name="code"><pre>
+import * as React from 'react';
+import { inject, observer } from 'mobx-react';
+
+import { LanguageStoreInterface } from 'store/language';
+
+import labels from 'labels';
+
+interface LabelPropsInterface {
+  name: string;
+  languageStore?: LanguageStoreInterface;
+}
+
+export const Label = (props: LabelPropsInterface) => {
+  const { name, languageStore: { getLanguage }, ...rest } = props;
+  return <span {...rest}>{labels[getLanguage()][name]}</span>;
+};
+
+export default inject('languageStore')(observer(Label));
+</pre></partial>
+<p>One thing I learned in the process is that observer should always be the innermost (first applied) decorator; otherwise it might do nothing at all.</p>
+<p>After this change, clicking on my LanguageSwitcher button, which was not corresponding to currently set language, resulted in immediate change in UI of my application - static pieces of text were taken from the other JS object with translations and rerendered properly. Cool thing that came out of the box was that clicking on the button that corresponds to already selected language didn't result in any component being rerendered, which is good for performance of my app.</p>
+<p>On the other hand, my list of entries didn't react to this change at all. Obviously, I also wanted this component to change with setLanguage action - I only wanted entries translated to Polish to appear when in Polish version, and vice versa - and it turned out to be much trickier than I expected.</p>
+<p>After a few hours of frustrating attempts to make my Entries component with an observer, which I used for Label component, I learned important lesson about MobX - observer makes your component react to any observable you use in render(). I used language parameter, which was observable, in this component, but only in componentDidMount function, where I fetched all the entries, not in render function. I had to come up with different idea.</p>
+<p>Another few hours later, I've found what I needed in reaction function from MobX. During this research I discovered that MobX offers a lot of ways to interact with the store in variety of manners. Among different methods, reaction was precisely what I needed for this case. Using it, one can define his custom way of, well, reacting to change in one of his observables. Unlike observer, which is tightly coupled with render function, reaction allowed me to refetch posts whenever language changed without referring to LanguageStore during render phase.</p>
+<partial name="code"><pre>
+export class Entries extends React.Component<EntriesPropsInterface, EntriesStateInterface> {
+  constructor(props: EntriesPropsInterface) {
+    super(props);
+
+    reaction(
+      () => this.props.languageStore.language,
+      () => {
+        this.getEntries();
+      },
+    );
+  }
+
+  componentDidMount() {
+    if (!this.state.entries) {
+      this.getEntries();
+    }
+  }
+
+  // ...
+}
+
+export default inject('languageStore')(Entries);
+</pre></partial>
+<p>After all, I enriched my application with simple store, made it compliant with other libraries in my stack, made some components that modify the store, and made some components that react to these modifications - in both trivial and non-that-trivial way. As always, all code that I wrote can be found on my GitHub, in my blog repository. Live example of it is this blog you're currently reading, although at the time of publishing this post, LanguageSwitcher component itself might not be visible to you yet. I implemented the feature, but I also have to actually translate some posts to Polish for it to make sense. As always, I started with the most fun part...</p>
+<h3>Conclusions</h3>
+<p>
+  So, what I learned in the process? One thing I learned, at least a little bit,
+  is, of course, MobX itself. Being quite keen on Redux already, I find MobX's
+  approach to the same problem... intriguing. It indeed seems simpler, at least
+  to start working with, than complicated data flow in Redux, with all it's
+  actions and reducers. It seems more human-readable. Hard to say if it's better
+  or not and in which cases, but after my first experience, I want to try it
+  more, to see its flaws and boundaries.
+</p>
+<p>
+  When I first learned about MobX and read about it's simplicity, I thought that
+  it must be also much more limited. Surprisingly, it seems to be very flexible
+  and ready for variety of use cases, with plenty of different ways to interact
+  with the state. I didn't discover them all, I touched only these, which I
+  needed, but during my research I've realized, that it can do much more than
+  simple use case I presented in this post. I'm wondering now how would it
+  handle sophisticated, complex logic of real world applications, with hundreds
+  of views, scenarios, API calls, etc. Redux might be an overkill for small
+  project with one variable in state, but it handles these complex ones very
+  well. How would MobX perform there? I guess I'll see it in future.
+</p>
+<p>
+  One last thought I had on this subject: introduction of global state to your
+  application makes you rethink data flow within it. I was horrified by some of
+  ideas I had when I implemented this blog originally, almost 2 years ago, when
+  I was forced to look at them closely, while adapting different components for
+  integration with MobX. I had to do some refactoring, because I realized, some
+  of those little monsters I had here and there cannot exist peacefully in
+  organized world, which I created with MobX. When it comes to this point, I
+  think it's the same with Redux. Having one of them in your application is not
+  always the way to go, but once you introduce it, you might want to rethink
+  your data flow and relations between components, and it's for the better.
+</p>

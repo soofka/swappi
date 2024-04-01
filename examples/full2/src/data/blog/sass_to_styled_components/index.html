@@ -1,0 +1,388 @@
+<p>
+  Who doesn't like to constantly rework perfectly fine stuff into something new
+  and fancy just because it's trendy now? Well, probably pretty much every
+  single JS developer, most certainly everyone who works with this language long
+  enough to experience at least a glimpse of famous "JS fatigue" feeling (so
+  approximately a few weeks). However, I created this blog as a playground to
+  try out new libraries and frameworks, and since I'm learning Styled Components
+  for my professional work at the moment, even though Sass-based styling worked
+  perfectly for my needs, I reimplemented all of it into this controversial
+  CSS-in-JS. And I'm still sane!
+</p>
+<p>
+  Styled Components is one of many implementations of an idea of CSS-in-JS:
+  concept, where you don't artificially map styling of components to components
+  themselves, instead you treat both as one, and put it all in your JS/TS file.
+  It's currently a hot topic in JavaScript world, at least for a year already.
+  There are many advocates for this approach, many opponents, and probably twice
+  as many libraries that bring it to life. Styled Components, with almost 20k
+  stars on GitHub at the time of writing this post, must be one of the most
+  widely used. It's popularity has been one of major reasons behind selecting it
+  in our front-end development in StepStone.
+</p>
+<p>
+  After a few days of learning and coding, I must admit, I see some profits
+  coming out of it (don't mistake it with strong recommendation or even opinion;
+  I don't have one yet), outside of tight coupling components with their styles,
+  which makes a lot of sense to me, especially in the context of React, and
+  being up to date with fancy trends around the world. It forced me to rethink
+  not only actual CSS code I have, but also separation of components inside my
+  application: I created a few new components along the way, thus now I have
+  smaller, more specialized, cleaner entities here and there, and I consider it
+  a gain.
+</p>
+<p>
+  As usual, I implemented it within React and TypeScript project - this blog,
+  the one you're reading. I'll display examples taken out of it's flesh, and you
+  can always refer to more detailed implementation on my GitHub, where this
+  application resides on average day.
+</p>
+<p>Without further ado, let's dive straight into code samples.</p>
+<h3>Rewriting variables into theme</h3>
+<p>
+  I started with reading the documentation. Once I got a grasp of it, I
+  proceeded to installation of the package.
+</p>
+<partial name="code">
+  <pre>
+npm install --save-dev styled-components
+</pre
+  >
+</partial>
+<p>
+  Foundation of my Sass-based styling of this blog was file named
+  variables.scss, where I stored standardized sizes of all elements, colors,
+  spacings, fonts, etc. Naturally, I started with implementation of something
+  analogical in Styled Components. In there, it's called theme, and it has it's
+  own section in documentation.
+</p>
+<p>Originally, my variables.scss file was:</p>
+<partial name="code">
+  <pre>
+$mobileBreakPointWidth: 968px;
+
+$infoSectionWidth: 32%;
+$contentSectionWidth: 100% - $infoSectionWidth;
+
+$blue: rgb(0, 1, 49);
+$darkBlue: darken($blue, 10%);
+$darkerBlue: darken($blue, 20%);
+$lightBlue: lighten($blue, 10%);
+$lighterBlue: lighten($blue, 20%);
+
+$white: rgb(246, 246, 246);
+$darkWhite: darken($white, 10%);
+$darkerWhite: darken($white, 20%);
+
+$black: rgb(20, 20, 20);
+$lightBlack: lighten($black, 10%);
+$lighterBlack: lighten($black, 20%);
+
+$gray: rgb(144, 144, 144);
+
+$baseDistance: 8px;
+
+$marginXXS: 0.25 * $baseDistance;
+// ...
+
+$paddingXXS: 0.25 * $baseDistance;
+// ...
+
+$fontSizeS: 1.5 * $baseDistance;
+// ...
+</pre
+  >
+</partial>
+<p>
+  When I attempted to redo it as a theme, which is basically JavaScript object,
+  I stumbled upon first issue: I couldn't perform basic mathematical operations
+  on percents and pixels, as I could in Sass. Instead of having base distance
+  defined as 8 pixels and multiplying it by any number without care, I had to
+  define value of base distance as 8 outside of my theme, perform any
+  calculation on pure number, and add px to the result. Template literals came
+  to the rescue.
+</p>
+<p>
+  Another issue I discovered was using some of Sass native functions, such as
+  lighten or darken. They're not supported in Styled Components by default.
+  There are some additional packages, mainly Polished, prepared by authors of
+  Styled Components themselves, which provide such functionality. However, at
+  this point I had my first reflection on styling of my blog. Why do I even
+  bother with this kind of operation for just a couple of variables? I decided
+  that instead of that, I'd rather have all my colors defined explicitly.
+</p>
+<p>Finally, my theme.ts ended up looking like this:</p>
+<partial name="code">
+  <pre>
+const infoSectionWidthPercentageValue = 32;
+const baseDistanceValue = 8;
+const baseFontSizeValue = 18;
+const baseLineHeightValue = 24;
+
+export const theme = {
+  mobileBreakPointWidth: '968px',
+
+  infoSectionWidth: `${infoSectionWidthPercentageValue}%`,
+  contentSectionWidth: `${100 - infoSectionWidthPercentageValue}%`,
+
+  blue: 'rgb(0,1,49)',
+  darkBlue: 'rgb(0,0,24)',
+  darkerBlue: 'rgb(0,0,0)',
+  lightBlue: 'rgb(0,2,98)',
+  lighterBlue: 'rgb(0,3,147)',
+
+  white: 'rgb(246,246,246)',
+  darkWhite: 'rgb(222,222,222)',
+  darkerWhite: 'rgb(198,198,198)',
+
+  black: 'rgb(20,20,20)',
+  lightBlack: 'rgb(32,32,32)',
+  lighterBlack: 'rgb(44,44,44)',
+
+  gray: 'rgb(144,144,144)',
+
+  baseDistance: `${baseDistanceValue}`,
+
+  marginXXS: `${0.25 * baseDistanceValue}px`,
+  // ...
+
+  paddingXXS: `${0.25 * baseDistanceValue}px`,
+  // ...
+
+  baseFontSize: `${baseFontSizeValue}px`,
+  baseLineHeight: `${baseLineHeightValue}px`,
+
+  fontSizeS: '0.7em',
+  // ...
+};
+</pre
+  >
+</partial>
+<p>
+  You might have noticed another difference between the two: in Sass I used
+  pixels as my font sizes, now I decided to go for "ems". That's another side
+  effect of my reconsideration of my whole stylesheet. Since I couldn't just go
+  for math operation on any unit like a mad man, I stopped for a second and
+  thought again about this, read some articles and guidelines, and ended up
+  deciding in favor of scalable unit.
+</p>
+<h3>Styling components</h3>
+<p>
+  Having my variables redefined as Styled Components theme, I could proceed to
+  getting rid of all SCSS files, replacing them with TS files. Hence, I asked
+  myself a question: how do I provide my new variables to my new styles? Again
+  documentation about theming came handy - theme is provided through component's
+  props. I only had to wrap my root component in ThemeProvider, coming from
+  Styled Components.
+</p>
+<partial name="code">
+  <pre>
+import theme from 'common/theme';
+
+// ...
+
+const Blog = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      // ...
+    </ThemeProvider>
+  );
+};
+</pre>
+</partial>
+<p>
+  Thanks to this solution, I could now not only use variables, but also access
+  all the other props in my styles. Not that I've used this feature, but I
+  realize, that it opens another dimension of possibilities in their
+  customization.
+</p>
+<p>
+  Before modifications, style for one of my components - Quote, piece of text
+  visible on left hand side of the screen in desktop view - looked like this:
+</p>
+<partial name="code">
+  <pre>
+@import 'components/Blog/variables.scss';
+
+.quote {
+  margin: $marginM;
+  padding: $paddingS;
+  font-style: italic;
+  text-align: center;
+}
+
+@media (max-width: $mobileBreakPointWidth) {
+  .quote {
+    display: none;
+  }
+}
+</pre
+  >
+</partial>
+<p>After addition of Styled Components, analogical file's content was:</p>
+<partial name="code">
+  <pre>
+import styledComponents from 'styled-components';
+
+export const StyledQuote = styledComponents.p`
+  margin: ${props => props.theme.marginM};
+  padding: ${props => props.theme.paddingS};
+  font-style: italic;
+  text-align: center;
+
+  @media (max-width: ${props => props.theme.mobileBreakPointWidth}) {
+    display: none;
+  }
+`;
+</pre
+  >
+</partial>
+<p>
+  As you can see, I could pretty much copy-paste my whole original style into
+  template literal, which, decorated by function from Styled Components, became
+  actual styled component. There's also type of component specified in there -
+  it's a paragraph.
+</p>
+<p>Now, instead of using traditional HTML notation in my rendering function:</p>
+<partial name="code">
+  <pre>
+import './styles.scss';
+
+export const Quote = (): JSX.Element => {
+  return (
+    <p className="quote">
+      <Label name="quote"/>
+    </p>
+  );
+};
+</pre>
+</partial>
+<p>I used component generated by Styled Components:</p>
+<partial name="code">
+  <pre>
+import { StyledQuote } from './styled';
+
+export const Quote = (): JSX.Element => {
+  return (
+    <StyledQuote>
+      <Label name="quote"/>
+    </StyledQuote>
+  );
+};
+</pre>
+</partial>
+<p>Voila!</p>
+<p>
+  However, not always it was such a piece of cake. In some cases, in my SCSS
+  files I had nested selectors, with styling for specific child elements. At
+  first I was fighting it, I tried to somehow preserve this configuration. I
+  figured, that I still can define such class-based selectors within my Styled
+  Components, and attempted to go with it. I quickly realized that I don't like
+  it - I had components wrapped in nice Styled Component decorator, without any
+  class definition, inside which there were divs with specific classes... This
+  combination looked just wrong.
+</p>
+<p>
+  Then I understood, that my separation of components is straight up wrong in
+  those cases. If there was a component that rendered specific divs with
+  different, explicit styling... Why those divs are not independent components?
+  So I made them independent components, I got rid of this styling issue, and I
+  ended up with much cleaner code in some areas. That's, by the way, what I
+  consider the greatest improvement to my blog's code base that came out of this
+  whole Styled Components experiment.
+</p>
+<p>
+  Once I was done with it, I could see my blog in almost the same shape as it
+  was originally, styled by Sass (only difference being sizes of fonts here and
+  there, which was due to change from pixels to "ems", and was expected).
+  Finally, I could remove all SCSS files, and all CSS and SCSS loaders both from
+  my Webpack configuration and from my dependencies.
+</p>
+<h3>Code quality</h3>
+<p>
+  Nevertheless of this change, I didn't want to make it at the cost of
+  consistency of my code. Previously, I used StyleLint to ensure that all my
+  SCSS files conform to the same standard. I was thinking if I can get the same
+  cool feature for Styled Components, and I was happy to discover, that it comes
+  almost out of the box. There is a package that integrates StyleLint with
+  Styled Components, so that linting styles worked for me exactly the same as
+  before: stylelint-processor-styled-components. It's not a part of main Styled
+  Components package, but it's created by the same contributors, and hosted from
+  the same account on GitHub.
+</p>
+<p>
+  At this point I was able to ensure quality of my styling code at the same
+  level as before the change to Styled Components, but I was very happy to
+  discover, that I can go even further than that. All thanks to
+  jest-styled-components package, which is also created by the same group of
+  people responsible for Styled Components.
+</p>
+<p>
+  I already had Jest snapshot tests written for all my components, in order to
+  ensure consistency and control over tree of DOM elements rendered by them. Why
+  wouldn't I have similar snapshot dedicated for styling generated for such
+  component? I never thought about it before, but now that I unearthed it, I
+  immediately wanted to have it. It's simple to generate, check, and modify
+  during development, and also very beneficial. So I went for it.
+</p>
+<p>
+  Unfortunately, I didn't manage to successfully run setup presented in the
+  documentation of this library, where they simply import it into their test
+  files, and obtain styling of the component in their snapshot. I spent some
+  time researching it and concluded that it might be caused by Enzyme or
+  TypeScript, which I'm using. Not discouraged, I simply created separate tests
+  to check my styles.
+</p>
+<partial name="code">
+  <pre>
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import 'jest-styled-components';
+
+import theme from 'common/theme';
+import { StyledQuote } from 'components/Quote/styled';
+
+describe('<StyledQuote/>', () => {
+
+  it('is styled correctly', () => {
+    expect(shallow(<StyledQuote theme={theme} />)).toMatchSnapshot();
+  });
+
+});
+</pre>
+</partial>
+<p>Running test displayed above resulted in following snapshot:</p>
+<partial name="code">
+  <pre>
+exports[` is styled correctly 1`] = `
+.c0 {
+  margin: 16px;
+  padding: 8px;
+  font-style: italic;
+  text-align: center;
+}
+
+@media (max-width:968px) {
+  .c0 {
+    display: none;
+  }
+}
+
+<p
+  className="c0"
+/>
+`;
+</pre>
+</partial>
+<p>
+  This way, I not only completely reimplemented Sass-based styling with Styled
+  Components for my whole project, but also improved it by adding some extra
+  snapshot tests, covering styling of my components - area, which was not tested
+  at all prior to this experiment. I learned something new, my blog got some
+  bonus points for being trendy, and in the process, quite unexpectedly, I must
+  admit, it also became tested more thoroughly.
+</p>
+<p>
+  That was a good exercise. I learned a lot, and I hope you can take something
+  out of it too.
+</p>

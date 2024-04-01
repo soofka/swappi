@@ -50,7 +50,7 @@ export const getContent = async (langs) => {
           `https://api.npmjs.org/downloads/point/2000-01-01:2050-01-01/${project.npm}`,
         )
       ).json();
-      project.downloads = downloads;
+      project.installs = downloads;
     }
   }
 

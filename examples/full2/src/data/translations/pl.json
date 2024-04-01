@@ -1,21 +1,20 @@
 {
   "meta": {
-    "title": "swn.ski PO POLSKU",
+    "title": "swn.ski",
     "description": "swn.ski description"
   },
   "nav": {
     "home": "home",
-    "projects": "projects",
-    "articles": "articles",
+    "articles": "artykuły",
     "blog": "blog",
-    "courses": "courses",
-    "project": "projects",
-    "talks": "talks"
+    "courses": "szkolenia",
+    "projects": "projekty",
+    "talks": "wystąpienia"
   },
   "pages": {
     "home": {
       "intro": {
-        "head": "Hello!",
+        "head": "Cześć!",
         "lead": "My name is Jakub, I'm a software enthusiast, and I work as a solution architect, software developer, programming teacher, and tech lead. Welcome to my corner of the Internet!",
         "text": "If you want to hire me, waste no time, <a href=\"mailto:j@swn.ski\" target=\"_blank\">drop me a message</a>. If you yet don't know that you want to hire me, please refer to my resume or read more about my work. Otherwise, enjoy fruits of my labor, such as my projects, talks, articles, courses, or blog posts, or just chill out here with me. Peace!",
         "buttons": {
@@ -62,9 +61,10 @@
     },
     "articles": {
       "meta": {
-        "title": "Articles",
-        "description": "Articles"
-      }
+        "title": "Artykuły",
+        "description": "Artykuły"
+      },
+      "publishedBy": "opublikowano na łamach"
     },
     "blog": {
       "meta": {
@@ -74,21 +74,36 @@
     },
     "courses": {
       "meta": {
-        "title": "Courses",
-        "description": "Courses"
-      }
+        "title": "Szkolenia",
+        "description": "Szkolenia"
+      },
+      "courseContent": "Zawartość:",
+      "taughtFor": "prowadzone dla"
     },
     "projects": {
       "meta": {
-        "title": "Projects",
-        "description": "Projects"
-      }
+        "title": "Projekty",
+        "description": "Projekty"
+      },
+      "stars": "gwiazdek",
+      "forks": "forków",
+      "installs": "instalacji"
     },
     "talks": {
       "meta": {
-        "title": "Talks",
-        "description": "Talks"
-      }
+        "title": "Wystąpienia",
+        "description": "Wystąpienia"
+      },
+      "slides": "slajdy"
     }
+  },
+  "misc": {
+    "continueReading": "Czytaj dalej",
+    "oneAvailableLang": "Ta treść jest dostępna tylko w języku",
+    "multipleAvailableLangs": "Ta treść jest dostępna w językach",
+    "availableLangs_en": "angielskim",
+    "availableLangs_pl": "polskim",
+    "and": "i",
+    "allRightsReserved": "wszystkie prawa zastrzeżone"
   }
 }

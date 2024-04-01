@@ -66,6 +66,9 @@ li {
   font-size: 1rem;
   margin: 0 0 0.5rem 0;
   padding: 0;
+}
+h4,
+p {
   text-align: justify;
 }
 button,
@@ -334,6 +337,8 @@ footer section article p {
 }
 .highlight {
   background: var(--off-bg);
+  border: 1px solid var(--off-bg-2);
+  padding: var(--gap);
 }
 .architect-fg {
   color: var(--architect-fg);

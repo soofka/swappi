@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": "open_source_project_tooling",
+    "title": "How to set up tooling around your open source project",
+    "description": "description",
+    "image": "open_source_project_tooling-1280x960.jpg",
+    "date": "2019-11",
+    "langs": ["en"]
+  },
+  {
+    "id": "react_helmet_prerender_cloud",
+    "title": "How to improve SEO and social media preview of your website with React Helmet and Prerender service",
+    "description": "description",
+    "image": "react_helmet_prerender_cloud-1280x960.jpg",
+    "date": "2018-10",
+    "langs": ["en"]
+  },
+  {
+    "id": "react_syntax_highlight",
+    "title": "Syntax highlighting in React with highlight.js and Web Worker",
+    "description": "description",
+    "image": "react_syntax_highlight-1280x960.jpg",
+    "date": "2018-09",
+    "langs": ["en"]
+  },
+  {
+    "id": "sass_to_styled_components",
+    "title": "Moving from Sass to Styled Components (with snapshot tests)",
+    "description": "description",
+    "image": "sass_to_styled_components-1280x960.jpg",
+    "date": "2018-08",
+    "langs": ["en"]
+  },
+  {
+    "id": "my_first_mobx_store",
+    "title": "My first MobX store",
+    "description": "description",
+    "image": "my_first_mobx_store-1280x960.jpg",
+    "date": "2018-07",
+    "langs": ["en"]
+  },
+  {
+    "id": "mock_and_proxy_http_request_in_webpack_express",
+    "title": "Mocking and proxying HTTP requests from localhost with Webpack Dev Server or Express",
+    "description": "description",
+    "image": "mock_and_proxy_http_request_in_webpack_express-1280x960.jpg",
+    "date": "2018-06",
+    "langs": ["en"]
+  },
+  {
+    "id": "webpack_4_explained",
+    "title": "Webpack 4 config explained (with example)",
+    "description": "description",
+    "image": "webpack_4_explained-1280x960.jpg",
+    "date": "2018-04",
+    "langs": ["en"]
+  },
+  {
+    "id": "404_in_react_router_and_express",
+    "title": "How to setup routing for Not Found on both sides with React-Router and Express",
+    "description": "description",
+    "image": "404_in_react_router_and_express-1280x960.jpg",
+    "date": "2018-03",
+    "langs": ["en"]
+  },
+  {
+    "id": "disqus_in_react",
+    "title": "How to integrate Disqus comments in React app",
+    "description": "description",
+    "image": "disqus_in_react-1280x960.jpg",
+    "date": "2017-09",
+    "langs": ["en"]
+  }
+]

@@ -173,6 +173,12 @@ export const getRouting = (langs, labels, data) => {
     });
   }
 
+  for (let route of Object.keys(routes)) {
+    if (!route.endsWith("/")) {
+      routes[`${route}/`] = { ...routes[route] };
+    }
+  }
+
   return { routes, pages };
 };
 

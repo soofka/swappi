@@ -14,6 +14,7 @@ import isImage from "./isImage.js";
 import isInArray from "./isInArray.js";
 import isInObject from "./isInObject.js";
 import isObject from "./isObject.js";
+import isPdf from "./isPdf.js";
 import loadDir from "./loadDir.js";
 import loadFile from "./loadFile.js";
 import loadJson from "./loadJson.js";
@@ -39,6 +40,7 @@ export {
   isInArray,
   isInObject,
   isObject,
+  isPdf,
   loadDir,
   loadFile,
   loadJson,

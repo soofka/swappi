@@ -8,11 +8,10 @@ let theme =
 
 applyTheme(theme, true);
 
-document
-  .querySelector("#theme-toggle")
-  .addEventListener("click", () =>
-    applyTheme(theme === "light" ? "dark" : "light"),
-  );
+document.querySelector("#theme-toggle").addEventListener("click", (e) => {
+  e.preventDefault();
+  applyTheme(theme === "light" ? "dark" : "light");
+});
 
 function applyTheme(newTheme, force = false) {
   if (

@@ -1,0 +1,242 @@
+<p>
+  Lately in my project we had very particular need for specific validation of
+  content of JavaScript bundle produced by Webpack. In the process of extensive
+  research we have not found any existing tool to serve this purpose. Therefore,
+  I've created Webpack Bundle Content Validator, which is a Webpack plugin and a
+  CLI tool for Webpack bundle content validation. More importantly, I made it
+  open source. Surprisingly, simply publishing it to NPM wasn't enough - I
+  decided to set up continuous integration, automated unit tests code coverage
+  calculation, automated check for vulnerabilities and a few other things, in
+  order to make it legitimate and reliable package. In this post I'm describing
+  those steps in details.
+</p>
+<h3>1. Create repository and write your code</h3>
+<p>
+  The first step is the most obvious one - if you want to create some piece of
+  software to be used by others, well, create it first. Somewhere in this
+  process it's worth to set up public repository for your code - after all, this
+  is going to be open source software, so you want others to be able to read the
+  source code. I would also advise to not wait with creating repository until
+  your source code is done, rather put it there continuously and incrementally -
+  you never know when your computer is going to explode, and with it all the
+  data. You can set up public repository for free using GitHub or GitLab, among
+  others.
+</p>
+<p>
+  In your repository, besides your source code, it's crucial to also include
+  unit tests (bonus points for additional layers of testing). Without those, how
+  could others trust that your package actually works and does the things it is
+  supposed to do? And about those things - what exactly is your software doing?
+  You'll need to create comprehensive description and documentation, preferably
+  with examples of usage, so that people can assess if your package meets their
+  needs and understand how to use it.
+</p>
+<p>
+  In my case, I've created GitHub repository for my package, in which I've
+  placed readme file with documentation and user manual. It's a trivial tool, so
+  I thought that unit tests would be enough. I wrote them with the help of Jest,
+  placed them in separate directory, and created simple NPM scripts which runs
+  them:
+</p>
+<partial name="code">
+  <pre>
+{
+  "scripts": {
+    "test": "jest --config ./jestconfig.json"
+  }
+}</pre
+  >
+</partial>
+<h3>2. Set up continuous integration</h3>
+<p>
+  Now that you have your software created and tested, it would be a pity if you
+  forgot to run your tests before publishing this or any subsequent version of
+  the package. It's a risk - without testing your software against your test
+  cases, despite your best efforts, you won't know for sure if it still works
+  (of course with tests you also won't know it for sure, but this issue is
+  rather related to tests coverage and quality, which makes up for entirely
+  different topic). Even if you'll remember about this step today, there is
+  always a risk you'll forget to perform it at some point in future. Therefore,
+  it's a good idea to create an automated process which will perform this step
+  for you. Additionally, your users can benefit from such setup - they will know
+  that your code is tested automatically, they will be able to check if it
+  passes those tests, they won't have to trust your word on it.
+</p>
+<p>
+  There are plenty of tools to set up continuous integration, for example Circle
+  CI, CodeShip, or Jenkins. I decided to use Travis CI, as it is very well
+  matured solution with plenty of possibilities for integrations with other
+  systems.
+</p>
+<p>
+  In order to use it, I had to sign up with my GitHub account and enable
+  integrations for selected repository. Then, I created .travis.yml file in my
+  project, which encapsulated basic configuration of my setup. Due to the fact
+  that my test command is literally named test, I only had to inform Travis
+  about programming in which my package is written.
+</p>
+<partial name="code">
+  <pre>
+language: node_js
+node_js:  
+  - 10
+</pre
+  >
+</partial>
+<p>
+  From the moment I pushed this file to my GitHub repository, for this and every
+  subsequent push, Travis is running my tests for me. Result of this process is
+  also publicly available.
+</p>
+<h3>3. Set up code coverage calculation</h3>
+<p>
+  Your code is being tested in continuous and automated manner and this
+  information is accessible to your users. That's good, but still one can ask,
+  how good your tests are? Can they be trusted? There are different ways to
+  assess quality of your tests, one of them being coverage - metric describing
+  how much of your code is actually invoked during this whole testing process.
+  Majority of tests runners have a feature for calculating your tests code
+  coverage, and my weapon of choice - Jest - is no different. I only had to add
+  --coverage flag to my script running tests in order for it to determine this
+  value for me.
+</p>
+<p>
+  This simple computation is not enough, though. I wanted this information to be
+  calculated automatically and transparent to my users. Again, there are
+  different tools that can do this for you, such as CodeCov or Coveralls. I
+  decided to use the latter, as it can be integrated with Travis CI in an
+  extremely simple way.
+</p>
+<p>
+  And again, I had to start with signing up with my GitHub account, and enabling
+  integration for selected repository. Then, I installed coveralls package from
+  NPM and created additional, separate NPM script to calculate code coverage and
+  push it to its destination:
+</p>
+<partial name="code">
+  <pre>
+{
+  "scripts": {
+    "test": "jest --config ./jestconfig.json",
+    "test:coverage": "npm run test -- --coverage | coveralls"
+  }
+}
+</pre
+  >
+</partial>
+<p>
+  Coveralls requires code coverage report to be provided in specific format
+  named LCOV. Jest has no issues with that - all I had to do was to enable it in
+  my jestconfig.json file:
+</p>
+<partial name="code">
+  <pre>
+{
+  "coverageReporters": [
+    "text-lcov"
+  ]
+}
+</pre
+  >
+</partial>
+<p>
+  Then, I triggered my new script from Travis, utilizing capabilities of
+  .travis.yml file:
+</p>
+<partial name="code">
+  <pre>
+language: node_js
+node_js:  
+  - 10
+after_success: npm run test:coverage
+</pre
+  >
+</partial>
+<p>
+  Once those changes were pushed to my GitHub repoository and Travis finished
+  testing my package, code coverage calculation was performed, report was
+  generated, and result was passed to Coveralls, where my code coverage level
+  became publicly available information.
+</p>
+<h3>4. Set up automated check for security vulnerabilities</h3>
+<p>
+  Another automated process that is worth setting up is check for security
+  vulnerabilities. Open source projects tend to rely on other open source
+  projects and use them as dependencies. You can do this too, and you can do it
+  for free - and so can others with your project (unless you specifically
+  disallow it in your license file). This amazing feature of open source world
+  comes with a risk: you don't know authors of other packages and you don't know
+  their intentions. Most of the time they are as pure as yours, but there are
+  rare exceptions. Using given package as your dependency, you might
+  unintentionally spread some malicious software to your users. It's worth to
+  put some extra effort to protect them from this.
+</p>
+<p>
+  Therefore, I decided to integrate my project with snyk, an open source
+  security platform. It didn't require me to modify anything in my code, all I
+  had to do was to again sign up with my GitHub account and enable integration
+  for particular repository. Guys at snyk maintain and regularly update list of
+  malicious, open source packages. Now that my project is scanned by them on a
+  daily basis, they'll let me know if they find anything suspicious in it, be it
+  today or in one year from now. More importantly, this information is also
+  publicly available, so that my users know that there are no security
+  vulnerabilities in my project as of now, and will be informed if there will be
+  any security vulnerabilities found in future.
+</p>
+<h3>5. Set up automated releases</h3>
+<p>
+  This step probably could be done somewhere at the beginning of this list,
+  preferably around the time when first commit was made, so that whole history
+  is present in automatically generated changelog - but sometimes it's better to
+  not have whole history in changelog, especially these early commits.
+  Nevertheless, in this step I propose to use specific tool, such as
+  standard-version or semantic-release, which can assist you with releases of
+  your package - automatically bump version number, appropriately tag certain
+  commits on GitHub, and generate changelog file.
+</p>
+<p>
+  For my project I used standard-version. Configuration is trivial - I installed
+  the package and created dedicated script in my NPM scripts:
+</p>
+<partial name="code">
+  <pre>
+{
+  "scripts": {
+    "release": "standard-version"
+  }
+}
+</pre
+  >
+</partial>
+<p>
+  This tool, in order to work properly, requires following specific convention
+  in your commit messages, so that it knows what to put in your changelog file
+  and which part of your version number to bump. I followed the convention and
+  ended up with automatically generated list of releases in my GitHub repository
+  as well as automatically generated changelog file. Those can come handy not
+  only to users of my package but also to potential, future maintainers.
+</p>
+<h3>6. Publish your package to NPM</h3>
+<p>
+  Now that all of this work is done, you can publish your nice, well-documented,
+  well-tested, secure - basically reliable and legitimate - package to NPM
+  repository of packages. All steps above were described with an assumption that
+  you know how it works and have your project configured properly for NPM, but
+  it's always worth to read how publishing works and how to set it up. My only
+  advice in that regard is to create separate NPM script which will build and
+  test your project before it goes to NPM. Just in case.
+</p>
+<partial name="code">
+  <pre>
+{
+  "scripts": {
+    "prepublishOnly": "npm run build && npm run test"
+  }
+}
+</pre
+  >
+</partial>
+<p>
+  Congratulations! Now you can sit back, relax and use npm-stat to monitor how
+  your project is being used in other projects all over the world.
+</p>

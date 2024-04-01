@@ -5,11 +5,10 @@
   },
   "nav": {
     "home": "home",
-    "projects": "projects",
     "articles": "articles",
     "blog": "blog",
     "courses": "courses",
-    "project": "projects",
+    "projects": "projects",
     "talks": "talks"
   },
   "pages": {
@@ -64,7 +63,8 @@
       "meta": {
         "title": "Articles",
         "description": "Articles"
-      }
+      },
+      "publishedBy": "published by"
     },
     "blog": {
       "meta": {
@@ -76,19 +76,34 @@
       "meta": {
         "title": "Courses",
         "description": "Courses"
-      }
+      },
+      "courseContent": "Content:",
+      "taughtFor": "taught for"
     },
     "projects": {
       "meta": {
         "title": "Projects",
         "description": "Projects"
-      }
+      },
+      "stars": "stars",
+      "forks": "forks",
+      "installs": "installs"
     },
     "talks": {
       "meta": {
         "title": "Talks",
         "description": "Talks"
-      }
+      },
+      "slides": "slides"
     }
+  },
+  "misc": {
+    "continueReading": "Continue reading",
+    "oneAvailableLang": "This content is only available in",
+    "multipleAvailableLangs": "This content is available in",
+    "availableLangs_en": "english",
+    "availableLangs_pl": "polish",
+    "and": "and",
+    "allRightsReserved": "all rights reserved"
   }
 }
