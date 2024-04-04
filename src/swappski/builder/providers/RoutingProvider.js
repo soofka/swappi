@@ -5,7 +5,9 @@ import { getConfig } from "../../utils/index.js";
 
 export class RoutingProvider extends Provider {
   constructor(options) {
-    super(options, { fileName: "routing.json", fileFormat: "json" });
+    super(options, {
+      formats: { json: "routing.json", plaintext: "_redirects" },
+    });
   }
 
   provide(src) {
@@ -23,15 +25,30 @@ export class RoutingProvider extends Provider {
         }
       }
     }
-    const routingFile = new File();
-    const routingFileDist = new DirentData(
-      path.join(getConfig().dist, this.options.fileName),
-    );
-    routingFileDist.content =
-      this.options.fileFormat === "json" ? JSON.stringify(routing) : routing;
-    routingFile.dists = [routingFileDist];
-    routingFile.distsToProcess = routingFile.dists;
-    src.dirents = [...src.dirents, routingFile];
+    for (let format of Object.keys(this.options.formats)) {
+      const routingFile = new File();
+      const routingFileDist = new DirentData(
+        path.join(getConfig().dist, this.options.formats[format]),
+      );
+      switch (format) {
+        case "plaintext":
+          routingFileDist.content = Object.keys(routing)
+            .map((route) => `${route} ${routing[route]}`)
+            .join("\r\n");
+          break;
+
+        case "json":
+          routingFileDist.content = JSON.stringify(routing);
+          break;
+
+        default:
+          routingFileDist.content = routing;
+          break;
+      }
+      routingFile.dists = [routingFileDist];
+      routingFile.distsToProcess = routingFile.dists;
+      src.dirents = [...src.dirents, routingFile];
+    }
     return src;
   }
 }

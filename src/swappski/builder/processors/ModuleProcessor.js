@@ -1,17 +1,18 @@
 import path from "path";
 import Processor from "./Processor.js";
-import { DirentData } from "../core/index.js";
 import {
   isFunction,
   isInObject,
   isObject,
-  loadModuleFromJsString,
+  loadModuleFromFile,
 } from "../../helpers/index.js";
 import { getConfig } from "../../utils/index.js";
 
 export class ModuleProcessor extends Processor {
   async prepareFile(file) {
-    file.src.content = await loadModuleFromJsString(file.src.content);
+    file.src.content = await loadModuleFromFile(
+      path.join(file.src.absDir, `${file.src.name}${file.src.ext}`),
+    );
     if (isFunction(file.src.content) || isObject(file.src.content)) {
       file.isStatic = false;
     }
