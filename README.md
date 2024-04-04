@@ -14,7 +14,6 @@
 - logfile handling to other operations
 - process events and pass changed files from watcher to server - controversial for change event (changing file might impact many other files, not obvious relation between file changed and what to recompile), to be implemented for all others i guess?
 - client script with routing
-- netlify routing tbh
 - monorepo with swappi and swappi processors separately
 - add processors:
   - ts

@@ -20,7 +20,7 @@ export class ImgProcessor extends Processor {
           ];
         } else {
           const variants = [];
-          for (let width of [320, 640, 1280]) {
+          for (let width of [320, 480, 640, 960]) {
             for (let type of ["avif", "webp", "jpg"]) {
               variants.push([width, type]);
             }
@@ -40,11 +40,13 @@ export class ImgProcessor extends Processor {
 
     const newDists = [];
     for (let [width, type, name] of this.options.getVariants(file.src)) {
-      const newDist = ogDist.clone();
-      const dimensions = `${width}x${Math.round(width * aspectRatio)}`;
-      newDist.name = name || `${newDist.name}-${dimensions}`;
-      newDist.ext = `.${type}`;
-      newDists.push(newDist);
+      if (width < 1.25 * ogWidth) {
+        const newDist = ogDist.clone();
+        const dimensions = `${width}x${Math.round(width * aspectRatio)}`;
+        newDist.name = name || `${newDist.name}-${dimensions}`;
+        newDist.ext = `.${type}`;
+        newDists.push(newDist);
+      }
     }
     file.dists = newDists;
     return file;
