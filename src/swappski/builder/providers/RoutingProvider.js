@@ -33,7 +33,7 @@ export class RoutingProvider extends Provider {
       switch (format) {
         case "plaintext":
           routingFileDist.content = Object.keys(routing)
-            .map((route) => `${route} ${routing[route]}`)
+            .map((route) => `${route} ${routing[route]} 200!`)
             .join("\r\n");
           break;
 
