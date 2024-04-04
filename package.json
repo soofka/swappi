@@ -1,6 +1,6 @@
 {
   "name": "swappi",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "soofka",
   "description": "swappi",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "test": "node test.js",
     "build": "npm run test && node build.js",
     "start": "npm run build && node dist/index.js",
+    "prepublishOnly": "npm run build",
     "generate-basic": "npm run start -- -g examples/basic/templates",
     "build-basic": "npm run start -- -c examples/basic/config.js -b",
     "run-basic": "npm run start -- -r examples/basic/dist",
