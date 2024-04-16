@@ -6,6 +6,7 @@ import deepMerge from "./deepMerge.js";
 import deleteDir from "./deleteDir.js";
 import deleteFile from "./deleteFile.js";
 import findInArray from "./findInArray.js";
+import findInDir from "./findInDir.js";
 import getDirentObject from "./getDirentObject.js";
 import isArray from "./isArray.js";
 import isDeepEqual from "./isDeepEqual.js";
@@ -32,6 +33,7 @@ export {
   deleteDir,
   deleteFile,
   findInArray,
+  findInDir,
   getDirentObject,
   isArray,
   isDeepEqual,

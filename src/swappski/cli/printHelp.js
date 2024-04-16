@@ -4,7 +4,7 @@ import { getLogger } from "../utils/index.js";
 export function printHelp(argsOptions, packageJson) {
   printHeader(packageJson);
   const records = {};
-  for (let key of Object.keys(argsOptions)) {
+  for (let key in argsOptions) {
     const arg = argsOptions[key];
     records[key] = new Record(
       arg.short,

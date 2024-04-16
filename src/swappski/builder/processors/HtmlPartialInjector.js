@@ -30,12 +30,17 @@ export class HtmlPartialInjector extends PartialInjector {
       const elementParsed = htmlParser(element);
       const partialName = elementParsed.attr("name");
       const partialContent = elementParsed.html();
-      let partialData;
+      let partialData = {};
 
       try {
         partialData = JSON.parse(decodeURI(elementParsed.attr("data")));
       } catch (e) {
-        partialData = elementParsed.attr();
+        const partialAttributes = elementParsed.attr();
+        for (let attribute in partialAttributes) {
+          if (attribute !== "name") {
+            partialData[attribute] = partialAttributes[attribute];
+          }
+        }
       }
 
       if (isInObject(this.partials, partialName)) {

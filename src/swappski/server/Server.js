@@ -2,7 +2,7 @@ import path from "path";
 import http from "http";
 import open from "open";
 import mimeTypes from "mime-db";
-import { isObject, isInObject, loadFile, loadJson } from "../helpers/index.js";
+import { isInObject, findInDir, loadFile, loadJson } from "../helpers/index.js";
 import { getConfig, getLogger } from "../utils/index.js";
 
 export class Server {
@@ -47,25 +47,41 @@ export class Server {
         let status;
         let headers;
         let content;
-        let encoding;
         try {
           status = 200;
           headers = { "Content-Type": mimeType };
           content = await loadFile(path.join(getConfig().dist, filePath));
-          encoding = "utf-8";
-        } catch (e) {
+        } catch (e1) {
           headers = { "Content-Type": "text/html" };
-          if (e.code === "ENOENT") {
+          if (e1.code === "ENOENT") {
             status = 404;
-            content = "404 Not found";
+            try {
+              content = await loadFile(
+                findInDir(
+                  getConfig().dist,
+                  (file) => file.startsWith("404") && file.endsWith(".html"),
+                ),
+              );
+            } catch (e2) {
+              content = "404 Not found";
+            }
           } else {
             status = 500;
-            content = "500 Internal server error";
+            try {
+              content = await loadFile(
+                findInDir(
+                  getConfig().dist,
+                  (file) => file.startsWith("500") && file.endsWith(".html"),
+                ),
+              );
+            } catch (e2) {
+              content = "500 Internal server error";
+            }
           }
         }
 
         res.writeHead(status, headers);
-        res.end(content, encoding);
+        res.end(content, "utf-8");
 
         getLogger().log(
           `Server responded to request ${req.method} ${req.url} with ${status}`,

@@ -20,7 +20,7 @@ export class ImgProcessor extends Processor {
           ];
         } else {
           const variants = [];
-          for (let width of [320, 480, 640, 960]) {
+          for (let width of [240, 480, 960]) {
             for (let type of ["avif", "webp", "jpg"]) {
               variants.push([width, type]);
             }

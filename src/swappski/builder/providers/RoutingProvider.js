@@ -12,20 +12,16 @@ export class RoutingProvider extends Provider {
 
   provide(src) {
     const routing = {};
-    for (let route of Object.keys(getConfig().routes)) {
+    for (let route in getConfig().routes) {
       const { template, pageId, alts = [] } = getConfig().routes[route];
-      const srcFile = src.files.find((file) => file.src.name === template);
-      if (srcFile) {
-        const dist = srcFile.dists.find((dist) => dist.name === pageId);
-        if (dist) {
-          routing[route] = dist.full;
-          for (let alt of alts) {
-            routing[alt] = dist.full;
-          }
-        }
+      routing[route] = src.files
+        .find((file) => file.src.name === template)
+        .dists.find((dist) => dist.name === pageId).full;
+      for (let alt of alts) {
+        routing[alt] = routing[route];
       }
     }
-    for (let format of Object.keys(this.options.formats)) {
+    for (let format in this.options.formats) {
       const routingFile = new File();
       const routingFileDist = new DirentData(
         path.join(getConfig().dist, this.options.formats[format]),

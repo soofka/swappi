@@ -1,6 +1,6 @@
 const img = (data, dists, htmlElement) => {
   let picture = "<picture";
-  // for (let key of Object.keys(htmlElement.attribs)) {
+  // for (let key in tmlElement.attribs) {
   //   if (key !== "name" && key !== "src") {
   //     picture += ` ${key}="${htmlElement.attr(key)}"`;
   //   }

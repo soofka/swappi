@@ -22,7 +22,7 @@ export function deepMerge(
     }
     return source;
   } else if (isObject(target) && isObject(source)) {
-    for (let key of Object.keys(source)) {
+    for (let key in source) {
       target[key] = deepMerge(target[key], source[key], arrayStrategy);
     }
     return target;

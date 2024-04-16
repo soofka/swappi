@@ -9,7 +9,7 @@ export function deepClone(source) {
     }
   } else if (isObject(source)) {
     result = {};
-    for (let key of Object.keys(source)) {
+    for (let key in source) {
       result[key] = deepClone(source[key]);
     }
   }
