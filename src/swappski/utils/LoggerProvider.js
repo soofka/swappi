@@ -14,8 +14,8 @@ class LoggerProvider {
   }
 
   constructor() {
-    this.#verbosity = getConfig().verbosity || 3;
-    this.#logFile = getConfig().logFile || "";
+    this.#verbosity = getConfig() ? getConfig().verbosity || 3 : 3;
+    this.#logFile = getConfig() ? getConfig().logFile || "" : "";
   }
 
   log(log, logLevel) {

@@ -2,12 +2,13 @@
 
 ### bugs
 
-- not sure about reload system
-- images resolutions? (NaNw)
+- reload system definitely has issues
+- server fails to serve 500 error file (just crashes)
 
 ### todo
 
 - do i really always have to reprocess files that rely on other files?
+- exclude files
 - tester
 - swappski elements as singletons?
 - swappski->swappi?

@@ -7,6 +7,7 @@ import { getConfig, getLogger } from "../utils/index.js";
 
 export class Server {
   #server;
+  #routing = { "/": "index.html" };
 
   async serve() {
     const hostname = process.env.HOST || "127.0.0.1";
@@ -17,10 +18,9 @@ export class Server {
       .log(`Starting server at ${url} with content of ${getConfig().dist}`)
       .logLevelUp();
 
-    let routing = { "/": "index.html" };
     const routingPath = path.join(getConfig().dist, "routing.json");
     try {
-      routing = await loadJson(routingPath);
+      this.#routing = await loadJson(routingPath);
     } catch (e) {
       getLogger().warn(
         `Routing table not found at ${routingPath} (error: ${e})`,
@@ -33,9 +33,18 @@ export class Server {
           `Server received request: ${req.method} ${req.url} (body: ${req.body || "empty"})`,
         );
 
+        let responseStatus;
+        let responseHeaders;
+        let responseContent;
+
+        let fileFound = false;
+        let serverError = false;
+
         const qsIndex = req.url.indexOf("?");
         const url = qsIndex === -1 ? req.url : req.url.substring(0, qsIndex);
-        const filePath = isInObject(routing, url) ? routing[url] : url;
+        const filePath = isInObject(this.#routing.static, url)
+          ? this.#routing.static[url]
+          : url;
         const mimeType = Object.keys(mimeTypes).find(
           (key) =>
             Object.hasOwn(mimeTypes[key], "extensions") &&
@@ -44,53 +53,64 @@ export class Server {
             ),
         );
 
-        let status;
-        let headers;
-        let content;
         try {
-          status = 200;
-          headers = { "Content-Type": mimeType };
-          content = await loadFile(path.join(getConfig().dist, filePath));
-        } catch (e1) {
-          headers = { "Content-Type": "text/html" };
-          if (e1.code === "ENOENT") {
-            status = 404;
-            try {
-              content = await loadFile(
-                findInDir(
-                  getConfig().dist,
-                  (file) => file.startsWith("404") && file.endsWith(".html"),
-                ),
-              );
-            } catch (e2) {
-              content = "404 Not found";
-            }
-          } else {
-            status = 500;
-            try {
-              content = await loadFile(
-                findInDir(
-                  getConfig().dist,
-                  (file) => file.startsWith("500") && file.endsWith(".html"),
-                ),
-              );
-            } catch (e2) {
-              content = "500 Internal server error";
-            }
+          responseStatus = 200;
+          responseHeaders = { "Content-Type": mimeType };
+          responseContent = await loadFile(
+            path.join(getConfig().dist, filePath),
+          );
+          fileFound = true;
+        } catch (e) {
+          if (e.code !== "ENOENT") {
+            serverError = true;
           }
         }
 
-        res.writeHead(status, headers);
-        res.end(content, "utf-8");
+        if (serverError) {
+          responseStatus = 500;
+          responseHeaders = { "Content-Type": "text/html" };
+          responseContent =
+            (await this.#loadErrorContent(responseStatus, url)) ||
+            "500 Internal server error";
+        } else if (!fileFound) {
+          responseStatus = 404;
+          responseHeaders = { "Content-Type": "text/html" };
+          responseContent =
+            (await this.#loadErrorContent(responseStatus, url)) ||
+            "404 Page not found";
+        }
+
+        res.writeHead(responseStatus, responseHeaders);
+        res.end(responseContent, "utf-8");
 
         getLogger().log(
-          `Server responded to request ${req.method} ${req.url} with ${status}`,
+          `Server responded to request ${req.method} ${req.url} with ${responseStatus}`,
         );
       })
       .listen(port);
 
     getLogger().log(`Server running at ${url}`);
     open(url);
+  }
+
+  async #loadErrorContent(statusCode, url) {
+    let errorContent;
+    const errorObjectKey = Object.keys(this.#routing.errors).find(
+      (errorId) =>
+        url.startsWith(this.#routing.errors[errorId].scope) &&
+        this.#routing.errors[errorId].statusCode == statusCode,
+    );
+    if (errorObjectKey && isInObject(this.#routing.errors, errorObjectKey)) {
+      try {
+        errorContent = await loadFile(
+          path.join(
+            getConfig().dist,
+            this.#routing.errors[errorObjectKey].filePath,
+          ),
+        );
+      } catch (e) {}
+    }
+    return errorContent;
   }
 
   close() {
