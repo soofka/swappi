@@ -5,7 +5,7 @@ import Server from "./server/index.js";
 import Watcher from "./watcher/index.js";
 import { initConfigProvider, initLoggerProvider } from "./utils/index.js";
 
-class Swappski {
+class Swappi {
   #builder;
   get builder() {
     return this.#builder;
@@ -41,20 +41,20 @@ class Swappski {
   }
 }
 
-const swappski = new Swappski();
-const SwappskiBuilder = swappski.builder;
-const SwappskiGenerator = swappski.generator;
-const SwappskiServer = swappski.server;
-// const SwappskiTester = swappski.tester;
-const SwappskiWatcher = swappski.watcher;
+const swappi = new Swappi();
+const SwappiBuilder = swappi.builder;
+const SwappiGenerator = swappi.generator;
+const SwappiServer = swappi.server;
+// const SwappiTester = swappi.tester;
+const SwappiWatcher = swappi.watcher;
 
 export {
-  swappski as Swappski,
-  SwappskiBuilder,
-  SwappskiGenerator,
-  SwappskiServer,
-  // SwappskiTester,
-  SwappskiWatcher,
+  swappi as Swappi,
+  SwappiBuilder,
+  SwappiGenerator,
+  SwappiServer,
+  // SwappiTester,
+  SwappiWatcher,
 };
 
-export default swappski;
+export default swappi;

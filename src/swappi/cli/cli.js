@@ -4,10 +4,10 @@ import getConfigFromArgs from "./getConfigFromArgs.js";
 import printHeader from "./printHeader.js";
 import printHelp from "./printHelp.js";
 import processArgs from "./processArgs.js";
-import Swappski from "../index.js";
+import Swappi from "../index.js";
 import { loadJson } from "../helpers/index.js";
 
-export function swappskiCli() {
+export function swappiCli() {
   return cli(argsOptions);
 }
 
@@ -23,10 +23,10 @@ async function cli(argsOptions) {
       printHeader(packageJson);
     }
 
-    Swappski.init(config);
+    Swappi.init(config);
 
     if (args.generate) {
-      await Swappski.generator.generate(
+      await Swappi.generator.generate(
         params.generate.target,
         params.generate.template,
       );
@@ -34,26 +34,26 @@ async function cli(argsOptions) {
 
     if (args.build || args.watch) {
       if (args.watch) {
-        (await Swappski.watcher.init()).watch();
+        (await Swappi.watcher.init()).watch();
       } else {
-        await Swappski.builder.init();
-        await Swappski.builder.build();
-        await Swappski.builder.close();
+        await Swappi.builder.init();
+        await Swappi.builder.build();
+        await Swappi.builder.close();
       }
     }
 
     if (args.run) {
-      Swappski.server.serve();
+      Swappi.server.serve();
     }
 
     const closeFunction = () => {
-      Swappski.builder.close();
-      Swappski.server.close();
-      Swappski.watcher.close();
+      Swappi.builder.close();
+      Swappi.server.close();
+      Swappi.watcher.close();
     };
     process.on("SIGINT", closeFunction);
     process.on("SIGTERM", closeFunction);
   }
 }
 
-export default swappskiCli;
+export default swappiCli;

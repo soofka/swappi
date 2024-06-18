@@ -1,8 +1,7 @@
 {
   "name": "swappi",
   "version": "0.1.8",
-  "author": "soofka",
-  "description": "swappi",
+  "author": "Jakub Sowiński <mail@jakubsowinski.com> (https://jakubsowinski.com)",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import defaultConfig from "../swappski.config.js";
+import defaultConfig from "../swappi.config.js";
 import { deepMerge } from "../helpers/index.js";
 import decorateWithSingleton from "./decorateWithSingleton.js";
 

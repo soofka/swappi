@@ -194,9 +194,9 @@ footer ul li {
   justify-content: center;
   align-items: center;
 }
-#intro::before {
+/* #intro::before {
   -swapp-partial: "background-image:me.jpg";
-}
+} */
 #intro .box {
   position: relative;
   top: 20%;

@@ -36,7 +36,7 @@ export const argsOptions = {
   config: {
     type: "string",
     short: "c",
-    default: "swappski.config.js",
+    default: "swappi.config.js",
     description: "Config file path",
   },
   mode: {

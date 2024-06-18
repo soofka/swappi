@@ -1,8 +1,8 @@
 import esMain from "es-main";
-import swappskiCli from "./swappski/cli/index.js";
+import swappiCli from "./swappi/cli/index.js";
 
 if (esMain(import.meta)) {
-  swappskiCli();
+  swappiCli();
 }
 
-export * from "./swappski/index.js";
+export * from "./swappi/index.js";

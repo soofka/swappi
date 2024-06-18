@@ -1,14 +1,14 @@
 import path from "path";
 import {
   CssMinifier,
-  CssPartialInjector,
+  // CssPartialInjector,
   HtmlMinifier,
   HtmlPartialInjector,
   ImgProcessor,
   JsMinifier,
   TemplateProcessor,
 } from "./builder/processors/index.js";
-import { RoutingProvider } from "./builder/providers/index.js";
+// import { RoutingProvider } from "./builder/providers/index.js";
 
 export const config = {
   src: path.resolve("src"),
@@ -33,19 +33,21 @@ export const config = {
     dev: [
       new TemplateProcessor(),
       new HtmlPartialInjector(),
-      new CssPartialInjector(),
+      // new CssPartialInjector(),
     ],
     prod: [
       new TemplateProcessor(),
       new HtmlPartialInjector(),
-      new CssPartialInjector(),
+      // new CssPartialInjector(),
       new HtmlMinifier(),
       new CssMinifier(),
       new JsMinifier(),
       new ImgProcessor(),
     ],
   },
-  providers: [new RoutingProvider()],
+  providers: [
+    /*new RoutingProvider()*/
+  ],
 
   data: {},
 };
