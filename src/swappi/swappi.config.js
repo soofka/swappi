@@ -46,7 +46,7 @@ export const config = {
     ],
   },
   providers: [
-    /*new RoutingProvider()*/
+    new RoutingProvider(),
   ],
 
   data: {},

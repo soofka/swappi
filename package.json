@@ -1,6 +1,6 @@
 {
   "name": "swappi",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "author": "Jakub Sowiński <mail@jakubsowinski.com> (https://jakubsowinski.com)",
   "license": "MIT",
   "repository": {
@@ -20,17 +20,7 @@
     "test": "node test.js",
     "build": "npm run test && node build.js",
     "start": "npm run build && node dist/index.js",
-    "prepublishOnly": "npm run build",
-    "generate-basic": "npm run start -- -g examples/basic/templates",
-    "build-basic": "npm run start -- -c examples/basic/config.js -b",
-    "run-basic": "npm run start -- -r examples/basic/dist",
-    "watch-basic": "npm run start -- -c examples/basic/config.js -w",
-    "watch-run-basic": "npm run start -- -c examples/basic/config.js -w -r",
-    "generate-full": "npm run start -- -g examples/full/templates",
-    "build-full": "npm run start -- -c examples/full/config.js -b",
-    "run-full": "npm run start -- -r examples/full/dist",
-    "watch-full": "npm run start -- -c examples/full/config.js -w",
-    "watch-run-full": "npm run start -- -c examples/full/config.js -w -r"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

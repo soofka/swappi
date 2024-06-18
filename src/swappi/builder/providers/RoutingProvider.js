@@ -6,7 +6,7 @@ import { getConfig } from "../../utils/index.js";
 export class RoutingProvider extends Provider {
   constructor(options) {
     super(options, {
-      formats: { json: "routing.json", plaintext: "_redirects" },
+      formats: { json: "routing.json", plaintext: "_redirects", sitemap: "sitemap.txt" },
     });
   }
 
@@ -37,6 +37,11 @@ export class RoutingProvider extends Provider {
         path.join(getConfig().dist, this.options.formats[format]),
       );
       switch (format) {
+        case "sitemap":
+          routingFileDist.content = Object.keys(routing.static)
+            .map((route) => `${route} /${routing.static[route]} 200!`)
+            .join("\r\n");
+
         case "plaintext":
           routingFileDist.content = Object.keys(routing.static)
             .map((route) => `${route} /${routing.static[route]} 200!`)
