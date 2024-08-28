@@ -1,6 +1,6 @@
 {
   "name": "swappi",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "author": "Jakub Sowiński <mail@jakubsowinski.com> (https://jakubsowinski.com)",
   "license": "MIT",
   "repository": {
@@ -28,6 +28,7 @@
     "css": "^3.0.0",
     "es-main": "^1.3.0",
     "html-minifier": "^4.0.0",
+    "ico-endec": "^0.1.6",
     "mime-db": "^1.52.0",
     "open": "^10.0.3",
     "sharp": "^0.33.2",

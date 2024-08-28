@@ -10,6 +10,7 @@ Simple Web App Processing Interface is, in it's core, an interface for monitorin
 - Supports templates and reusable partials
 - Optimizes images
 - Minifies HTML, CSS, and JS
+- Generates favicon
 - Handles application routing
 
 <!---description_end-->
@@ -20,11 +21,12 @@ Simple Web App Processing Interface is, in it's core, an interface for monitorin
 
 - reload system definitely has issues
 - server fails to serve 500 error file (just crashes)
+- server does not handle assets routing
 - css partials injector doesn't work
-- examples are not adapted to routing provider
 
 ### todo
 
+- examples
 - do i really always have to reprocess files that rely on other files?
 - exclude files
 - tester

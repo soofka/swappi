@@ -8,7 +8,7 @@ import {
   JsMinifier,
   TemplateProcessor,
 } from "./builder/processors/index.js";
-import { RoutingProvider } from "./builder/providers/index.js";
+import { FaviconProvider, RoutingProvider } from "./builder/providers/index.js";
 
 export const config = {
   src: path.resolve("src"),
@@ -45,9 +45,7 @@ export const config = {
       new ImgProcessor(),
     ],
   },
-  providers: [
-    new RoutingProvider(),
-  ],
+  providers: [new FaviconProvider(), new RoutingProvider()],
 
   data: {},
 };

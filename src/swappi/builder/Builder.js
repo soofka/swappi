@@ -51,6 +51,7 @@ export class Builder {
     await this.#delete();
 
     await this.#process();
+    await this.#postProcess();
     await this.#save();
     await this.#saveReport();
 
@@ -150,10 +151,6 @@ export class Builder {
       await Promise.all(preparing);
     }
 
-    for (let provider of this.#providers) {
-      this.#src = provider.provide(this.#src);
-    }
-
     this.#markForProcessing();
 
     getLogger().logLevelDown().log(`${preparingCount} files prepared`);
@@ -238,6 +235,16 @@ export class Builder {
     }
 
     getLogger().logLevelDown().log(`Dists processed ${processingCount} times`);
+  }
+
+  async #postProcess() {
+    getLogger().log("Postprocessing dists").logLevelUp();
+
+    for (let provider of this.#providers) {
+      this.#src = provider.provide(this.#src);
+    }
+
+    getLogger().logLevelDown().log(`Dists postprocessed`);
   }
 
   async #save() {

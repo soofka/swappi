@@ -11,7 +11,7 @@ export class ImgProcessor extends Processor {
           return [
             [16, "png"],
             [32, "png"],
-            [48, "ico", "favicon"],
+            [48, "png"],
             [76, "png"],
             [120, "png"],
             [152, "png"],

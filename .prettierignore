@@ -1,4 +1,2 @@
 dist
-examples/**/dist
-examples/**/templates
 node_modules
